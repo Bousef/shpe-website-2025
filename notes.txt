@@ -1,0 +1,49 @@
+May 13 Students and Eboard
+
+    Firebase (Handles authentication)
+    Supabase -> Postgresql
+    Google QR identifier
+
+Student
+    Points
+    Events Attended
+    First  
+    Last
+    UCFID
+    Email
+    Password
+    Linkedin
+    Resume (upload pdf)
+    Bio
+        Major
+        Year
+    Photos
+
+Admin
+    Getcallsforsutdents 
+    First
+    Last
+    Email (authentication by email ending on @SHPEUCF.com)
+    Points 
+    Position (Permission to create events)
+    Events Scheduled (Relaation with event table)
+    Photos xq
+
+Events [ID]
+    Name 
+    Group
+    Date
+    Time 
+    Points Worth
+    QR Code
+    Photos 
+
+# All photos need to be able to link to a different event
+# More of a relationship table for admin
+
+Photos 
+    Photo
+    Event
+    Who Uploaded
+    Date
+    Time
