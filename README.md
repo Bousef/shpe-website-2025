@@ -1,5 +1,6 @@
 <div align="center">
-  <img src="./public/assets/shpe-logo.png" alt="SHPE UCF Logo" width="400"/>
+  <img src="./public/assets/shpe-white-horizontal-logo.png" alt="SHPE Logo" width="400px" style="margin: 0.25in 0.25in 0.25in 0.25in; min-width: 150px" />
+  <!-- According to the brand guidelines, the SHPE logo has to be a minimum of 150px no matter the screen size and margins around the logo have to be 0.25". -->
   <h1>SHPE UCF Website</h1>
   <p>Official SHPE UCF website for the Society of Hispanic Professional Engineers at the University of Central Florida chapter.</p>
   
