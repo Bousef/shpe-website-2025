@@ -1,6 +1,8 @@
 export default function FooterSection() {
   return (
-    <footer className="bg-[#2A3342] text-white flex flex-col items-center justify-around pt-3 h-[30rem] 2xl:h-[35rem]">
+    <footer>
+      <div className="w-full h-1 bg-orange-500"/>
+      <div className="bg-[#2A3342] text-white flex flex-col items-center justify-around pt-3 h-[30rem]">
       <img
         src="assets/logo-footer.svg"
         alt="SHPE logo"
@@ -16,7 +18,7 @@ export default function FooterSection() {
             label: "News",
             target: "_blank",
           },
-          { href: "#team", label: "Our Team" },
+          { href: "#team", label: "Dev Team" },
           { href: "#calendar", label: "Calendar" },
           { href: "#contact", label: "Contact Us" },
         ].map(({ href, label, target }) => (
@@ -31,6 +33,7 @@ export default function FooterSection() {
       <p className="text-slate-400 2xl:text-xl">
         © 2023 SHPE UCF. All rights reserved.
       </p>
+      </div>
     </footer>
   );
 }

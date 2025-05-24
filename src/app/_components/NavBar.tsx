@@ -1,5 +1,5 @@
-/* src/components/Navbar.tsx */
 import Link from "next/link";
+import { FaBars, FaTimes } from "react-icons/fa";
 
 const navItems = [
   { href: "/board",    label: "Board" },
@@ -8,33 +8,24 @@ const navItems = [
   { href: "/sponsors", label: "Sponsors" },
   { href: "/calendar", label: "Calendar" },
   { href: "/shop",     label: "Shop", external: true },
-  // login is rendered separately so we can position it absolutely
 ];
 
 export default function Navbar() {
   return (
-    <nav className="relative flex w-full items-center justify-center bg-[#F7F8F9] p-5 text-[30px] font-normal text-black">
-      {/* logo (absolute left) */}
-      <Link
-        href="/"
-        aria-label="SHPE UCF – Home"
-        className="absolute left-5"
-      >
-        <img
-          src="/assets/logo.svg"
-          alt="SHPE UCF logo"
-          className="h-55 w-55"
-        />
+    <nav className="relative flex items-center justify-between bg-[#F7F8F9] p-5 text-black">
+      {/* Logo */}
+      <Link href="/" aria-label="SHPE UCF – Home" className="flex-shrink-0">
+        <img src="/assets/logo.svg" alt="SHPE UCF logo" className="md:2x1:w-[12%]" />
       </Link>
 
-      {/* centred nav links */}
-      <div className="p-4 flex items-center text-[25px] gap-x-20">
+      {/* Desktop navigation */}
+      <div className="hidden md:flex space-x-14 text-3x1">
         {navItems.map(({ href, label, external }) =>
           external ? (
             <a
               key={href}
               href={href}
-              className="px-4 py-2 text-[#6B7280] hover:bg-gray-100"
+              className="px-4 py-2 text-[#6B7280] text-2xl hover:bg-gray-100 rounded"
             >
               {label}
             </a>
@@ -42,7 +33,7 @@ export default function Navbar() {
             <Link
               key={href}
               href={href}
-              className="px-4 py-2 text-[#6B7280] hover:bg-gray-100"
+              className="px-4 py-2 text-[#6B7280] text-2xl hover:bg-gray-100 rounded"
             >
               {label}
             </Link>
@@ -50,13 +41,49 @@ export default function Navbar() {
         )}
       </div>
 
-      {/* login (absolute right) */}
+      {/* Login button on desktop */}
       <Link
         href="/login"
-        className="absolute right-5 text-white 2xl:text-2xl 2xl:h-14 2xl:w-[200px] text-sm w-[127px] h-9 px-4 py-2 bg-orange-500 hover:bg-orange-600 rounded-md shadow justify-center items-center gap-1.5 inline-flex"
+        className="hidden md:inline-flex items-center justify-center bg-orange-500 hover:bg-orange-600 text-white text-sm md:text-lg px-4 py-2 rounded shadow"
       >
         Login
       </Link>
+
+      {/* Mobile menu (pure CSS) */}
+      <div className="md:hidden relative">
+        <input type="checkbox" id="menu-toggle" className="peer hidden" aria-hidden="true" />
+        <label htmlFor="menu-toggle" className="block p-2 cursor-pointer">
+          <FaBars className="peer-checked:hidden" size={24} />
+          <FaTimes className="hidden peer-checked:block" size={24} />
+        </label>
+        <div className="hidden peer-checked:flex flex-col absolute left-0 top-full w-full bg-white shadow-md p-4 space-y-2">
+          {navItems.map(({ href, label, external }) =>
+            external ? (
+              <a
+                key={href}
+                href={href}
+                className="px-4 py-2 text-[#6B7280] hover:bg-gray-100 rounded"
+              >
+                {label}
+              </a>
+            ) : (
+              <Link
+                key={href}
+                href={href}
+                className="px-4 py-2 text-[#6B7280] hover:bg-gray-100 rounded"
+              >
+                {label}
+              </Link>
+            )
+          )}
+          <Link
+            href="/login"
+            className="mt-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded text-center"
+          >
+            Login
+          </Link>
+        </div>
+      </div>
     </nav>
   );
 }

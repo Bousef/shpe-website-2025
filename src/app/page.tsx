@@ -1,5 +1,3 @@
-import Head from "next/head";
-
 import Navbar          from "./_components/NavBar";
 import HeroSection     from "./_components/HeroSection";
 import AboutSection    from "./_components/AboutSection";
