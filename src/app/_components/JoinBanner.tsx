@@ -1,6 +1,6 @@
 export default function JoinBanner() {
   return (
-    <div className="relative">
+    <div className="relative bg-white">
       <section className="z-10 bg-[#2A3342] text-white rounded-md flex justify-around items-center
                            w-[90%] lg:w-[80%] h-[18rem] lg:h-[22rem] mx-auto">
         <article className="w-[12rem] lg:w-[26rem] 2xl:w-[30rem]">
