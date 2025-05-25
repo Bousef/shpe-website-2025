@@ -50,15 +50,20 @@ export default function AboutSection() {
   return (
     <main
       id="about"
-      className="relative bg-white 2xl:h-[110rem] xl:h-[70rem] lg:h-[60rem] h-[128rem]"
+      className="relativ 2xl:h-[110rem] xl:h-[70rem] lg:h-[60rem] h-[128rem] items-center bg-white"
     >
       <img
-        src="/_next/static/media/pattern.204798be.svg"
-        alt=""
-        className="absolute z-10 w-screen"
+        src="/assets/pattern.204798be.svg"
+        className="
+        bg-white
+          absolute
+          w-full h-full
+          opacity-100
+          object-cover
+          object-center
+    "
       />
-
-      <article className="absolute z-20 flex flex-col items-center w-screen h-full my-[5rem] pb-[5rem]">
+      <article className="absolute z-20 flex flex-col items-center w-screen h-full my-[5rem] pb-[5rem">
         <h4 className="font-bold text-slate-800 text-3xl lg:text-4xl 2xl:text-7xl text-center pb-[2rem]">
           Learn more about SHPE
         </h4>
@@ -73,7 +78,7 @@ export default function AboutSection() {
               key={title}
               className="flex flex-col items-center mb-[4rem] w-80 h-60 2xl:w-[35rem] 2xl:h-96"
             >
-              <img src={`/_next/static/media/${img}`} alt={title} />
+              <img src={`/assets/${img}`} alt={title} />
               <h5 className="font-bold text-slate-800 text-2xl 2xl:text-5xl text-center py-4 2xl:py-8">
                 {title}
               </h5>
