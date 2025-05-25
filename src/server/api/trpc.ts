@@ -11,7 +11,7 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
-import { auth } from "~/server/auth";
+import { createClient } from "~/server/auth/server";
 import { db } from "~/server/db";
 
 /**
@@ -27,7 +27,9 @@ import { db } from "~/server/db";
  * @see https://trpc.io/docs/server/context
  */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
-  const session = await auth();
+  const supabase = await createClient();
+  // Error value is ignored as we check if session is null instead
+  const { data: { session } } = await supabase.auth.getSession();
 
   return {
     db,
@@ -120,14 +122,16 @@ export const publicProcedure = t.procedure.use(timingMiddleware);
  */
 export const protectedProcedure = t.procedure
   .use(timingMiddleware)
-  .use(({ ctx, next }) => {
-    if (!ctx.session?.user) {
+  .use(async ({ ctx, next }) => {
+    if (!ctx.session) {
       throw new TRPCError({ code: "UNAUTHORIZED" });
     }
+
+    // We reconstruct to make sure the session is non-nullable 
     return next({
       ctx: {
-        // infers the `session` as non-nullable
-        session: { ...ctx.session, user: ctx.session.user },
+        ...ctx,
+        session: ctx.session, // Now typed as non-nullable Session
       },
     });
   });
