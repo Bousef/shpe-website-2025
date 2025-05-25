@@ -1,4 +1,3 @@
-import FooterSection from "../_components/FooterSection";
 import Navbar from "../_components/NavBar";
 
 export default function Calendar() {
@@ -15,7 +14,6 @@ export default function Calendar() {
                     className="pt-10 w-[85vw] lg:w-[75vw] h-[45vh] lg:h-[80vh]"
                 />
             </div>
-            <FooterSection />
         </div>
     );
 }

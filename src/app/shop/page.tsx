@@ -1,4 +1,3 @@
-import FooterSection from "../_components/FooterSection";
 import Navbar from "../_components/NavBar";
 export default function Shop () {
 
@@ -6,7 +5,6 @@ export default function Shop () {
         <div>
             <Navbar/>
             Shop
-            <FooterSection/>
         </div>
     );
 }

@@ -22,7 +22,6 @@ export default function HomePage() {
         <AboutSection />
         <JoinBanner />
         <ContactSection/>
-        <FooterSection />
       </div>
     </>
   );

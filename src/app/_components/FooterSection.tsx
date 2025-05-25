@@ -4,7 +4,7 @@ export default function FooterSection() {
       <div className="w-full h-1 bg-orange-500"/>
       <div className="bg-[#2A3342] text-white flex flex-col items-center justify-around pt-3 h-[30rem]">
       <img
-        src="assets/logo-footer.svg"
+        src="/assets/logo-footer.svg"
         alt="SHPE logo"
         className="2xl:w-[6%]"
       />
