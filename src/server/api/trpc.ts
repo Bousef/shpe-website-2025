@@ -29,11 +29,10 @@ import { db } from "~/server/db";
 export const createTRPCContext = async (opts: { headers: Headers }) => {
   const supabase = await createClient();
   // Error value is ignored as we check if session is null instead
-  const { data: { session } } = await supabase.auth.getSession();
 
   return {
     db,
-    session,
+    supabase,
     ...opts,
   };
 };
@@ -123,7 +122,17 @@ export const publicProcedure = t.procedure.use(timingMiddleware);
 export const protectedProcedure = t.procedure
   .use(timingMiddleware)
   .use(async ({ ctx, next }) => {
-    if (!ctx.session) {
+    if (!ctx.supabase) {
+      throw new TRPCError({ 
+        code: "UNAUTHORIZED",
+        message: "Authentication not configured" 
+      });
+    }
+
+    const { data: { session } } = await ctx.supabase.auth.getSession();
+    const { data: { user } } = await ctx.supabase.auth.getUser();
+
+    if (!session || !user) {
       throw new TRPCError({ code: "UNAUTHORIZED" });
     }
 
@@ -131,7 +140,8 @@ export const protectedProcedure = t.procedure
     return next({
       ctx: {
         ...ctx,
-        session: ctx.session, // Now typed as non-nullable Session
+        session: session, // Now typed as non-nullable Session
+        user: user,
       },
     });
   });

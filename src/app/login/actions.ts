@@ -8,6 +8,10 @@ import { createClient } from 'src/server/auth/server'
 export async function login(prevState: unknown, formData: FormData): Promise<{error: string}> {
   const supabase = await createClient();
 
+  if (!supabase) {
+    return {error: 'Supabase client is not initialized.'};
+  }
+
   // type-casting here for convenience
   // in practice, you should validate your inputs
   const data = {
@@ -27,7 +31,11 @@ export async function login(prevState: unknown, formData: FormData): Promise<{er
 }
 
 export async function signup(prevState: unknown, formData: FormData): Promise<{error: string}> {
-  const supabase = await createClient()
+  const supabase = await createClient();
+
+  if (!supabase) {
+    return {error: 'Supabase client is not initialized.'};
+  }
 
   // type-casting here for convenience
   // in practice, you should validate your inputs
@@ -36,13 +44,13 @@ export async function signup(prevState: unknown, formData: FormData): Promise<{e
     password: formData.get('password') as string,
   }
 
-  const { error } = await supabase.auth.signUp(data)
+  const { error } = await supabase.auth.signUp(data);
 
   if (error) {
     console.error('Signup error:', error);
     return {error: error.message};
   }
 
-  revalidatePath('/', 'layout')
-  redirect('/')
+  revalidatePath('/', 'layout');
+  redirect('/');
 }
