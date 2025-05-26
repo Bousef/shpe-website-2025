@@ -16,14 +16,14 @@ export default function LoginPage() {
             <div className="h-6 text-red-500 text-sm">
                 {currentError && <p>{currentError}</p>}
             </div>
-          <p>Email:</p>
-          <input 
-            id="email" 
-            name="email" 
-            type="email" 
-            required 
-            className="w-full p-2 border rounded"
-          />
+            <label htmlFor="email">Email:</label>
+            <input 
+              id="email" 
+              name="email" 
+              type="email" 
+              required 
+              className="w-full p-2 border rounded"
+            />
         </div>
         <div>
           <p>Password:</p>
