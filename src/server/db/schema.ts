@@ -38,6 +38,26 @@ export const createTable = pgTableCreator(
   (name) => `shpe-website-2025_${name}`,
 );
 
+export const adminActions = pgTable("admin_action", {
+  id: varchar({ length: 255 }).notNull().primaryKey().$defaultFn(() => crypto.randomUUID()),
+  admin_id: varchar({ length: 255 }).notNull().references(() => users.id),
+  target_user_id: varchar({ length: 255 }).references(() => users.id),
+  action_type: varchar({ length: 100 }).notNull(),
+  description: text(),         
+  created_at: timestamp({ withTimezone: true }).defaultNow(),             
+});
+
+export const adminActionsRelations = relations(adminActions, ({ one }) => ({
+  admin: one(users, {
+    fields: [adminActions.admin_id],
+    references: [users.id],
+  }),
+  targetUser: one(users, {
+    fields: [adminActions.target_user_id],
+    references: [users.id],
+  }),
+}));
+
 export const users = pgTable("user", {
   id: varchar({ length: 255 }).notNull().primaryKey().$defaultFn(() => crypto.randomUUID()),
   ucf_id: varchar({ length: 20 }),
