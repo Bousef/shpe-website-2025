@@ -116,7 +116,8 @@ export default function TeamSection() {
                 <p>{selected.hobbies}</p>
               </div>
 
-              <div className="mt-2">
+              <div className="flex flex-row gap-3 mt-2">
+              <Flag className="w-10" code={ iso.whereCountry(selected.country)?.alpha3 } />
                 <a
                   href={selected.linkedin}
                   target="_blank"
