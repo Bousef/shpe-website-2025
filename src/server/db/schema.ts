@@ -1,6 +1,14 @@
 import { relations, sql } from "drizzle-orm";
 import { index, pgEnum, pgTableCreator, primaryKey, pgTable, varchar, numeric, timestamp, integer, boolean, text } from "drizzle-orm/pg-core";
-import { type AdapterAccount } from "next-auth/adapters";
+
+// taken from https://supabase.com/docs/guides/auth/identities
+// should probably be moved to a separate file
+// and we should probably also make a providers type
+export type IdentityType =
+  | "email"
+  | "phone"
+  | "oauth"
+  | "saml";
 
 export const invoiceStatusEnum = pgEnum('invoice_status', [
   'paid', 
@@ -145,7 +153,7 @@ export const accounts = createTable(
       .varchar({ length: 255 })
       .notNull()
       .references(() => users.id),
-    type: d.varchar({ length: 255 }).$type<AdapterAccount["type"]>().notNull(),
+    type: d.varchar({ length: 255 }).$type<IdentityType>().notNull(),
     provider: d.varchar({ length: 255 }).notNull(),
     providerAccountId: d.varchar({ length: 255 }).notNull(),
     refresh_token: d.text(),
