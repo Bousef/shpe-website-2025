@@ -1,6 +1,8 @@
 "use client";
 
+import Flag from 'react-world-flags';
 import { useState } from "react";
+import iso from 'iso-3166-1';
 
 type Member = {
   name: string;
@@ -78,14 +80,17 @@ export default function TeamSection() {
             <p><strong>Role:</strong> {selected.role}</p>
             <p><strong>Major:</strong> {selected.major}</p>
             <p><strong>Hobbies:</strong> {selected.hobbies}</p>
-            <a
-              href={selected.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 underline mt-2 block"
-            >
-              View LinkedIn
-            </a>
+            <div className="flex flex-row gap-3">
+              <Flag className="w-10" code={ iso.whereCountry(selected.country)?.alpha3 } />
+              <a
+                href={selected.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 underline mt-2 block"
+              >
+                View LinkedIn
+              </a>
+            </div>
           </div>
         </div>
       )}
