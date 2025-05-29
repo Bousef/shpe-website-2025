@@ -76,35 +76,61 @@ export default function TeamSection() {
         ))}
       </div>
 
-{selected && (
-  <div className="fixed inset-0 bg-blue-300/50 flex justify-center items-center z-50">
-    <div className="bg-white p-6 h-[40rem] w-[60rem] relative overflow-y-auto flex flex-col items-center">
-      <button
-        onClick={() => setSelected(null)}
-        className="absolute top-2 right-2 text-gray-500 hover:text-black"
-      >
-        ✕
-      </button>
+      {selected && (
+        <div className="fixed inset-0 bg-blue-300/50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 w-[65rem] h-[40rem] relative flex gap-6">
+            {/* Close Button */}
+            <button
+              onClick={() => setSelected(null)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-black text-xl"
+            >
+              ✕
+            </button>
 
-      <img src={selected.picture} className="h-[35rem] w-[30rem] object-contain mb-4" />
+            <div className="w-3/5 flex items-start justify-center">
+              <img
+                src={selected.picture}
+                alt={selected.name}
+                className="h-full object-cover rounded-md"
+              />
+            </div>
 
-      <div className="text-center space-y-2">
-        <h2 className="text-xl font-bold">{selected.name}</h2>
-        <p><strong>Role:</strong> {selected.role}</p>
-        <p><strong>Major:</strong> {selected.major}</p>
-        <p><strong>Hobbies:</strong> {selected.hobbies}</p>
-        <a
-          href={selected.linkedin}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 underline"
-        >
-          View LinkedIn
-        </a>
-      </div>
-    </div>
-  </div>
-)}
+            <div className="w-2/3 flex flex-col justify-start space-y-3 ">
+              <div>
+                <p className="font-bold text-lg  text-blue-950">MAJOR:</p>
+                <p>{selected.major}</p>
+              </div>
+
+              <div>
+                <p className="font-bold text-lg text-blue-950">FUTURE INDUSTRY FOCUS:</p>
+                <p>{selected.future_ind}</p>
+              </div>
+
+              <div>
+                <p className="font-bold text-lg text-blue-950">BIO:</p>
+                <p className="text-justify whitespace-pre-wrap">{selected.bio}</p>
+              </div>
+
+              <div>
+                <p className="font-bold text-sm text-blue-950">HOBBIES:</p>
+                <p>{selected.hobbies}</p>
+              </div>
+
+              <div className="mt-2">
+                <a
+                  href={selected.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block text-blue-600 underline"
+                >
+                  View LinkedIn
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
 
     </main>
   );
