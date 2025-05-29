@@ -29,52 +29,66 @@ const members: Member[] = [
 ];
 
 export default function TeamSection() {
+  const [selected, setSelected] = useState<Member | null>(null);
+
   return (
-    <main id="team" className="relative">
-      <img
-        src="/_next/static/media/wave2.6d75af1d.svg"
-        alt=""
-        className="w-full"
-      />
+    <main className="p-6 flex items-center">
+      <div className="text-[ffc201]">
+      <h1>
+        Title
+      </h1>
+      <div>
+        <div>
 
-      <section className="bg-[#2A3342] text-white flex flex-col items-center pb-[6rem] py-[2rem]">
-        <article className="w-[80%] flex flex-col lg:h-[12rem] 2xl:h-[16rem] justify-around py-6 pb-10">
-          <h2 className="font-bold text-[1.6rem] lg:text-4xl 2xl:text-7xl pb-4">
-            Get to know our Team
-          </h2>
-          <p className="font-medium text-xl 2xl:text-3xl text-slate-400">
-            Know the faces of SHPE UCF
-          </p>
-        </article>
-
-        <section className="flex flex-wrap justify-around gap-[3rem] w-[90%]">
-          {members.map(({ name, role, img }) => (
-            <div
-              key={name}
-              className="inline-flex flex-col items-center gap-4 bg-white rounded-lg shadow border-stone-300
-                         w-56 h-[22rem] 2xl:w-80 2xl:h-[27rem] p-4"
+        </div>
+      </div>
+      </div>
+      <div className="flex flex-wrap items-center gap-6">
+        {members.map((member) => (
+          <div
+            key={member.name}
+            className="flex flex-col items-center"
+          >
+            <img
+              src={member.picture}
+              alt={member.name}
+              className="w-24 h-24 rounded-full object-cover cursor-pointer"
+              onClick={() => setSelected(member)}
+            />
+            <button
+              onClick={() => setSelected(member)}
+              className="mt-2 px-4 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
-              <div className="flex flex-col items-start w-full">
-                <img
-                  src={img}
-                  alt={name}
-                  className="rounded-md m-auto w-40 h-40 2xl:w-36 2xl:h-36"
-                />
-                <h3 className="font-bold text-black text-lg 2xl:text-[1.6rem] mt-4 ml-4">
-                  {name}
-                </h3>
-                <p className="font-medium text-neutral-700 text-base 2xl:text-xl ml-4">
-                  {role}
-                </p>
-              </div>
-              <button className="inline-flex items-center justify-center bg-yellow-400 hover:bg-yellow-500 rounded-md shadow text-black font-medium
-                                 w-40 h-9 2xl:w-60 2xl:h-12 2xl:text-xl mb-4">
-                More
-              </button>
-            </div>
-          ))}
-        </section>
-      </section>
+              Contact
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {selected && (
+        <div className="fixed inset-0 bg-blue-300/50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded-lg max-w-sm w-full relative">
+            <button
+              onClick={() => setSelected(null)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-black"
+            >
+              ✕
+            </button>
+            <h2 className="text-xl font-bold mb-2">{selected.name}</h2>
+            <p><strong>Role:</strong> {selected.role}</p>
+            <p><strong>Major:</strong> {selected.major}</p>
+            <p><strong>Hobbies:</strong> {selected.hobbies}</p>
+            <a
+              href={selected.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 underline mt-2 block"
+            >
+              View LinkedIn
+            </a>
+          </div>
+        </div>
+      )}
     </main>
-  )
+  );
 }
