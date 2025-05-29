@@ -6,10 +6,14 @@ export const env = createEnv({
    * Specify your server-side environment variables schema here.
    */
   server: {
-    AUTH_SECRET:
+    SUPABASE_URL:
       process.env.NODE_ENV === "production"
         ? z.string()
         : z.string().optional(),
+    SUPABASE_ANON_KEY:
+      process.env.NODE_ENV === "production"
+      ? z.string()
+      : z.string().optional(),
     DATABASE_URL: z.string().url(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
@@ -27,7 +31,8 @@ export const env = createEnv({
    * Manually assign env vars to avoid destructuring issues in some runtimes.
    */
   runtimeEnv: {
-    AUTH_SECRET: process.env.AUTH_SECRET,
+    SUPABASE_URL: process.env.SUPABASE_URL,
+    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
   },
