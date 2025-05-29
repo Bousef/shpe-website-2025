@@ -3,6 +3,7 @@
 import Flag from 'react-world-flags';
 import { useState } from "react";
 import iso from 'iso-3166-1';
+import { BsLinkedin } from "react-icons/bs";
 
 type Member = {
   name: string;
@@ -117,14 +118,14 @@ export default function TeamSection() {
               </div>
 
               <div className="flex flex-row gap-3 mt-2">
-              <Flag className="w-10" code={ iso.whereCountry(selected.country)?.alpha3 } />
+              <Flag className="h-10" code={ iso.whereCountry(selected.country)?.alpha3 } />
                 <a
                   href={selected.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-block text-blue-600 underline"
                 >
-                  View LinkedIn
+                  <BsLinkedin className='w-10 h-10' />
                 </a>
               </div>
             </div>
