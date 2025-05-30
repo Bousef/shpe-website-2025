@@ -4,3 +4,12 @@
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
+
+:root {
+  --shpe-dark-orange: #D33A02;
+  --shpe-orange: #FD652F;
+  --shpe-navy-blue: #001F5B;
+  --shpe-blue: #0070C0;
+  --shpe-light-blue: #72A9BE;
+  --shpe-gray: #626366;
+}
