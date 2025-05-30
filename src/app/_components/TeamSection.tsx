@@ -19,7 +19,7 @@ type Member = {
 
 const members: Member[] = [
   {
-    name: "Santiago",
+    name: "Luis Suarez",
     role: "Director",
     major: "Art",
     future_ind: "Samsung",
@@ -36,47 +36,102 @@ const members: Member[] = [
     future_ind: "Samsung",
     bio: "Este, este o este?",
     hobbies: "AI for ChatGPT",
-    country: "Puelto Lico",
+    country: "puerto rico",
     linkedin: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     picture: "/members/contact_placeholder.jpg",
   },
-
+  {
+    name: "Reyjay",
+    role: "Tech Stool",
+    major: "Computer Information",
+    future_ind: "Samsung",
+    bio: "Este, este o este?",
+    hobbies: "AI for ChatGPT",
+    country: "Puerto Rico",
+    linkedin: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    picture: "/members/contact_placeholder.jpg",
+  },
+  {
+    name: "Teyjay",
+    role: "Tech Stool",
+    major: "Computer Information",
+    future_ind: "Samsung",
+    bio: "Este, este o este?",
+    hobbies: "AI for ChatGPT",
+    country: "Puerto Rico",
+    linkedin: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    picture: "/members/contact_placeholder.jpg",
+  },
+  {
+    name: "Meyjay",
+    role: "Tech Stool",
+    major: "Computer Information",
+    future_ind: "Samsung",
+    bio: "Este, este o este?",
+    hobbies: "AI for ChatGPT",
+    country: "Puerto Rico",
+    linkedin: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    picture: "/members/contact_placeholder.jpg",
+  },
+  {
+    name: "Oeyjay",
+    role: "Tech Stool",
+    major: "Computer Information",
+    future_ind: "Samsung",
+    bio: "Este, este o este?",
+    hobbies: "AI for ChatGPT",
+    country: "Puerto Rico",
+    linkedin: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    picture: "/members/contact_placeholder.jpg",
+  },
+  {
+    name: "Peyjay",
+    role: "Tech Stool",
+    major: "Computer Information",
+    future_ind: "Samsung",
+    bio: "Este, este o este?",
+    hobbies: "AI for ChatGPT",
+    country: "Puerto Rico",
+    linkedin: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    picture: "/members/contact_placeholder.jpg",
+  },
 ];
 
 export default function TeamSection() {
   const [selected, setSelected] = useState<Member | null>(null);
 
   return (
-    <main className="p-6">
+    <main >
       <div className="flex items-center">
         <div className="text-yellow-500 mx-auto">
-          <h1>
-            Title
+          <h1 className="font-helvetica text-[50px] m-10 pb-5">
+            GET TO KNOW OR TEAM
           </h1>
         </div>
       </div>
-      <div className="flex flex-wrap items-center gap-6">
-        {members.map((member) => (
-          <div
-            key={member.name}
-            className="flex flex-col items-center"
-          >
-            <img
-              src={member.picture}
-              alt={member.name}
-              className="w-24 h-24 rounded-full object-cover cursor-pointer"
-              onClick={() => setSelected(member)}
-            />
-            <button
-              onClick={() => setSelected(member)}
-              className="mt-2 px-4 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              Contact
-            </button>
-          </div>
-        ))}
+      {/* Photo, name and role */}
+      <div className="container mx-auto max-w-full px-25">
+        <div className="grid grid-cols-4 gap-x-5">
+          {members.map((member) => (
+            <div key={member.name} className="flex flex-col items-center">
+              <button onClick={() => setSelected(member)} className="block w-full">
+                <div className="w-full aspect-[3/4]">
+                  <img
+                    src={member.picture}
+                    alt={member.name}
+                    className="w-full h-full object-cover cursor-pointer"
+                  />
+                </div>
+                <div className="mt-2 text-center">
+                  <p className="text-2xl tracking-wide text-[#001f5b]">{member.name}</p>
+                  <p className="font-bold text-2xl tracking-wider text-[#001f5b] mb-10">{member.role.toUpperCase()}</p>
+                </div>
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
-
+      {/* Contact card pop-up */}
       {selected && (
         <div className="fixed inset-0 bg-blue-300/50 flex justify-center items-center z-50">
           <div className="bg-white p-6 w-[65rem] h-[40rem] relative flex gap-6">
@@ -118,7 +173,7 @@ export default function TeamSection() {
               </div>
 
               <div className="flex flex-row gap-3 mt-2">
-              <Flag className="h-10" code={ iso.whereCountry(selected.country)?.alpha3 } />
+                <Flag className="h-10" code={iso.whereCountry(selected.country)?.alpha3} />
                 <a
                   href={selected.linkedin}
                   target="_blank"
