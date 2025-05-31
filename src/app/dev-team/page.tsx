@@ -1,11 +1,11 @@
 import Navbar from "../_components/NavBar";
-import TeamSection from "../_components/TeamSection";
+import DevTeam from "../_components/DevTeam";
 
 export default function Devteam () {
     return (
         <div>
             <Navbar/>
-            <TeamSection/>
+            <DevTeam/>
             DevTeam
         </div>
     );
