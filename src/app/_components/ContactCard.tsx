@@ -63,9 +63,9 @@ export default function ContactCard({ member, onClose }: ContactCardProps) {
             <p>{member.hobbies}</p>
           </div>
 
-          <div className="flex flex-row gap-3 mt-2 bottom-0 right-0 absolute">
+          <div className="flex flex-row gap-5 mt-2 bottom-0 right-0 absolute items-center">
             <Flag
-              className="h-10"
+              className="h-10 overflow-hidden"
               code={iso.whereCountry(member.country)?.alpha3 || ""}
             />
             <a
