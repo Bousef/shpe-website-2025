@@ -64,7 +64,7 @@ export default function ContactCard({ member, onClose }: ContactCardProps) {
           <div className="flex flex-row gap-5 mt-2 bottom-0 right-0 absolute items-center">
             <Flag
               className="h-10 overflow-hidden"
-              code={iso.whereCountry(member.country)?.alpha3 || ""}
+              code={iso.whereCountry(member.country)?.alpha3}
             />
             <a
               href={member.email}
