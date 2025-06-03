@@ -1,0 +1,86 @@
+export type Member = {
+	name: string;
+	role: string;
+	pfp: string;
+	bio : {
+		major: string;
+		industryFocus: string;
+		biotext: string;
+		hobbies: string;
+		flags: string[];
+		email: string;
+		linkedin: string;
+	};
+};
+
+type BioPopupsProps = {
+	member: Member;
+	onClose: () => void;
+};
+
+export function DevBioPopup ({ member, onClose }: BioPopupsProps) {
+	return (
+		/* outer backdrop: covers parent component's area */ 
+		<div 
+			className="fixed inset-0 flex items-center justify-center backdrop-blur-sm z-50" 
+			onClick={onClose} // clicking anywhere here closes the popup
+		>
+			{/* inner content: stops click events from closing */}
+			<div 
+				className="relative bg-white shadow-xl max-w-3xl p-10" 
+				onClick={(e) => e.stopPropagation()}
+			>
+				{/* bio content goes here */}
+				<div className="flex flex-col md:flex-row gap-4">
+					{/* profile image */}
+					<div className="md:w-1/3 h-40 md:h-auto">
+						<img
+							src={member.pfp}
+							alt={member.name}
+							className="w-full h-full object-cover rounded-md"
+						/>
+					</div>
+
+					{/* text fields */}
+					<div className="md:w-2/3 space-y-3">
+						<h2 className="text-2xl font-bold text-gray-900">{member.name}</h2>
+						<p className="text-sm font-semibold uppercase text-blue-900">{member.role}</p>
+
+						<div className="space-y-2 text-sm text-gray-700">
+							<p>
+								<span className="font-semibold">Major:</span> {member.bio.major}
+							</p>
+							<p>
+								<span className="font-semibold">Future Industry Focus:</span>{" "}
+								{member.bio.industryFocus}
+							</p>
+							<p>
+								<span className="font-semibold">Bio:</span> {member.bio.biotext}
+							</p>
+							<p>
+								<span className="font-semibold">Hobbies:</span> {member.bio.hobbies}
+							</p>
+						</div>
+
+						{/* contact icons row (email, LinkedIn, etc.) */}
+						<div className="flex items-center space-x-3 mt-4">
+							{/* flags */}
+
+							<a
+                href={member.bio.email}
+                className="text-gray-600 hover:text-gray-900"
+              ></a>
+							<a
+                href={member.bio.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 hover:text-gray-900"
+              ></a>
+						</div>
+					</div>
+				</div>
+				
+			</div>
+		</div>
+	);
+}
