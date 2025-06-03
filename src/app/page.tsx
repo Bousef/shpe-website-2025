@@ -1,9 +1,8 @@
 import Navbar          from "./_components/NavBar";
 import HeroSection     from "./_components/HeroSection";
 import AboutSection    from "./_components/AboutSection";
-import JoinBanner      from "./_components/JoinBanner";
-import FooterSection   from "./_components/FooterSection";
 import ContactSection from "./_components/ContactSection";
+import EventsSection from "./_components/EventsSection";
 
 
 export const metadata = {
@@ -20,8 +19,7 @@ export default function HomePage() {
         <Navbar />
         <HeroSection />
         <AboutSection />
-        <JoinBanner />
-        <ContactSection/>
+        <EventsSection />
       </div>
     </>
   );
