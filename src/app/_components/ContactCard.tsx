@@ -23,7 +23,7 @@ export default function ContactCard({ member, onClose }: ContactCardProps) {
         {/* Image Section */}
         <div className="w-3/5 flex items-start justify-center">
           <img
-            src={member.picture}
+            src={`/members/${member.picture}`}
             alt={member.name}
             className="h-full object-cover rounded-md"
           />
