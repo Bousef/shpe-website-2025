@@ -25,7 +25,7 @@ export default function MemberCard({ member, onSelect }: MemberCardProps) {
       >
         <div className="w-full aspect-[3/4] overflow-hidden rounded-md">
           <img
-            src={member.picture}
+            src={`/members/${member.picture}`}
             alt={member.name}
             className="w-full h-full object-cover cursor-pointer"
           />
