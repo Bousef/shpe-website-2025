@@ -30,7 +30,7 @@ export default function ContactCard({ member, onClose }: ContactCardProps) {
         </div>
 
         {/* Details Section */}
-        <div className="w-2/3 flex flex-col justify-start space-y-3">
+        <div className="w-2/3 flex flex-col justify-start space-y-3 relative">
           <div>
             <p className="font-bold text-lg text-blue-950">MAJOR:</p>
             <p>{member.major}</p>
@@ -53,7 +53,7 @@ export default function ContactCard({ member, onClose }: ContactCardProps) {
             <p>{member.hobbies}</p>
           </div>
 
-          <div className="flex flex-row gap-3 mt-2">
+          <div className="flex flex-row gap-3 mt-2 bottom-0 right-0 absolute">
             <Flag
               className="h-10"
               code={iso.whereCountry(member.country)?.alpha3 || ""}
