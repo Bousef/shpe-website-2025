@@ -1,94 +1,172 @@
-import { ChevronRightIcon } from '@heroicons/react/24/solid'
+import { DevProfileCard } from "./DevProfileCard";
+import type { Member } from "./DevBioPopup";
 
-const members = [
+const members: Member[] = [
   {
     name: "Yousef Osman",
     role: "Tech Chair",
-    img: "../favicon.ico",
+    pfp: "/path/to/yousef.jpg", 
+    bio: {
+      major: "Computer Engineering",
+      industryFocus: "Project Management, Technical Design, Drafting",
+      biotext: `Hey! My name is Yousef, I was born in Maracay, Venezuela, my grandparents were Colombian (Medellín) and Lebanese (Zgharta) immigrants in Venezuela. I'm majoring in Industrial Engineering and minoring in Business Administration. Fun fact about me: I do rapel since I was 2 years old. I also want to be an architect and a fashion designer living in Italy, so I’m learning Italian.`,
+      hobbies: "Sports, Modeling, F1, Sewing, Amusement parks, Music, Traveling, Concerts, trying new things, etc.",
+      flags: [""], 
+      email: "",
+      linkedin: "",
+    },
   },
   {
     name: "Cata",
     role: "Tech Chair",
-    img: "/board/hernan.jpg",
+    pfp: "/path/to/cata.jpg",
+    bio: {
+      major: "Computer Science",
+      industryFocus: "Full‐stack Development, UI/UX Design",
+      biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
+      hobbies: "Painting, Photography, Board games, Hiking.",
+      flags: [""], 
+      email: "",
+      linkedin: "",
+    },
   },
   {
-    name: "Name1",
+    name: "Gabriela Cardenas",
+    role: "UI/UX Designer",
+    pfp: "/path/to/cata.jpg",
+    bio: {
+      major: "Computer Science",
+      industryFocus: "Full‐stack Development, UI/UX Design",
+      biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
+      hobbies: "Painting, Photography, Board games, Hiking.",
+      flags: [""], 
+      email: "",
+      linkedin: "",
+    },
+  },
+  {
+    name: "name2",
     role: "Mobile",
-    img: "/board/hernan.jpg",
+    pfp: "/path/to/cata.jpg",
+    bio: {
+      major: "Computer Science",
+      industryFocus: "Full‐stack Development, UI/UX Design",
+      biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
+      hobbies: "Painting, Photography, Board games, Hiking.",
+      flags: [""], 
+      email: "",
+      linkedin: "",
+    },
   },
   {
-    name: "Name2",
+    name: "name3",
     role: "Mobile",
-    img: "/board/hernan.jpg",
+    pfp: "/path/to/cata.jpg",
+    bio: {
+      major: "Computer Science",
+      industryFocus: "Full‐stack Development, UI/UX Design",
+      biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
+      hobbies: "Painting, Photography, Board games, Hiking.",
+      flags: [""], 
+      email: "",
+      linkedin: "",
+    },
   },
   {
-    name: "Name3",
+    name: "name4",
     role: "Mobile",
-    img: "/board/hernan.jpg",
+    pfp: "/path/to/cata.jpg",
+    bio: {
+      major: "Computer Science",
+      industryFocus: "Full‐stack Development, UI/UX Design",
+      biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
+      hobbies: "Painting, Photography, Board games, Hiking.",
+      flags: [""], 
+      email: "",
+      linkedin: "",
+    },
   },
   {
-    name: "Name4",
+    name: "name5",
     role: "Web",
-    img: "/board/hernan.jpg",
+    pfp: "/path/to/cata.jpg",
+    bio: {
+      major: "Computer Science",
+      industryFocus: "Full‐stack Development, UI/UX Design",
+      biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
+      hobbies: "Painting, Photography, Board games, Hiking.",
+      flags: [""], 
+      email: "",
+      linkedin: "",
+    },
   },
   {
-    name: "Name5",
+    name: "name6",
     role: "Web",
-    img: "/board/hernan.jpg",
+    pfp: "/path/to/cata.jpg",
+    bio: {
+      major: "Computer Science",
+      industryFocus: "Full‐stack Development, UI/UX Design",
+      biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
+      hobbies: "Painting, Photography, Board games, Hiking.",
+      flags: [""], 
+      email: "",
+      linkedin: "",
+    },
   },
   {
-    name: "Name6",
+    name: "name7",
     role: "Web",
-    img: "/board/hernan.jpg",
+    pfp: "/path/to/cata.jpg",
+    bio: {
+      major: "Computer Science",
+      industryFocus: "Full‐stack Development, UI/UX Design",
+      biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
+      hobbies: "Painting, Photography, Board games, Hiking.",
+      flags: [""], 
+      email: "",
+      linkedin: "",
+    },
   },
   {
-    name: "Name7",
+    name: "name8",
     role: "Web",
-    img: "/board/hernan.jpg",
+    pfp: "/path/to/cata.jpg",
+    bio: {
+      major: "Computer Science",
+      industryFocus: "Full‐stack Development, UI/UX Design",
+      biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
+      hobbies: "Painting, Photography, Board games, Hiking.",
+      flags: [""], 
+      email: "",
+      linkedin: "",
+    },
   },
   {
-    name: "Name8",
-    role: "Web",
-    img: "/board/hernan.jpg",
+    name: "name9",
+    role: "Mobile",
+    pfp: "/path/to/cata.jpg",
+    bio: {
+      major: "Computer Science",
+      industryFocus: "Full‐stack Development, UI/UX Design",
+      biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
+      hobbies: "Painting, Photography, Board games, Hiking.",
+      flags: [""], 
+      email: "",
+      linkedin: "",
+    },
   },
-  // …add the remaining remaining team members here …
+  // …other members (with `bio` fields)…
 ];
-
-function Card({ member }: { member: { name: string; role: string; img: string } }) {
-  return (
-    <div className="group bg-white overflow-hidden shadow-lg flex flex-col">
-      {/* image + hover overlay + arrow */}
-      <div className="relative w-full h-96">
-        <img
-          src={member.img}
-          alt={member.name}
-          className="w-full h-full object-cover"
-        />
-      
-        {/* subtle dark overlay on hover */}
-        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition" />
-        {/* arrow icon */}
-        <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition">
-        {/* <ChevronRightIcon className="w-6 h-6" /> */}
-        </div>
-      </div>
-
-      {/* name + role */}
-      <div className="p-1 text-center flex-grow">
-        <h3 className="text-lg font-semibold text-gray-900">{member.name}</h3>
-        <p className="text-sm uppercase font-bold text-blue-900">{member.role}</p>
-      </div>
-    </div>
-  )
-} 
 
 export default function DevSection() {
   const techChairs = members.filter((m) => m.role === "Tech Chair")
-  const devTeam    = members.filter((m) => m.role !== "Tech Chair")
+  const uiDesigner = members.filter((m) => m.role === "UI/UX Designer")
+  const devTeam    = members.filter((m) => m.role !== "Tech Chair" && m.role !== "UI/UX Designer")
 
   return (
-    <main id="team" className="relative">
-      <section className="bg-white text-white flex flex-col items-center pb-[6rem] py-[2rem]">
+    <main id="team" className="relative bg-white">
+      <section className="flex flex-col items-center pb-[6rem] py-[2rem]">
 
         {/* header */}
         <div className="container mx-auto px-4 text-center mb-12 text-black">
@@ -99,12 +177,10 @@ export default function DevSection() {
         {/* grid for the tech chairs profile cards */}
         <section className="container mx-auto mb-16 px-4">
           <h3 className="text-4xl text-[var(--shpe-blue)] font-semibold text-center mb-4">TECH CHAIRS</h3>
-          <div className="flex justify-center">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {techChairs.map((m) => (
-                <Card key={m.name} member={m} />
-              ))}
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {techChairs.map((m) => (
+              <DevProfileCard key={m.name} member={m} />
+            ))}
           </div>
         </section>
 
@@ -113,7 +189,7 @@ export default function DevSection() {
           <h3 className="text-4xl text-[var(--shpe-blue)] font-semibold text-center mb-4">REST OF DEV TEAM</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {devTeam.map((m) => (
-              <Card key={m.name} member={m} />
+              <DevProfileCard key={m.name} member={m} />
             ))}
           </div>
         </section>
