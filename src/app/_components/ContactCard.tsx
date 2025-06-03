@@ -2,6 +2,7 @@ import Flag from "react-world-flags";
 import iso from "iso-3166-1";
 import { BsEnvelope, BsLinkedin } from "react-icons/bs";
 import { type Member } from "./MemberCard";
+import Image from "next/image";
 
 type ContactCardProps = {
   member: Member;
@@ -21,21 +22,18 @@ export default function ContactCard({ member, onClose }: ContactCardProps) {
         </button>
 
         {/* Image Section */}
-        <div className="w-3/5 relative">
-          <div className="flex flex-col items-center h-full absolute left-0">
-            <img
-              src={`/members/${member.picture}`}
+        <div className="w-3/5 min-w-64 sm:min-w-80 md:min-w-96 relative flex flex-col justify-center items-center">
+          <div className="flex-1 w-full relative mb-3">
+            <Image
+              className="object-contain rounded-md" 
               alt={member.name}
-              className="h-full object-cover rounded-md"
+              fill
+              src={`/members/${member.picture}`}
             />
-            <div className="text-center mt-3 w-full text-2xl">
-              <div>
-                {member.name}
-              </div>
-              <div className="font-bold">
-                {member.role}
-              </div>
-            </div>
+          </div>
+          <div className="text-center w-full text-2xl flex-shrink-0">
+            <div>{member.name}</div>
+            <div className="font-bold">{member.role}</div>
           </div>
         </div>
 
