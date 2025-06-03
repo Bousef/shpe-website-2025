@@ -21,12 +21,22 @@ export default function ContactCard({ member, onClose }: ContactCardProps) {
         </button>
 
         {/* Image Section */}
-        <div className="w-3/5 flex items-start justify-center">
-          <img
-            src={`/members/${member.picture}`}
-            alt={member.name}
-            className="h-full object-cover rounded-md"
-          />
+        <div className="w-3/5 relative">
+          <div className="flex flex-col items-center h-full absolute left-0">
+            <img
+              src={`/members/${member.picture}`}
+              alt={member.name}
+              className="h-full object-cover rounded-md"
+            />
+            <div className="text-center mt-3 w-full text-2xl">
+              <div>
+                {member.name}
+              </div>
+              <div className="font-bold">
+                {member.role}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Details Section */}
