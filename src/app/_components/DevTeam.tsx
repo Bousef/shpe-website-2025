@@ -184,6 +184,16 @@ export default function DevSection() {
           </div>
         </section>
 
+        {/* grid for the ui/ux designer profile cards */}
+        <section className="container mx-auto mb-16 px-4">
+          <h3 className="text-4xl text-[var(--shpe-blue)] font-semibold text-center mb-4">UI/UX DESIGNER</h3>
+          <div className="grid grid-cols-1 gap-4">
+            {uiDesigner.map((m) => (
+              <DevProfileCard key={m.name} member={m} />
+            ))}
+          </div>
+        </section>
+
         {/* grid for rest of dev team profile cards */}
         <section className="container mx-auto mb-16 px-4">
           <h3 className="text-4xl text-[var(--shpe-blue)] font-semibold text-center mb-4">REST OF DEV TEAM</h3>
