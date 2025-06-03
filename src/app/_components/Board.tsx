@@ -7,7 +7,7 @@ import type { Member, } from "./MemberCard";
 import MemberCard from "./MemberCard";
 
 
-export default function TeamSection() {
+export default function Board() {
   const [selected, setSelected] = useState<Member | null>(null);
 
   return (

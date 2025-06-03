@@ -1,11 +1,11 @@
 import Navbar from "../_components/NavBar";
-import TeamSection from "../_components/TeamSection";
-export default function Board () {
+import Board from "../_components/Board";
+export default function BoardPage () {
 
     return (
         <div>
             <Navbar/>
-            <TeamSection/>
+            <Board/>
         </div>
     );
 }
