@@ -1,6 +1,6 @@
 import Flag from "react-world-flags";
 import iso from "iso-3166-1";
-import { BsLinkedin } from "react-icons/bs";
+import { BsEnvelope, BsLinkedin } from "react-icons/bs";
 import { type Member } from "./MemberCard";
 
 type ContactCardProps = {
@@ -68,6 +68,14 @@ export default function ContactCard({ member, onClose }: ContactCardProps) {
               className="h-10"
               code={iso.whereCountry(member.country)?.alpha3 || ""}
             />
+            <a
+              href={member.email}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block"
+            >
+              <BsEnvelope className="w-10 h-10 scale-125" style={{ boxSizing: 'content-box' }}/>
+            </a>
             <a
               href={member.linkedin}
               target="_blank"
