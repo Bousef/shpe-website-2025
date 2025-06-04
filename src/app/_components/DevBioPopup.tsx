@@ -7,8 +7,6 @@ export type Member = {
 		industryFocus: string;
 		biotext: string;
 		hobbies: string;
-		flags: string[];
-		email: string;
 		linkedin: string;
 	};
 };
@@ -64,12 +62,6 @@ export function DevBioPopup ({ member, onClose }: BioPopupsProps) {
 
 						{/* contact icons row (email, LinkedIn, etc.) */}
 						<div className="flex items-center space-x-3 mt-4">
-							{/* flags */}
-
-							<a
-                href={member.bio.email}
-                className="text-gray-600 hover:text-gray-900"
-              ></a>
 							<a
                 href={member.bio.linkedin}
                 target="_blank"
