@@ -24,7 +24,7 @@ export function DevProfileCard({ member }: ProfileCardProps) {
           />
         
           {/* subtle dark overlay on hover */}
-          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition" />
+          {/* <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition" /> */}
           {/* arrow icon */}
           <button
             onClick={() => setIsOpen(true)} 
