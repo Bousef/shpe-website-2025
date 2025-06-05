@@ -162,9 +162,10 @@ const members: Member[] = [
 ];
 
 export default function DevSection() {
-  const techChairs = members.filter((m) => m.role === "Tech Chair")
-  const uiDesigner = members.filter((m) => m.role === "UI/UX Designer")
-  const devTeam    = members.filter((m) => m.role !== "Tech Chair" && m.role !== "UI/UX Designer")
+  const techChairs = members.filter((m) => m.role === "Tech Chair");
+  const uiDesigner = members.filter((m) => m.role === "UI/UX Designer");
+  const mobileTeam = members.filter((m) => m.role === "Mobile");
+  const webTeam    = members.filter((m) => m.role === "Web");
 
   return (
     <main id="team" className="relative bg-white">
@@ -196,13 +197,32 @@ export default function DevSection() {
           </div>
         </section>
 
-        {/* grid for rest of dev team profile cards */}
-        <section className="container mx-auto mb-16 px-4">
-          <h3 className="text-4xl text-[var(--shpe-blue)] font-semibold text-center mb-4">REST OF DEV TEAM</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {devTeam.map((m) => (
-              <DevProfileCard key={m.name} member={m} />
-            ))}
+        {/* two columns of grid: one for mobile and one for dev profile cards */}
+        <section className="container mx-auto mb-16 px-8">
+          <div className="flex flex-col md:flex-row gap-12">
+            {/* MOBILE TEAM */}
+            <div className="flex-1">
+              <h4 className="text-4xl font-semibold text-center text-[var(--shpe-blue)] mb-4">MOBILE TEAM</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 justify-items-center">
+                {mobileTeam.map((member) => (
+                  <div key={member.name} className="w-full max-w-xs">
+                    <DevProfileCard member={member} />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* WEB TEAM */}
+            <div className="flex-1">
+              <h4 className="text-4xl font-semibold text-center text-[var(--shpe-blue)] mb-4">WEB TEAM</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 justify-items-center">
+                {webTeam.map((member) => (
+                  <div key={member.name} className="w-full max-w-xs">
+                    <DevProfileCard member={member} />
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
       </section>
