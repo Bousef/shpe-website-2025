@@ -1,3 +1,5 @@
+import {BsLinkedin} from "react-icons/bs"
+
 export type Member = {
 	name: string;
 	role: string;
@@ -49,25 +51,20 @@ export function DevBioPopup ({ member, onClose }: BioPopupsProps) {
 								<span className="font-semibold">Major:</span> {member.bio.major}
 							</p>
 							<p>
-								<span className="font-semibold">Future Industry Focus:</span>{" "}
-								{member.bio.industryFocus}
-							</p>
-							<p>
-								<span className="font-semibold">Bio:</span> {member.bio.biotext}
-							</p>
-							<p>
 								<span className="font-semibold">Hobbies:</span> {member.bio.hobbies}
 							</p>
 						</div>
 
 						{/* contact icons row (email, LinkedIn, etc.) */}
-						<div className="flex items-center space-x-3 mt-4">
+						<div className="flex flex-row gap-5 mt-2 bottom-0 right-0 absolute items-center">
 							<a
                 href={member.bio.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-600 hover:text-gray-900"
-              ></a>
+                className=" bg-[#0077b5] rounded flex items-center justify-center hover:opacity-90 trasition-opacity"
+              >
+								<BsLinkedin className="w-10 h-10 text-white" />
+							</a>
 						</div>
 					</div>
 				</div>
