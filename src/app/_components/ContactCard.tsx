@@ -56,7 +56,7 @@ export default function ContactCard({ member, onClose }: ContactCardProps) {
           <div className="flex flex-row gap-3 mt-2">
             <Flag
               className="h-10"
-              code={iso.whereCountry(member.country)?.alpha3 || ""}
+              code={iso.whereCountry(member.country ?? "")?.alpha3 || ""}
             />
             <a
               href={member.linkedin}
