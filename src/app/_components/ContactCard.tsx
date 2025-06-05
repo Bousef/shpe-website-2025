@@ -3,6 +3,7 @@ import iso from "iso-3166-1";
 import { BsEnvelope, BsLinkedin } from "react-icons/bs";
 import { type Member } from "./MemberCard";
 import Image from "next/image";
+import { useEffect, useRef } from "react";
 
 type ContactCardProps = {
   member: Member;
@@ -10,9 +11,22 @@ type ContactCardProps = {
 };
 
 export default function ContactCard({ member, onClose }: ContactCardProps) {
+
+  const handleOutsideClick = () => {
+    console.log('Clicked outside!');
+    // Your event handler here
+    onClose();
+  };
+
+  const handleInsideClick = (e) => {
+    // Prevent the event from bubbling up to parent
+    e.stopPropagation();
+  };
+
+
   return (
-    <div className="fixed inset-0 bg-[#001f5b]/60 text-blue-950 flex justify-center items-center z-50">
-      <div className="bg-white p-6 w-[65rem] h-[40rem] relative flex gap-6">
+    <div onClick={handleOutsideClick} className="fixed inset-0 bg-[#001f5b]/60 text-blue-950 flex justify-center items-center z-50">
+      <div onClick={handleInsideClick} className="bg-white p-6 w-[65rem] h-[40rem] relative flex gap-6">
         {/* Close Button */}
         <button
           onClick={onClose}
