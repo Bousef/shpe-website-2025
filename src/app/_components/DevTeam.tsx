@@ -41,13 +41,13 @@ const members: Member[] = [
   {
     name: "Nicole Baez Espinosa",
     role: "Mobile",
-    pfp: "/dev-team/nickie.jpg",
+    pfp: "/dev-team/nicole.jpg",
     bio: {
       major: "Computer Science",
       industryFocus: "Full‐stack Development, UI/UX Design",
       biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
-      hobbies: "Painting, Photography, Board games, Hiking.",
-      linkedin: "",
+      hobbies: "Reading, junk journaling, watching movies",
+      linkedin: "https://www.linkedin.com/in/nicole-esp",
     },
   },
   {
@@ -58,8 +58,8 @@ const members: Member[] = [
       major: "Computer Science",
       industryFocus: "Full‐stack Development, UI/UX Design",
       biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
-      hobbies: "Painting, Photography, Board games, Hiking.",
-      linkedin: "",
+      hobbies: "Visiting museums, ballet, watching video essays, pilates",
+      linkedin: "http://linkedin.com/in/denice-garcia",
     },
   },
   {
@@ -70,8 +70,8 @@ const members: Member[] = [
       major: "Computer Science",
       industryFocus: "Full‐stack Development, UI/UX Design",
       biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
-      hobbies: "Painting, Photography, Board games, Hiking.",
-      linkedin: "",
+      hobbies: "Video games, gym, Vollyball, Tennis",
+      linkedin: "http://www.linkedin.com/in/santiago-aguilar-b2a99b169",
     },
   },
   {
@@ -79,11 +79,11 @@ const members: Member[] = [
     role: "Mobile",
     pfp: "/dev-team/cami.jpg",
     bio: {
-      major: "Computer Science",
+      major: "Digital Media",
       industryFocus: "Full‐stack Development, UI/UX Design",
       biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
-      hobbies: "Painting, Photography, Board games, Hiking.",
-      linkedin: "",
+      hobbies: "Drawing, reading, playing open-world video games",
+      linkedin: "https://www.linkedin.com/in/camille-alarcon-fernandez",
     },
   },
   {
@@ -94,8 +94,8 @@ const members: Member[] = [
       major: "Computer Science",
       industryFocus: "Full‐stack Development, UI/UX Design",
       biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
-      hobbies: "Painting, Photography, Board games, Hiking.",
-      linkedin: "",
+      hobbies: "playing Soccer and learning about Cyber Security",
+      linkedin: "https://www.linkedin.com/in/sebastianchacon1/",
     },
   },
   {
@@ -106,8 +106,8 @@ const members: Member[] = [
       major: "Computer Science",
       industryFocus: "Full‐stack Development, UI/UX Design",
       biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
-      hobbies: "Painting, Photography, Board games, Hiking.",
-      linkedin: "",
+      hobbies: "Programming Language Design, Systems Programming",
+      linkedin: "https://www.linkedin.com/in/luciano-paredes-701300191/",
     },
   },
   {
@@ -118,8 +118,8 @@ const members: Member[] = [
       major: "Computer Science",
       industryFocus: "Full‐stack Development, UI/UX Design",
       biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
-      hobbies: "Painting, Photography, Board games, Hiking.",
-      linkedin: "",
+      hobbies: "I like playing video games and playing video games",
+      linkedin: "https://www.linkedin.com/in/fernando-ailon/",
     },
   },
   {
@@ -130,8 +130,8 @@ const members: Member[] = [
       major: "Computer Science",
       industryFocus: "Full‐stack Development, UI/UX Design",
       biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
-      hobbies: "Painting, Photography, Board games, Hiking.",
-      linkedin: "",
+      hobbies: "Coding, gaming, listening to music, hanging with friends",
+      linkedin: "https://www.linkedin.com/in/isaiahstockton/",
     },
   },
   {
@@ -143,7 +143,7 @@ const members: Member[] = [
       industryFocus: "Full‐stack Development, UI/UX Design",
       biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
       hobbies: "Painting, Photography, Board games, Hiking.",
-      linkedin: "",
+      linkedin: "https://www.linkedin.com/in/mary-bauta-a76753292/",
     },
   },
   {
@@ -154,8 +154,8 @@ const members: Member[] = [
       major: "Computer Science",
       industryFocus: "Full‐stack Development, UI/UX Design",
       biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
-      hobbies: "Painting, Photography, Board games, Hiking.",
-      linkedin: "",
+      hobbies: "You can catch me doodling/drawing, watching cdramas, kdramas, horror movies, etc., but at the moment trying to learn crochet :)",
+      linkedin: "https://linkedin.com/in/anna-zheng000",
     },
   },
   // …other members (with `bio` fields)…
