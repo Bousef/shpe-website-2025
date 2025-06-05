@@ -1,13 +1,13 @@
 export type Member = {
   name: string;
   role: string;
-  major: string;
-  future_ind: string;
-  bio: string;
-  hobbies: string;
-  country: string;
+  major?: string;
+  future_ind?: string;
+  bio?: string;
+  hobbies?: string;
+  country?: string;
   linkedin: string;
-  email: string;
+  email?: string;
   picture: string;
 };
 
