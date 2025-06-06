@@ -18,7 +18,7 @@ export default function ContactCard({ member, onClose }: ContactCardProps) {
     onClose();
   };
 
-  const handleInsideClick = (e) => {
+  const handleInsideClick = (e: { stopPropagation: () => void; }) => {
     // Prevent the event from bubbling up to parent
     e.stopPropagation();
   };
