@@ -29,7 +29,7 @@ const members: Member[] = [
   {
     name: "Gabriela Cardenas",
     role: "UI/UX Designer",
-    pfp: "/board/gabriela.jpg",
+    pfp: "/board/gabriela.jpeg",
     bio: {
       major: "Computer Science",
       industryFocus: "Full‐stack Development, UI/UX Design",
@@ -41,7 +41,7 @@ const members: Member[] = [
   {
     name: "Nicole Baez Espinosa",
     role: "Mobile",
-    pfp: "/dev-team/nicole.jpg",
+    pfp: "/dev-team/nicole_baez.jpeg",
     bio: {
       major: "Computer Science",
       industryFocus: "Full‐stack Development, UI/UX Design",
@@ -122,7 +122,7 @@ const members: Member[] = [
       linkedin: "https://www.linkedin.com/in/fernando-ailon/",
     },
   },
-  {
+  /*{
     name: "Isaiah Stockton",
     role: "Web",
     pfp: "/dev-team/isaiah.jpg",
@@ -133,7 +133,7 @@ const members: Member[] = [
       hobbies: "Coding, gaming, listening to music, hanging with friends",
       linkedin: "https://www.linkedin.com/in/isaiahstockton/",
     },
-  },
+  },*/
   {
     name: "Mary Bauta",
     role: "Web",
