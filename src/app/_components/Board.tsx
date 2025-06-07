@@ -26,7 +26,7 @@ export default function Board() {
       <div className="text-yellow-500 text-4xl font-helvetica text-center mb-6">
       </div>
       <div className="container mx-auto max-w-full px-25 mb-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-8">
           {eBoardMembers.map((member) => (
             <MemberCard
               key={member.name}

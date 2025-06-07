@@ -23,13 +23,15 @@ export default function MemberCard({ member, onSelect }: MemberCardProps) {
         onClick={() => onSelect(member)}
         className="block w-full focus:outline-none"
       >
-        <div className="w-full aspect-[3/4] overflow-hidden rounded-md">
-          <img
-            src={`/members/${member.picture}`}
-            alt={member.name}
-            className="w-full h-full object-cover cursor-pointer"
-          />
-        </div>
+<div className="w-full aspect-[3/4] overflow-hidden rounded-md">
+  <img
+    src={`/members/${member.picture}`}
+    alt={member.name}
+    className="w-full h-full object-cover cursor-pointer scale-[0.9]"
+  />
+</div>
+
+
         <div className="mt-2 text-center">
           <p className="text-2xl tracking-wide text-[#001f5b]">
             {member.name}
