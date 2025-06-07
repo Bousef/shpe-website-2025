@@ -10,7 +10,7 @@ type AlumniCardProps = {
 
 export default function AlumniCard({ member }: AlumniCardProps) {
     return (
-        <div className="w-full max-w-[220px] rounded-xl overflow-hidden flex flex-col group">
+        <div className="w-full max-w-[220px] bg-white shadow-xl rounded-xl overflow-hidden flex flex-col group">
             {/* Image section with LinkedIn button */}
             <div className="relative w-full aspect-[2/1]">
                 {member.linkedin ? (
@@ -37,7 +37,7 @@ export default function AlumniCard({ member }: AlumniCardProps) {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="absolute bottom-2 right-2 w-7 h-7 rounded-full flex items-center justify-center 
-                       bg-white bg-opacity-70 group-hover:bg-blue-700 transition"
+ bg-white bg-opacity-70 group-hover:bg-blue-700 transition"
                     >
                         <BsLinkedin className="w-4 h-4 text-blue-800 group-hover:text-white" />
                     </a>
