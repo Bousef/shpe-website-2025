@@ -19,78 +19,78 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <nav className="relative flex flex-col bg-gradient-to-t from-white to-[#afc1e3] p-4 sm:p-5">
-      {/* Top bar */}
-      <div className="flex items-center justify-between">
-        {/* Logo */}
-        <Link href="/" aria-label="SHPE UCF – Home" className="flex-shrink-0">
-          <img
-            src="/assets/logo.svg"
-            alt="SHPE UCF logo"
-            className="h-16 sm:h-20 w-44 sm:w-60 object-contain"
-          />
-        </Link>
+  <nav className="w-full bg-gradient-to-t from-white to-[#afc1e3] p-4 sm:p-5">
+  <div className="flex items-center justify-between w-full flex-wrap">
+    {/* Logo */}
+    <Link href="/" className="flex-shrink-0">
+      <img
+        src="/assets/logo.svg"
+        alt="SHPE UCF logo"
+        className="h-16 sm:h-20 w-44 sm:w-60 object-contain"
+      />
+    </Link>
 
-        {/* Mobile toggle button */}
-        <button
-          className="md:absolute md:hiddens text-3xl text-[#001f5b]"
-          onClick={() => setMobileOpen((prev) => !prev)}
-          aria-label="Toggle menu"
-        >
-          {mobileOpen ? <HiX /> : <HiMenuAlt3 />}
-        </button>
+    {/* Toggle Button — FIXED CLASS */}
+    <button
+      className="md:hidden text-3xl text-[#001f5b]"
+      onClick={() => setMobileOpen((prev) => !prev)}
+      aria-label="Toggle menu"
+    >
+      {mobileOpen ? <HiX /> : <HiMenuAlt3 />}
+    </button>
 
-        {/* Desktop nav */}
-        <div className="hidden md:flex space-x-10 lg:space-x-14 text-xl sm:text-2xl items-center pr-6">
-          {navItems.map(({ href, label, external }) =>
-            external ? (
-              <a
-                key={href}
-                href={href}
-                className="px-4 py-2 text-[#001f5b] hover:bg-gradient-to-t from-white/70 to-[#a4bade] rounded-3xl"
-              >
-                {label.toUpperCase()}
-              </a>
-            ) : (
-              <Link
-                key={href}
-                href={href}
-                className="px-4 py-2 text-[#001f5b] hover:bg-gradient-to-t from-white/70 to-[#a4bade] rounded-3xl"
-              >
-                {label.toUpperCase()}
-              </Link>
-            )
-          )}
-          <VscAccount className="text-3xl sm:text-4xl text-[#001f5b]" />
-        </div>
-      </div>
-
-      {/* Mobile nav */}
-      {mobileOpen && (
-        <div className="md:hidden mt-4 space-y-3 flex flex-col items-start text-lg sm:text-xl">
-          {navItems.map(({ href, label, external }) =>
-            external ? (
-              <a
-                key={href}
-                href={href}
-                className="block w-full px-4 py-2 text-[#001f5b] bg-white/90 rounded-xl"
-              >
-                {label}
-              </a>
-            ) : (
-              <Link
-                key={href}
-                href={href}
-                className="block w-full px-4 py-2 text-[#001f5b] bg-white/90 rounded-xl"
-                onClick={() => setMobileOpen(false)}
-              >
-                {label}
-              </Link>
-            )
-          )}
-          <VscAccount className="text-3xl text-[#001f5b] mt-2" />
-        </div>
+    {/* Desktop Nav */}
+    <div className="hidden md:flex flex-wrap justify-end items-center mx-auto gap-6 text-base sm:text-xl w-full md:w-auto mt-4 md:mt-0">
+      {navItems.map(({ href, label, external }) =>
+        external ? (
+          <a
+            key={href}
+            href={href}
+            className="px-3 py-1 text-[#001f5b] hover:bg-gradient-to-t from-white/70 to-[#a4bade] rounded-3xl"
+          >
+            {label.toUpperCase()}
+          </a>
+        ) : (
+          <Link
+            key={href}
+            href={href}
+            className="px-3 py-1 text-[#001f5b] hover:bg-gradient-to-t from-white/70 to-[#a4bade] rounded-3xl"
+          >
+            {label.toUpperCase()}
+          </Link>
+        )
       )}
-    </nav>
+      <VscAccount className="text-3xl sm:text-4xl text-[#001f5b]" />
+    </div>
+  </div>
+
+  {/* Mobile Nav */}
+  {mobileOpen && (
+    <div className="md:hidden mt-4 space-y-3 flex flex-col items-start text-lg sm:text-xl">
+      {navItems.map(({ href, label, external }) =>
+        external ? (
+          <a
+            key={href}
+            href={href}
+            className="block w-full px-4 py-2 text-[#001f5b] bg-white/90 rounded-xl"
+          >
+            {label}
+          </a>
+        ) : (
+          <Link
+            key={href}
+            href={href}
+            className="block w-full px-4 py-2 text-[#001f5b] bg-white/90 rounded-xl"
+            onClick={() => setMobileOpen(false)}
+          >
+            {label}
+          </Link>
+        )
+      )}
+      <VscAccount className="text-3xl text-[#001f5b] mt-2" />
+    </div>
+  )}
+</nav>
+
   );
 }
