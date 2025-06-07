@@ -56,12 +56,12 @@ export function DevBioPopup ({ member, onClose }: BioPopupsProps) {
 						</div>
 
 						{/* contact icons row (email, LinkedIn, etc.) */}
-						<div className="flex flex-row gap-5 mt-2 bottom-0 right-0 absolute items-center">
+						<div className="flex flex-row gap-5 mt-2 bottom-2 right-2 absolute items-center">
 							<a
                 href={member.bio.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className=" bg-[#0077b5] rounded flex items-center justify-center hover:opacity-90 trasition-opacity"
+                className=" bg-[#0077b5] rounded flex items-center justify-center hover:opacity-90 transition-opacity"
               >
 								<BsLinkedin className="w-10 h-10 text-white" />
 							</a>
