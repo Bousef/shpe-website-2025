@@ -23,9 +23,8 @@ export default function Board() {
 
       {/* E-Board Section */}
       <div className="text-yellow-500 text-4xl font-helvetica text-center mb-6">
-        E-Board Members
       </div>
-      <div className="container mx-auto max-w-full px-4 mb-12">
+      <div className="container mx-auto max-w-full px-25 mb-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-8">
           {eBoardMembers.map((member) => (
             <MemberCard
@@ -33,16 +32,8 @@ export default function Board() {
               member={member}
               onSelect={setSelected}
             />
+            
           ))}
-        </div>
-      </div>
-
-      {/* Other Members Section */}
-      <div className="text-yellow-500 text-4xl font-helvetica text-center mb-6">
-        Other Members
-      </div>
-      <div className="container mx-auto max-w-full px-4 mb-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-8">
           {remainingMembers.map((member) => (
             <MemberCard
               key={member.name}
