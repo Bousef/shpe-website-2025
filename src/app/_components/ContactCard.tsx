@@ -3,7 +3,6 @@ import iso from "iso-3166-1";
 import { BsEnvelope, BsLinkedin } from "react-icons/bs";
 import { type Member } from "./MemberCard";
 import Image from "next/image";
-import Link from "next/link";
 
 type ContactCardProps = {
   member: Member;
