@@ -15,9 +15,10 @@ export default function Board() {
       {/* Main Title */}
       <div className="flex items-center">
         <div className="text-yellow-500 mx-auto">
-          <h1 className="font-helvetica text-[50px] m-10 pb-5">
-            GET TO KNOW OUR TEAM
-          </h1>
+<h1 className="font-helvetica text-[28px] sm:text-[36px] md:text-[50px] m-6 sm:m-10 pb-4 text-center">
+  KNOW THE FACES OF SHPE UCF
+</h1>
+
         </div>
       </div>
 
