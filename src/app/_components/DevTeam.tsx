@@ -174,13 +174,13 @@ export default function DevSection() {
         {/* header */}
         <div className="container mx-auto px-4 text-center mb-12 text-black">
           <h2 className="text-5xl text-[var(--shpe-orange)]">GET TO KNOW OUR TEAM</h2>
-          <p className="mt-2 text-xl text-slate-400">Know the faces of SHPE UCF</p>
+          <p className="mt-2 text-2xl text-[var(--shpe-light-blue)]">Know the faces of SHPE UCF</p>
         </div>
 
         {/* grid for the tech chairs profile cards */}
-        <section className="container mx-auto mb-16 px-4">
+        <section className="relative mx-auto mb-16 px-4">
           <h3 className="text-4xl text-[var(--shpe-blue)] font-semibold text-center mb-4">TECH CHAIRS</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
             {techChairs.map((m) => (
               <DevProfileCard key={m.name} member={m} />
             ))}
@@ -203,7 +203,7 @@ export default function DevSection() {
             {/* MOBILE TEAM */}
             <div className="flex-1">
               <h4 className="text-4xl font-semibold text-center text-[var(--shpe-blue)] mb-4">MOBILE TEAM</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 justify-items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 justify-items-center">
                 {mobileTeam.map((member) => (
                   <div key={member.name} className="w-full max-w-xs">
                     <DevProfileCard member={member} />
@@ -215,7 +215,7 @@ export default function DevSection() {
             {/* WEB TEAM */}
             <div className="flex-1">
               <h4 className="text-4xl font-semibold text-center text-[var(--shpe-blue)] mb-4">WEB TEAM</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 justify-items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 justify-items-center">
                 {webTeam.map((member) => (
                   <div key={member.name} className="w-full max-w-xs">
                     <DevProfileCard member={member} />
