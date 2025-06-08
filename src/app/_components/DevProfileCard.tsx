@@ -28,10 +28,10 @@ export function DevProfileCard({ member }: ProfileCardProps) {
           {/* arrow icon */}
           <button
             onClick={() => setIsOpen(true)} 
-            className="absolute bottom-3 right-3 w-8 h-8 rounded-full flex items-center justify-center 
+            className="absolute bottom-3 right-3 w-8 h-8 rounded-full flex items-center justify-center border-2 border-[var(--shpe-orange)]
               bg-white bg-opacity-70 group-hover:bg-yellow-400 group-hover:bg-opacity-100 transition"
           >
-            <ChevronRightIcon className="w-6 h-6 text-bold text-gray-900" />
+            <ChevronRightIcon className="w-7 h-7 text-[var(--shpe-navy-blue)]" />
           </button>
         </div>
 

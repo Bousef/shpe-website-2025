@@ -33,7 +33,7 @@ export function DevBioPopup ({ member, onClose }: BioPopupsProps) {
 				{/* bio content goes here */}
 				<div className="flex flex-col md:flex-row gap-4">
 					{/* profile image */}
-					<div className="w-full md:w-1/3 aspect-[4/3] md:h-auto">
+					<div className="w-full md:w-1/3 aspect-[3/4] md:h-auto">
 						<img
 							src={member.pfp}
 							alt={member.name}
