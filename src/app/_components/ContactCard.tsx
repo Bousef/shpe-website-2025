@@ -78,23 +78,11 @@ export default function ContactCard({ member, onClose }: ContactCardProps) {
             `}
           >
             <Flag
-              className="h-6 sm:h-8 lg:h-10 overflow-hidden"
-              code={iso.whereCountry(member.country)?.alpha3}
+              className="h-10"
+              code={iso.whereCountry(member.country ?? "")?.alpha3 || ""}
             />
             <a
-              href={`mailto:${member.email}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block"
-            >
-              <BsEnvelope className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 scale-125" />
-            </a>
-            <a
-              href={
-                member.linkedin.startsWith("http")
-                  ? member.linkedin
-                  : `https://${member.linkedin}`
-              }
+              href={member.linkedin}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block text-blue-600 underline"
