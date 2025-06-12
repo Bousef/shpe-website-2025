@@ -5,7 +5,7 @@ import EventsSection from "./_components/EventsSection";
 
 export const metadata = {
   title: "SHPE UCF",
-  description: "Society of Hispanic Professional Engineers – UCF Chapter",
+  description: "Society of Hispanic Professional Engineers - UCF Chapter",
   icons: { icon: "/favicon.ico" },
 };
 
