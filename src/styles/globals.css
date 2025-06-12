@@ -1,9 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
 @import "tailwindcss";
 
-@theme {
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+@layer utilities {
+  .font-condensed {
+    font-stretch: condensed;
+  }
 }
+
+:root {
+  --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-roboto: 'Roboto', sans-serif;
+}
+
 
 
 .hero-title {
@@ -15,5 +25,3 @@
   display: inline-block;      /* needed so transform only affects text */
   transform: scaleX(1.2);     /* stretch to 120% width; tweak as needed */
   transform-origin: left;     /* scale out from left edge */
-  
-}

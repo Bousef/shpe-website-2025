@@ -40,6 +40,7 @@ export default function Navbar() {
     </button>
 
     {/* Desktop Nav */}
+
     <div className="hidden md:flex flex-wrap justify-end items-center mx-auto gap-6 text-sm lg:text-xl w-full md:w-auto mt-4 md:mt-0">
       {navItems.map(({ href, label, external }) =>
         external ? (
