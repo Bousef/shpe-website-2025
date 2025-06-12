@@ -3,7 +3,7 @@ import type { Member } from "~/app/_components/MemberCard";
 export const remainingMembers: Member[] = [
   {
     name: "Jovany Joseph",
-    role: "Professional Development",
+    role: "Professional Development Chair ",
     major: "Aerospace",
     future_ind: "Space",
     bio: "Isn’t it funny how me and Spiderman are never in the room at the same time…",
@@ -15,7 +15,7 @@ export const remainingMembers: Member[] = [
   },
   {
     name: "Onely Maza",
-    role: "Socials Chair",
+    role: "Socials Co-Chair",
     major: "Industrial Engineering",
     future_ind: "Quality engineering/systems engineering",
     bio: "What’s up guys I’m Onely I am a third year IE major and currently am a Trip/Procurement services Intern with the business intelligence and digital Ops team at The Walt Disney Company. Excited to be part of your 2025-2026 board. Let’s make this year a great one!",
@@ -47,7 +47,7 @@ export const remainingMembers: Member[] = [
     country: "Colombia",
     linkedin: "www.linkedin.com/in/john-s-z",
     email: "",
-    picture: ""
+    picture: "john.jpg"
   },
   {
     name: "Justin Hoyos",
@@ -75,7 +75,7 @@ export const remainingMembers: Member[] = [
   },
   {
     name: "Catalina Ocampo",
-    role: "Tech Co-Chair",
+    role: "Technology Co-Chair",
     major: "Computer Science",
     future_ind: "Software Engineering/Cloud Development",
     bio: "Hola! My name is Catalina, a fourth-year Computer Science major. I was raised in South Florida, and I’m proudly Colombia. A fun fact about me: I’ve traveled to about nine countries in the past year! I’m excited to support aspiring developers in pursuing their dreams!",
@@ -87,7 +87,7 @@ export const remainingMembers: Member[] = [
   },
   {
     name: "Gabriela A. Cárdenas Sánchez",
-    role: "Event Coordinator Co-Chair",
+    role: "Socials Co-Chair",
     major: "Industrial Engineering",
     future_ind: "Project Management, Technical Design, Drafting",
     bio: "Hey! My name is Gabriela, I was born in Maracay, Venezuela, my grandparents where Colombian (Medellin) and Lebanese (Zgharta) immigrants in Venezuela. I'm majoring in Industrial Engineering and minoring in Business Administration. Fun fact about me: I do rappel since I was 2 years old. I also want to be an architect and a fashion designer living in Italy, that's why I'm learning my forth language (Italian)",
@@ -95,7 +95,7 @@ export const remainingMembers: Member[] = [
     country: "",
     linkedin: "www.linkedin.com/in/g-cardenas",
     email: "socials@shpeucf.com",
-    picture: ""
+    picture: "gaby.jpeg"
   },
   {
     name: "Vilanys Rivera Caceres",
@@ -107,11 +107,11 @@ export const remainingMembers: Member[] = [
     country: "Puerto Rico",
     linkedin: "https://www.linkedin.com/in/vilanys-rivera-caceres-8b4000291?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app",
     email: "vilanysc@gmail.com",
-    picture: ""
+    picture: "vila.jpg"
   },
   {
     name: "Yousef Osman",
-    role: "Tech Chair",
+    role: "Technology Co-Chair",
     major: "Information Technology",
     future_ind: "Full Stack Developer",
     bio: "Hi! My name is Yousef and I am a junior Information Technology major! I'm Egyptian and Puerto Rican Currently in an internship at Lockheed Martin working as a software engineer, I look forward to working with all of you guys!",
