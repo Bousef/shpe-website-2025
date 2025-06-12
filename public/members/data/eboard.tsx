@@ -40,7 +40,7 @@ export const eBoardMembers: Member[] = [
   },
   {
     name: "Jayson Benitez",
-    role: "Marketing VP",
+    role: "Marketing Vice President",
     major: "Civil Engineering",
     future_ind: "Civil Engineering Prohect manager",
     bio: "Hola familia, my name is Jayson Benitez I was born and raised in Honduras moved to Palm Beach Florida in 2018. I enjoy going to the gym and watching soccer, F1, and UFC.",
