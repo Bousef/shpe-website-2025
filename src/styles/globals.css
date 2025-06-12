@@ -26,3 +26,17 @@
   transform: scaleX(1.2);     /* stretch to 120% width; tweak as needed */
   transform-origin: left;     /* scale out from left edge */
 }
+:root{
+  --shpe-dark-orange: #D33A02;
+  --shpe-orange: #FD652F;
+  --shpe-navy-blue:#001F5B;
+  --shpe-blue:#0070C0;
+  --shpe-light-blue:#72A9BE;
+  --shpe-gray:#626366;
+  --shpe-yellow:#F7A800;
+}
+.partner-logo {
+  mix-blend-mode: multiply;
+  background: transparent !important;
+  filter: drop-shadow(0 0 1px rgba(0,0,0,0.1));
+}
