@@ -1,40 +1,60 @@
+"use client";
+
+import {
+  RiInstagramLine,
+  RiDiscordLine,
+  RiTiktokLine,
+  RiYoutubeLine,
+} from "react-icons/ri";
+import { SlSocialLinkedin } from "react-icons/sl";
+import { RxDiscordLogo } from "react-icons/rx";
+import { PiYoutubeLogoLight, PiInstagramLogoLight, PiTiktokLogoThin } from "react-icons/pi";
+import {  } from "react-icons/pi";
+
 export default function FooterSection() {
   return (
-    <footer>
-      <div className="w-full h-1 bg-orange-500"/>
-      <div className="bg-[#2A3342] text-white flex flex-col items-center justify-around pt-3 h-[30rem]">
-      <img
-        src="/assets/logo-footer.svg"
-        alt="SHPE logo"
-        className="2xl:w-[6%]"
-      />
+    <footer className="relative flex flex-col items-center bg-[url(/assets/homebg.png)] h-[15rem] w-full bg-cover mt-6">
+      {/* White horizontal line */}
+      <hr className="w-11/12 border-t-2 border-white mt-8" />
 
-      <ul className="flex justify-around w-full lg:w-[50%] text-center text-slate-400 2xl:text-2xl">
-        {[
-          { href: "#about", label: "About" },
-          {
-            href:
-              "https://docs.google.com/forms/d/e/1FAIpQLSd-afMh4hdQtk6HfmeaEOxptbqrMK4Nei9ukQXQBaFB0rwKOQ/viewform",
-            label: "News",
-            target: "_blank",
-          },
-          { href: "#team", label: "Dev Team" },
-          { href: "#calendar", label: "Calendar" },
-          { href: "#contact", label: "Contact Us" },
-        ].map(({ href, label, target }) => (
-          <li key={label}>
-            <a href={href} target={target}>
-              {label}
-            </a>
-          </li>
-        ))}
-      </ul>
-
-      <p className="text-slate-400 2xl:text-xl">
-        © 2023 SHPE UCF. All rights reserved.
-      </p>
+      {/* Hollow social icons */}
+      <div className="flex space-x-8 mt-4">
+        <a
+          href="https://www.instagram.com/shpeucf/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <PiInstagramLogoLight className="text-white text-4xl sm:text-5xl hover:text-gray-300" />
+        </a>
+        <a
+          href="https://www.linkedin.com/company/society-of-hispanic-professional-engineers/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <SlSocialLinkedin className="text-white text-4xl sm:text-5xl hover:text-gray-300" />
+        </a>
+        <a
+          href="https://discord.com/invite/gRamS65mqT"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <RxDiscordLogo className="text-white text-4xl sm:text-5xl hover:text-gray-300" />
+        </a>
+        <a
+          href="https://www.tiktok.com/@shpe_ucf?_t=ZP-8x1AoD0oTDr&_r=1"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <PiTiktokLogoThin className="text-white text-4xl sm:text-5xl hover:text-gray-300" />
+        </a>
+        <a
+          href="https://www.youtube.com/@SHPEUCF"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <PiYoutubeLogoLight className="text-white text-4xl sm:text-5xl hover:text-gray-300" />
+        </a>
       </div>
     </footer>
   );
 }
-

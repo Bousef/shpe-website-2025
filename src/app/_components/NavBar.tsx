@@ -19,14 +19,14 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-  <nav className="w-full bg-gradient-to-t from-white to-[#afc1e3] p-4 sm:p-5">
-  <div className="flex items-center justify-between w-full flex-wrap">
+  <nav className="w-full bg-gradient-to-t from-white to-[#afc1e3] p-4 sm:p-5 max-w-screen overlay-x-hidden">
+  <div className="flex items-center ">
     {/* Logo */}
-    <Link href="/" className="flex-shrink-0">
+    <Link href="/" className="flex-shrink-0.5">
       <img
-        src="/assets/logo.svg"
+        src="/assets/NavLogo.png"
         alt="SHPE UCF logo"
-        className="h-16 sm:h-20 w-44 sm:w-60 object-contain"
+        className="w-80 object-contain"
       />
     </Link>
 
@@ -40,7 +40,8 @@ export default function Navbar() {
     </button>
 
     {/* Desktop Nav */}
-    <div className="hidden md:flex flex-wrap justify-end items-center mx-auto gap-6 text-base sm:text-xl w-full md:w-auto mt-4 md:mt-0">
+
+    <div className="hidden md:flex flex-wrap justify-end items-center mx-auto gap-6 text-sm lg:text-xl w-full md:w-auto mt-4 md:mt-0">
       {navItems.map(({ href, label, external }) =>
         external ? (
           <a
