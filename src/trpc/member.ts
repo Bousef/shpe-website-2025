@@ -56,7 +56,7 @@ export const memberRouter = createTRPCRouter({
   //get member
 
 
-  //delete member
+  //delete member - debugging
 
 
   //update member
