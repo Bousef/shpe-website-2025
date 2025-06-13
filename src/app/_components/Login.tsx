@@ -10,10 +10,10 @@ export default function Login(){
 	const currentError = loginState.error || signupState.error;
 
 	return (
-		<section className="flex flex-col items-center pb-[6rem] py-[2rem]">
+		<section className="flex flex-col items-center pb-[6rem] py-[2rem] px-4 min-w-[280px]">
 
 			{/* header */}
-			<div className="container mx-auto px-4 text-center mb-10.5 text-black">
+			<div className="container px-4 text-center mb-10.5 text-black">
 				<h2 className="text-5xl text-[var(--shpe-orange)]">LOG IN</h2>
 			</div>
 
