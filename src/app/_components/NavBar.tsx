@@ -6,12 +6,12 @@ import { VscAccount } from "react-icons/vsc";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
 
 const navItems = [
+  { href: "/about", label: "About" },
   { href: "/board", label: "Board" },
   { href: "/dev-team", label: "Dev team" },
   { href: "/alumni", label: "Alumni" },
   { href: "/sponsors", label: "Sponsors" },
   { href: "/calendar", label: "Calendar" },
-  { href: "/gallery", label: "Gallery" }, // fixed duplicate "Calendar"
   { href: "/shop", label: "Shop", external: true },
 ];
 
@@ -41,13 +41,13 @@ export default function Navbar() {
 
     {/* Desktop Nav */}
 
-    <div className="hidden md:flex flex-wrap justify-end items-center mx-auto gap-6 text-sm lg:text-xl w-full md:w-auto mt-4 md:mt-0">
+    <div className="hidden md:flex justify-between items-center w-full text-sm lg:text-xl mt-4 md:mt-0 px-6">
       {navItems.map(({ href, label, external }) =>
         external ? (
           <a
             key={href}
             href={href}
-            className="px-3 py-1 text-[#001f5b] hover:bg-gradient-to-t from-white/70 to-[#a4bade] rounded-3xl"
+            className="px-3 py-1 text-[#001f5b] hover:text-[#001133] hover:scale-105 transition-transform duration-150 rounded-3xl"
           >
             {label.toUpperCase()}
           </a>
@@ -55,7 +55,7 @@ export default function Navbar() {
           <Link
             key={href}
             href={href}
-            className="px-3 py-1 text-[#001f5b] hover:bg-gradient-to-t from-white/70 to-[#a4bade] rounded-3xl"
+            className="px-3 py-1 text-[#001f5b] hover:text-[#001133] hover:scale-105 transition-transform duration-150 rounded-3xl"
           >
             {label.toUpperCase()}
           </Link>
@@ -73,7 +73,7 @@ export default function Navbar() {
           <a
             key={href}
             href={href}
-            className="block w-full px-4 py-2 text-[#001f5b] bg-white/90 rounded-xl"
+            className="block w-full px-4 py-2 text-[#001f5b] hover:text-[#001133] hover:scale-105 transition-transform duration-150 bg-white/90 rounded-xl"
           >
             {label}
           </a>
@@ -81,7 +81,7 @@ export default function Navbar() {
           <Link
             key={href}
             href={href}
-            className="block w-full px-4 py-2 text-[#001f5b] bg-white/90 rounded-xl"
+            className="block w-full px-4 py-2 text-[#001f5b] hover:text-[#001133] hover:scale-105 transition-transform duration-150 bg-white/90 rounded-xl"
             onClick={() => setMobileOpen(false)}
           >
             {label}
