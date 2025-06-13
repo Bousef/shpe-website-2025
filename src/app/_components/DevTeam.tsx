@@ -15,7 +15,7 @@ const members: Member[] = [
     },
   },
   {
-    name: "Cata",
+    name: "Catalina Ocampo",
     role: "Tech Chair",
     pfp: "/board/cata.png",
     bio: {
@@ -29,7 +29,7 @@ const members: Member[] = [
   {
     name: "Gabriela Cardenas",
     role: "UI/UX Designer",
-    pfp: "/board/gabriela.jpeg",
+    pfp: "/members/gaby.jpeg",
     bio: {
       major: "Computer Science",
       industryFocus: "Full‐stack Development, UI/UX Design",
@@ -173,13 +173,12 @@ export default function DevSection() {
 
         {/* header */}
         <div className="container mx-auto px-4 text-center mb-12 text-black">
-          <h2 className="text-5xl text-[var(--shpe-orange)]">GET TO KNOW OUR TEAM</h2>
-          <p className="mt-2 text-2xl text-[var(--shpe-light-blue)]">Know the faces of SHPE UCF</p>
+          <h2 className="text-blue-800 text-5xl text-[var(--shpe-orange)]">GET TO KNOW OUR TEAM</h2>
         </div>
 
         {/* grid for the tech chairs profile cards */}
         <section className="relative mx-auto mb-16 px-4">
-          <h3 className="text-4xl text-[var(--shpe-blue)] font-semibold text-center mb-4">TECH CHAIRS</h3>
+          <h3 className="text-4xl font-semibold text-center mb-4">TECH CHAIRS</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
             {techChairs.map((m) => (
               <DevProfileCard key={m.name} member={m} />
@@ -189,7 +188,7 @@ export default function DevSection() {
 
         {/* grid for the ui/ux designer profile cards */}
         <section className="container mx-auto mb-16 px-4">
-          <h3 className="text-4xl text-[var(--shpe-blue)] font-semibold text-center mb-4">UI/UX DESIGNER</h3>
+          <h3 className="text-4xl font-semibold text-center mb-4">UI/UX DESIGNER</h3>
           <div className="grid grid-cols-1 gap-4">
             {uiDesigner.map((m) => (
               <DevProfileCard key={m.name} member={m} />
@@ -202,7 +201,7 @@ export default function DevSection() {
           <div className="flex flex-col md:flex-row gap-12">
             {/* MOBILE TEAM */}
             <div className="flex-1">
-              <h4 className="text-4xl font-semibold text-center text-[var(--shpe-blue)] mb-4">MOBILE TEAM</h4>
+              <h4 className="text-4xl font-semibold text-center mb-4">MOBILE TEAM</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 justify-items-center">
                 {mobileTeam.map((member) => (
                   <div key={member.name} className="w-full max-w-xs">
@@ -214,7 +213,7 @@ export default function DevSection() {
 
             {/* WEB TEAM */}
             <div className="flex-1">
-              <h4 className="text-4xl font-semibold text-center text-[var(--shpe-blue)] mb-4">WEB TEAM</h4>
+              <h4 className="text-4xl font-semibold text-center mb-4">WEB TEAM</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 justify-items-center">
                 {webTeam.map((member) => (
                   <div key={member.name} className="w-full max-w-xs">

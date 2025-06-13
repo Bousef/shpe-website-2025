@@ -1,89 +1,97 @@
+'use client';
+
+import { useState } from "react";
 import Link from "next/link";
-import { FaBars, FaTimes } from "react-icons/fa";
+import { VscAccount } from "react-icons/vsc";
+import { HiMenuAlt3, HiX } from "react-icons/hi";
 
 const navItems = [
-  { href: "/board",    label: "Board" },
+  { href: "/about", label: "About" },
+  { href: "/board", label: "Board" },
   { href: "/dev-team", label: "Dev team" },
-  { href: "/alumni",   label: "Alumni" },
+  { href: "/alumni", label: "Alumni" },
   { href: "/sponsors", label: "Sponsors" },
   { href: "/calendar", label: "Calendar" },
-  { href: "/shop",     label: "Shop", external: true },
+  { href: "/shop", label: "Shop", external: true },
 ];
 
 export default function Navbar() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   return (
-    <nav className="relative flex items-center justify-between bg-[#F7F8F9] p-5 text-black">
-      {/* Logo */}
-      <Link href="/" aria-label="SHPE UCF – Home" className="flex-shrink-0">
-        <img src="/assets/logo.svg" alt="SHPE UCF logo" className="md:2x1:w-[12%]" />
-      </Link>
+  <nav className="w-full bg-gradient-to-t from-white to-[#afc1e3] p-4 sm:p-5 max-w-screen overlay-x-hidden">
+  <div className="flex items-center ">
+    {/* Logo */}
+    <Link href="/" className="flex-shrink-0.5">
+      <img
+        src="/assets/NavLogo.png"
+        alt="SHPE UCF logo"
+        className="w-80 object-contain"
+      />
+    </Link>
 
-      {/* Desktop navigation */}
-      <div className="hidden md:flex space-x-14 text-3x1">
-        {navItems.map(({ href, label, external }) =>
-          external ? (
-            <a
-              key={href}
-              href={href}
-              className="px-4 py-2 text-[#6B7280] text-2xl hover:bg-gray-100 rounded"
-            >
-              {label}
-            </a>
-          ) : (
-            <Link
-              key={href}
-              href={href}
-              className="px-4 py-2 text-[#6B7280] text-2xl hover:bg-gray-100 rounded"
-            >
-              {label}
-            </Link>
-          )
-        )}
-      </div>
+    {/* Toggle Button — FIXED CLASS */}
+    <button
+      className="md:hidden text-3xl text-[#001f5b]"
+      onClick={() => setMobileOpen((prev) => !prev)}
+      aria-label="Toggle menu"
+    >
+      {mobileOpen ? <HiX /> : <HiMenuAlt3 />}
+    </button>
 
-      {/* Login button on desktop */}
-      <Link
-        href="/login"
-        className="hidden md:inline-flex items-center justify-center bg-orange-500 hover:bg-orange-600 text-white text-sm md:text-lg px-4 py-2 rounded shadow"
-      >
-        Login
-      </Link>
+    {/* Desktop Nav */}
 
-      {/* Mobile menu (pure CSS) */}
-      <div className="md:hidden relative">
-        <input type="checkbox" id="menu-toggle" className="peer hidden" aria-hidden="true" />
-        <label htmlFor="menu-toggle" className="block p-2 cursor-pointer">
-          <FaBars className="peer-checked:hidden" size={24} />
-          <FaTimes className="hidden peer-checked:block" size={24} />
-        </label>
-        <div className="hidden peer-checked:flex flex-col absolute left-0 top-full w-full bg-white shadow-md p-4 space-y-2">
-          {navItems.map(({ href, label, external }) =>
-            external ? (
-              <a
-                key={href}
-                href={href}
-                className="px-4 py-2 text-[#6B7280] hover:bg-gray-100 rounded"
-              >
-                {label}
-              </a>
-            ) : (
-              <Link
-                key={href}
-                href={href}
-                className="px-4 py-2 text-[#6B7280] hover:bg-gray-100 rounded"
-              >
-                {label}
-              </Link>
-            )
-          )}
-          <Link
-            href="/login"
-            className="mt-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded text-center"
+    <div className="hidden md:flex justify-between items-center w-full text-sm lg:text-xl mt-4 md:mt-0 px-6">
+      {navItems.map(({ href, label, external }) =>
+        external ? (
+          <a
+            key={href}
+            href={href}
+            className="px-3 py-1 text-[#001f5b] hover:text-[#001133] hover:scale-105 transition-transform duration-150 rounded-3xl"
           >
-            Login
+            {label.toUpperCase()}
+          </a>
+        ) : (
+          <Link
+            key={href}
+            href={href}
+            className="px-3 py-1 text-[#001f5b] hover:text-[#001133] hover:scale-105 transition-transform duration-150 rounded-3xl"
+          >
+            {label.toUpperCase()}
           </Link>
-        </div>
-      </div>
-    </nav>
+        )
+      )}
+      <VscAccount className="text-3xl sm:text-4xl text-[#001f5b]" />
+    </div>
+  </div>
+
+  {/* Mobile Nav */}
+  {mobileOpen && (
+    <div className="md:hidden mt-4 space-y-3 flex flex-col items-start text-lg sm:text-xl">
+      {navItems.map(({ href, label, external }) =>
+        external ? (
+          <a
+            key={href}
+            href={href}
+            className="block w-full px-4 py-2 text-[#001f5b] hover:text-[#001133] hover:scale-105 transition-transform duration-150 bg-white/90 rounded-xl"
+          >
+            {label}
+          </a>
+        ) : (
+          <Link
+            key={href}
+            href={href}
+            className="block w-full px-4 py-2 text-[#001f5b] hover:text-[#001133] hover:scale-105 transition-transform duration-150 bg-white/90 rounded-xl"
+            onClick={() => setMobileOpen(false)}
+          >
+            {label}
+          </Link>
+        )
+      )}
+      <VscAccount className="text-3xl text-[#001f5b] mt-2" />
+    </div>
+  )}
+</nav>
+
   );
 }
