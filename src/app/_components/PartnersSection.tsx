@@ -9,7 +9,7 @@ export default function PartnersSection() {
   return (
     <main className="bg-white py-12 px-4">
       <section className="max-w-6xl mx-auto text-center">
-        <h2 className="text-5xl text-[var(--shpe-yellow)]">
+        <h2 className="text-5xl text-blue-800">
           THANK YOU TO OUR SPONSORS!
         </h2>
 

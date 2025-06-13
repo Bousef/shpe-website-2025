@@ -5,7 +5,6 @@ export default function Calendar() {
     return (
         <div>
             <Navbar />
-            Calendar
             <div className = "flex flex-col items-center">
                 <iframe
                     id="calendar"

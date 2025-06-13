@@ -12,7 +12,7 @@ export default function Alumni() {
       <Navbar />
 
       <div className="text-center py-10">
-        <h1 className="text-4xl font-bold text-yellow-500">2024 - 2025</h1>
+        <h1 className="text-4xl text-blue-800">2024 - 2025</h1>
       </div>
 
       <div className="grid grid-cols-0 sm:grid-cols-3 md:grid-cols-3 gap-6 px-6 pb-20 justify-items-center">

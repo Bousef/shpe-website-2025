@@ -6,7 +6,6 @@ export default function Devteam () {
         <div>
             <Navbar/>
             <DevTeam/>
-            DevTeam
         </div>
     );
 }
