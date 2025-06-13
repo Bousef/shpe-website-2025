@@ -13,13 +13,13 @@ export default function Login(){
 		<section className="flex flex-col items-center pb-[6rem] py-[2rem]">
 
 			{/* header */}
-			<div className="container mx-auto px-4 text-center mb-10 text-black">
+			<div className="container mx-auto px-4 text-center mb-10.5 text-black">
 				<h2 className="text-5xl text-[var(--shpe-orange)]">LOG IN</h2>
 			</div>
 
 			<form className="w-full max-w-md space-y-1">
 				{/* border for the form container */}
-				<div className="border-5 border-[var(--shpe-light-blue)] p-4 divide-y-4">
+				<div className="border-4 border-[var(--shpe-light-blue)] p-4 divide-y-2">
 					{/* EMAIL */}
 					<div className="pb-3">
 							<div className="h-6 text-red-500 text-sm hidden">
@@ -32,7 +32,7 @@ export default function Login(){
 								type="email" 
 								placeholder="Email"
 								required 
-								className="w-full text-[var(--shpe-navy-blue)] text-xl"
+								className="w-full text-[var(--shpe-navy-blue)] text-xl focus:outline-none  "
 							/>
 					</div>
 					{/* PASSWORD */}
@@ -43,13 +43,24 @@ export default function Login(){
 							type="password" 
 							placeholder="Password"
 							required 
-							className="w-full text-[var(--shpe-navy-blue)] text-xl"
+							className="w-full text-[var(--shpe-navy-blue)] text-xl focus:outline-none"
 						/>
 					</div>
 				</div>
 
-				{/* FORGET PASSWORD */}
-				<div className="flex justify-end mb-2">
+				{/* REMEMBER ME + FORGET PASSWORD */}
+				<div className="flex justify-between items-center mb-2">
+					<label className="flex items-center">	
+						<input
+							id="remember"
+							type="checkbox"
+							className="h-4 w-4 text-yellow-500 focus:ring-yellow-400 border-gray-300 rounded"
+						/>
+						<span className="ml-2 text-sm text-[var(--shpe-navy-blue)] select-none">
+							Remember Me
+						</span>
+					</label>
+
 					<a
 						href="#"
 						className="text-sm text-[var(--shpe-navy-blue)] hover:underline"
@@ -58,20 +69,7 @@ export default function Login(){
 					</a>
 				</div>
 
-				{/* REMEMBER ME */}
-				<div className="flex items-center">
-					<input
-						id="remember"
-						type="checkbox"
-						className="h-4 w-4 text-yellow-500 focus:ring-yellow-400 border-gray-300 rounded"
-					/>
-					<label
-						htmlFor="remember"
-						className="ml-2 text-sm text-[var(--shpe-navy-blue)] select-none"
-					>
-						Remember Me
-					</label>
-				</div>
+				
 
 				{/* LOGIN / SIGNUP BUTTONS */}
 				<div className="mt-15 space-y-2 text-[var(--shpe-navy-blue)] font-bold">
