@@ -32,18 +32,26 @@ export const memberRouter = createTRPCRouter({
     .where(eq(members.email, input.email));
 
     if (existingMember.length > 0) {
-      throw new Error("Error: Account already exists.");
+      // We return null to tell the user that there the member already exists
+      return null;
     }
     
     //insert new member with the hashed password
-    const newMember = await db
+    const [newMember] = await db
     .insert(members)
     .values({
       ...input,
     })
     .returning();
 
-    return newMember[0];
+    // Wrapper around undefined to make it consistent with previous error handling
+    // TODO: make this error handling better (report more info to the api user)
+    if (newMember === undefined) {
+      console.error("createMember procedure returned undefined. This should not happen.");
+      return null
+    }
+
+    return newMember;
   }),
 
 
