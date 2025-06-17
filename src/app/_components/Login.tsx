@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react';
 import { login, signup } from '../login/actions';
+import Link from 'next/link';
 
 export default function Login(){
 	const [loginState, loginAction] = useActionState(login, { error: "" });
@@ -13,7 +14,7 @@ export default function Login(){
 		<section className="flex flex-col items-center pb-[6rem] py-[2rem] px-4 min-w-[280px]">
 
 			{/* header */}
-			<div className="container px-4 text-center mb-10.5 text-black">
+			<div className="container px-4 text-center mb-10.5">
 				<h2 className="text-5xl text-[var(--shpe-orange)]">LOG IN</h2>
 			</div>
 
@@ -61,15 +62,12 @@ export default function Login(){
 						</span>
 					</label>
 
-					<a
-						href="#"
-						className="text-sm text-[var(--shpe-navy-blue)] hover:underline"
-					>
+					<a 
+						href="/forgot-password"
+						className="text-sm text-[var(--shpe-navy-blue)] hover:underline">
 						Forgot Password
 					</a>
 				</div>
-
-				
 
 				{/* LOGIN / SIGNUP BUTTONS */}
 				<div className="mt-15 space-y-2 text-[var(--shpe-navy-blue)] font-bold">
