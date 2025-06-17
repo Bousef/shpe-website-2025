@@ -59,8 +59,43 @@ export const memberRouter = createTRPCRouter({
   //delete member - debugging
 
 
-  //update member
+  // update member
+  // Retrieves member to update by `ucf_id`, meaning that the ucf id by itself can't be changed
+  updateMember: publicProcedure.input(
+    z.object({
+      ucf_id: z.number(),
+      first_name: z.string().min(1).optional(),
+      last_name: z.string().min(1).optional(),
+      email: z.string().optional(),
+      image: z.string().optional(),
+      bio: z.string().optional(),
+      resume: z.string().optional(),
+      is_member: z.boolean().optional(),
+  }))
+  .mutation(async ({ input, ctx }) => {
+    const { ucf_id, ...updateData } = input;
 
+    const fieldsToUpdate = Object.fromEntries(
+      Object.entries(updateData).filter(([_, value]) => value !== undefined)
+    );
+
+    if (Object.keys(fieldsToUpdate).length === 0) {
+      return null;
+    }
+
+    const updatedMember = await ctx.db
+      .update(members)
+      .set(fieldsToUpdate)
+      .where(eq(members.ucf_id, ucf_id))
+      .returning();
+
+    // Member not found
+    if (updatedMember.length === 0) {
+      return null;
+    }
+
+    return updatedMember[0];
+  }),
 
   //get all members - debugging purposes
 
