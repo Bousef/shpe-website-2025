@@ -97,7 +97,12 @@ export const memberRouter = createTRPCRouter({
     return updatedMember[0];
   }),
 
-  //get all members - debugging purposes
+  // get all members - debugging purposes
+  getAllMembers: publicProcedure.query(async ({ ctx }) => {
+    const allMembers = await ctx.db
+      .select()
+      .from(members);
 
- 
+    return allMembers;
+  }),
 });
