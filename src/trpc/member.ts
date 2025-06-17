@@ -17,7 +17,7 @@ import { idText } from "typescript";
 
 export const memberRouter = createTRPCRouter({
 
-  //create member -> looks longer than it actually is
+  //create member ->looks longer than it actually is
   createMember: publicProcedure
   .input(
     z.object({
@@ -54,15 +54,45 @@ export const memberRouter = createTRPCRouter({
 
 
   //get member
+  getMember: publicProcedure
+  .input(z.object({ucf_id : z.number()}))
+  .query(async ({input}) => {
+    const member = await db
+      .select()
+      .from(members)
+      .where(eq(members.ucf_id, input.ucf_id));
 
+      if (member.length == 0){
+        throw new Error("No member found!");
+      }
+      return member[0];
+  }),
 
   //delete member - debugging
+  deleteMember: publicProcedure
+  .input(z.object({id: z.number()}))
+  .mutation(async ({input}) => {
+    const delteMem = await db
+      .select()
+      .from(members)
+      .where(eq(members.id, input.id));
+    
+    if (delteMem.length == 0){
+      throw new Error("No member with that Id");
+    }
+
+
+    await db.delete(members).where(eq(members.id, input.id));
+
+
+    return delteMem[0];
+  }),
+
 
 
   //update member
 
 
   //get all members - debugging purposes
-
- 
 });
+
