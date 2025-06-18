@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { ChevronRightIcon } from '@heroicons/react/24/solid';
 import { DevBioPopup, type Member } from "./DevBioPopup";
 
 type ProfileCardProps = {
@@ -25,13 +24,18 @@ export function DevProfileCard({ member }: ProfileCardProps) {
         
           {/* subtle dark overlay on hover */}
           {/* <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition" /> */}
+
           {/* arrow icon */}
           <button
             onClick={() => setIsOpen(true)} 
-            className="absolute bottom-3 right-3 w-8 h-8 rounded-full flex items-center justify-center border-2 border-[var(--shpe-orange)]
-              bg-white bg-opacity-70 group-hover:bg-yellow-400 group-hover:bg-opacity-100 transition"
+            className="absolute bottom-3 right-3 w-8 h-8 rounded-full flex items-center justify-center
+              bg-white bg-opacity-70 group-hover:bg-yellow-400 group-hover:bg-opacity-100 transition cursor-pointer"
           >
-            <ChevronRightIcon className="w-7 h-7 text-[var(--shpe-navy-blue)]" />
+            <img
+              src={"/assets/arrow.png"}
+              alt={member.name + "'s Biography"}
+              className="w-6 h-6"
+            />
           </button>
         </div>
 
