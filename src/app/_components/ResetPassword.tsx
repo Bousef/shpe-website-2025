@@ -33,7 +33,7 @@ export default function ResetPassword() {
 			</div>
 			
 			{/* ENTER NEW PASSWORD */}
-			<form onSubmit={handleSubmit} className="w-full max-w-md bg-white item-center p-6 rounded-lg shadow text-[var(--shpe-navy-blue)]">
+			<form onSubmit={handleSubmit} className="w-full max-w-md bg-white items-center p-6 rounded-lg shadow text-[var(--shpe-navy-blue)]">
 				<h2 className="text-lg font-semibold">Enter New Password</h2>
 				<input 
 					type="password"
