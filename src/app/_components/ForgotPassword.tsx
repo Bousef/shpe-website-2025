@@ -20,7 +20,7 @@ export default function ForgotPassword() {
 			</div>
 			
 			{/* ENTER EMAIL */}
-			<form onSubmit={handleSubmit} className="w-full max-w-md bg-white item-center p-6 rounded-lg shadow text-[var(--shpe-navy-blue)]">
+			<form onSubmit={handleSubmit} className="w-full max-w-md bg-white items-center p-6 rounded-lg shadow text-[var(--shpe-navy-blue)]">
 				<h2 className="text-xl font-bold mb-4">Enter Email Address</h2>
 				<input 
 					type="email"

@@ -31,7 +31,7 @@ export default function CodeVerification() {
 			</div>
 			
 			{/* ENTER CODE */}
-			<form onSubmit={handleSubmit} className="w-full max-w-md bg-white item-center p-6 rounded-lg shadow text-[var(--shpe-navy-blue)]">
+			<form onSubmit={handleSubmit} className="w-full max-w-md bg-white items-center p-6 rounded-lg shadow text-[var(--shpe-navy-blue)]">
 				<h2 className="text-xl font-bold mb-4">Enter Verification Code</h2>
 				<input 
 					type="text"
