@@ -27,7 +27,7 @@ export default function FooterSection() {
           <PiInstagramLogoLight className="text-white text-4xl sm:text-5xl hover:text-gray-300" />
         </a>
         <a
-          href="https://www.linkedin.com/company/society-of-hispanic-professional-engineers/"
+          href="https://www.linkedin.com/company/shpe-ucf/"
           target="_blank"
           rel="noopener noreferrer"
         >
