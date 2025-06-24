@@ -61,7 +61,9 @@ export default function Navbar() {
           </Link>
         )
       )}
-      <VscAccount className="text-3xl sm:text-4xl text-[#001f5b]" />
+      <Link href="/login">
+        <VscAccount className="text-3xl sm:text-4xl text-[#001f5b] cursor-pointer" />
+      </Link>
     </div>
   </div>
 
@@ -88,7 +90,9 @@ export default function Navbar() {
           </Link>
         )
       )}
-      <VscAccount className="text-3xl text-[#001f5b] mt-2" />
+      <Link href="/login">
+        <VscAccount className="text-3xl text-[#001f5b] mt-2 cursor-pointer" />
+      </Link>
     </div>
   )}
 </nav>
