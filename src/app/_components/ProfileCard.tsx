@@ -1,33 +1,33 @@
 export default function ProfileCard() {
 	return (
-		<main id="profile" className="relative bg-white py-10 px-15 text-[var(--shpe-navy-blue)] max-w-4xl mx-auto h-125">
-			<section className="flex items-stretch space-x-5 p-8 bg-[var(--shpe-blue)] h-full shadow-sm">
+		<main id="profile" className="relative bg-white py-10 px-15 text-[var(--shpe-navy-blue)] max-w-4xl mx-auto h-150">
+			<section className="flex items-stretch space-x-5 p-6 bg-[var(--shpe-blue)] h-full shadow-sm">
 				{/* LEFT */}
-				<div className="w-1/3 bg-[var(--shpe-light-blue)] rounded p-4">
+				<div className="w-1/3 bg-[var(--shpe-light-blue)] rounded flex flex-col items-center">
 					<img 
-						src="/path/to/photo.jpg"
+						src="/assets/yousefxd.jpeg"
 						alt="Profile"
-						className="w-32 h-32 object-cover"
+						className="w-50 h-50 object-cover mt-5 mb-2"
 					/>
 					<div className="text-center">
 						<h2 className="font-bold text-lg">FIRST_NAME</h2>
 						<p className="text-sm">SURNAME</p>
 					</div>
 					<div className="text-center space-y-1">
-						<p className="font-mono text-xl">XXXXXX</p>
+						<p className="font-mono font-bold text-xl">XXXXXX</p>
 						<p className="text-xs">Member ID</p>
-						<p className="font-mono text-xl>">XXXXXX</p>
+						<p className="font-mono font-bold text-xl>">XXXXXX</p>
 						<p className="text-xs">UCF ID</p>
 					</div>
-					<img src="shpeucf.png" alt="SHPE UCF Logo" className="w-20" />
+					<img src="/assets/round_logo.png" alt="SHPE UCF Logo" className="h-30 w-30 mt-2" />
 				</div>
 
 				{/* RIGHT */}
 				<div className="w-2/3 flex flex-col h-full gap-5">
 					{/* MEMBER DETAILS */}
-					<div className="bg-[var(--shpe-light-blue)] rounded p-4 overflow-auto flex-1">
-						<h2 className="text-xl font-bold mb-3">MEMBER DETAILS</h2>
-						<dl className="space-y-1 text-sm">
+					<div className="bg-[var(--shpe-light-blue)] rounded p-6 overflow-auto flex-1">
+						<h2 className="text-2xl font-bold mb-3 font-helios tracking-[0.1em]">MEMBER DETAILS</h2>
+						<dl className="space-y-1 text-md">
 							<div className="flex">
 								<dt className="w-24 font-semibold">Name:</dt>
 								<dd>FULL_NAME</dd>
@@ -47,17 +47,26 @@ export default function ProfileCard() {
 						</dl>
 					</div>
 					{/* BECOME A MEMBER */}
-					<div className="bg-[var(--shpe-light-blue)] rounded p-4 overflow-auto flex-1">
-						<h3 className="font-bold mb-2">HAVEN'T PAID YOUR DUES?</h3>
-						<p className="text-sm mb-4">Pay below to become a SHPEofficial! 🗣️</p>
-						<button className="inline-flex items-center bg-yellow-500 px-5 py-3 rounded-full font-semibold">
-							<span className="mr-2">MEMBERSHIP</span>
-							<img 
-								src="/assets/arrow.png" 
-								alt="Become a Member!" 
-								className="w-5 h-5"
-							/>
-						</button>
+					<div className="bg-[var(--shpe-light-blue)] rounded p-6 overflow-auto flex-none">
+						<h3 className="text-lg font-bold mb-2">HAVEN'T PAID YOUR DUES?</h3>
+						<p className="text-md mb-4">Pay below to become a SHPEofficial! 🗣️</p>
+						<a
+							href="https://form.jotform.com/70387424224151"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="inline-flex items-center justify-center
+								bg-[#f2ac02] hover:bg-[#e0a200]
+								text-black font-helvetica
+								text-base sm:text-lg font-bold
+								tracking-[0.3em]
+								px-7 py-3
+								rounded-full
+								transition-all duration-200
+								shadow-md hover:scale-105"
+						>
+							MEMBERSHIP
+							<img src="/assets/arrow.png" alt="→" className="ml-2 w-5 h-5" />
+						</a>	
 					</div>					
 				</div>
 			</section>
