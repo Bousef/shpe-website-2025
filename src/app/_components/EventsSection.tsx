@@ -69,8 +69,6 @@ export default function EventsSection() {
               />
             </div>
 
-
-
             <div className="px-4 py-3">
               <h3 className="text-center text-slate-800 font-bold text-xl 2xl:text-2xl">
                 {title.toUpperCase()}
