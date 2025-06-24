@@ -32,6 +32,7 @@ export const memberRouter = createTRPCRouter({
     .where(eq(members.email, input.email));
 
     if (existingMember.length > 0) {
+
       // We return null to tell the user that there the member already exists
       return null;
     }
@@ -52,6 +53,7 @@ export const memberRouter = createTRPCRouter({
     }
 
     return newMember;
+
   }),
 
 

@@ -15,8 +15,10 @@ export default function HomePage() {
       {/* full page */}
       <div className="bg-[#F7F8F9] text-black overflow-x-hidden flex flex-col">
         <Navbar />
+
         <EventsSection />
         <HeroSection />   
+
       </div>
     </>
   );
