@@ -35,12 +35,10 @@ export const alumni = createTable(
     id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
     first_name: d.varchar({length: 100}),
     last_name: d.varchar({length: 100}),
-    email: d.varchar({length:100}).unique().notNull(),
-    image: d.varchar({length: 2048}),
-    bio: d.text(),
-    resume: d.varchar({length: 2048}),
-    job: d.varchar({length: 100}),
     grad_year: d.integer(),
+    image: d.varchar({length: 2048}),
+    postion: d.text(),
+    linkedIn: d.text(),
 
   })
 
