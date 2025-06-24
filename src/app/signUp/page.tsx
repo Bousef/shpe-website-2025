@@ -52,8 +52,8 @@ export default function SignUp() {
             className="peer placeholder-[#0b1e57] w-full mb-4 border-b border-blue-300 focus:outline-none py-1"
             onChange={(e) => setEmail(e.target.value)}
           />
-          {errors.includes("Invalid email. Must include '@'") && (
-            <div className="text-red-600 text-sm mb-1">Invalid email. Must include '@'</div>
+          {errors.includes("Email must be a valid @ucf.edu address.") && (
+            <div className="text-red-600 text-sm mb-1">Email must be a valid @ucf.edu address.</div>
           )}
         </div>
 
@@ -108,8 +108,8 @@ export default function SignUp() {
           className="py-4 bg-[#82a8bc] hover:bg-[#6c92a8] text-[#0b1e57] w-md mt-10 mx-auto font-medium"
           onClick={() => {
             const newErrors = [];
-            if (!email.includes("@")) {
-              newErrors.push("Invalid email. Must include '@'");
+            if (!/^[\w.-]+@ucf\.edu$/.test(email)) {
+              newErrors.push("Email must be a valid @ucf.edu address.");
             }
             if (!/^\d{7}$/.test(ucfId)) {
               newErrors.push("UCF ID must be exactly 7 digits.");

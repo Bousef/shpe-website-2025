@@ -29,6 +29,20 @@ export const members = createTable(
   })
 );
 
+//alumni table
+export const alumni = createTable(
+  "alumni",
+  (d) => ({
+    //id
+    //first name
+    //last name
+    //year
+    //position
+    //linkedin 
+    //image
+  })
+);
+
 /*
 export type IdentityType =
   | "email"
