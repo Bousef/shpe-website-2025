@@ -47,14 +47,17 @@ export default function Navbar() {
           <a
             key={href}
             href={href}
+
             className="px-3 py-1 text-[#001f5b] hover:text-[#001133] hover:scale-105 transition-transform duration-150 rounded-3xl"
           >
             {label.toUpperCase()}
+
           </a>
         ) : (
           <Link
             key={href}
             href={href}
+
             className="px-3 py-1 text-[#001f5b] hover:text-[#001133] hover:scale-105 transition-transform duration-150 rounded-3xl"
           >
             {label.toUpperCase()}
