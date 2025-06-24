@@ -1,9 +1,9 @@
 export default function ProfileCard() {
 	return (
-		<main id="profile" className="relative bg-white py-10 px-15 text-[var(--shpe-navy-blue)]">
-			<section className="flex items-stretch space-x-4 p-5 bg-[var(--shpe-blue)]">
-				{/* LEFT COLUMN */}
-				<div className="w-1/5 bg-[var(--shpe-light-blue)] rounded p-4">
+		<main id="profile" className="relative bg-white py-10 px-15 text-[var(--shpe-navy-blue)] max-w-4xl mx-auto h-125">
+			<section className="flex items-stretch space-x-5 p-8 bg-[var(--shpe-blue)] h-full shadow-sm">
+				{/* LEFT */}
+				<div className="w-1/3 bg-[var(--shpe-light-blue)] rounded p-4">
 					<img 
 						src="/path/to/photo.jpg"
 						alt="Profile"
@@ -22,9 +22,10 @@ export default function ProfileCard() {
 					<img src="shpeucf.png" alt="SHPE UCF Logo" className="w-20" />
 				</div>
 
-				{/* MID COLUMN */}
-				<div className="w-2/3 flex flex-col gap-5">
-					<div className="bg-[var(--shpe-light-blue)] rounded p-4 overflow-auto">
+				{/* RIGHT */}
+				<div className="w-2/3 flex flex-col h-full gap-5">
+					{/* MEMBER DETAILS */}
+					<div className="bg-[var(--shpe-light-blue)] rounded p-4 overflow-auto flex-1">
 						<h2 className="text-xl font-bold mb-3">MEMBER DETAILS</h2>
 						<dl className="space-y-1 text-sm">
 							<div className="flex">
@@ -32,12 +33,12 @@ export default function ProfileCard() {
 								<dd>FULL_NAME</dd>
 							</div>
 							<div className="flex">
-								<dt className="w-24 font-semibold">Email:</dt>
-								<dd>example@ucf.edu</dd>
+								<dt className="w-24 font-semibold">Major:</dt>
+								<dd>Computer Science B.S.</dd>
 							</div>
 							<div className="flex">
-								<dt className="w-24 font-semibold">Address:</dt>
-								<dd>MAYBE REMOVING THIS PART</dd>
+								<dt className="w-24 font-semibold">Email:</dt>
+								<dd>example@ucf.edu</dd>
 							</div>
 							<div className="flex">
 								<dt className="w-24 font-semibold">Phone:</dt>
@@ -45,21 +46,19 @@ export default function ProfileCard() {
 							</div>		
 						</dl>
 					</div>
-
-					<div className="bg-[var(--shpe-light-blue)] rounded p-4 overflow-auto">
-						<h2 className="text-xl font-bold mb-3">BIO</h2>
-						<p>sorry unavailable thanks for your understanding...</p>
+					{/* BECOME A MEMBER */}
+					<div className="bg-[var(--shpe-light-blue)] rounded p-4 overflow-auto flex-1">
+						<h3 className="font-bold mb-2">HAVEN'T PAID YOUR DUES?</h3>
+						<p className="text-sm mb-4">Pay below to become a SHPEofficial! 🗣️</p>
+						<button className="inline-flex items-center bg-yellow-500 px-5 py-3 rounded-full font-semibold">
+							<span className="mr-2">MEMBERSHIP</span>
+							<img 
+								src="/assets/arrow.png" 
+								alt="Become a Member!" 
+								className="w-5 h-5"
+							/>
+						</button>
 					</div>					
-				</div>
-
-				{/* RIGHT COLUMN */}
-				<div className="w-1/5 bg-[var(--shpe-light-blue)] rounded text-center p-4">
-					<h3 className="font-bold mb-2">HAVEN'T PAID YOUR DUES?</h3>
-					<p className="text-sm mb-4">Pay below to become a SHPEofficial! 🗣️</p>
-					<button className="inline-flex items-center bg-yellow-500 px-5 py-3 rounded-full font-semibold">
-						<span className="mr-2">MEMBERSHIP</span>
-						<img src="/assets/arrow.png" alt="Become a Member!" className="w-5 h-5"/>
-					</button>
 				</div>
 			</section>
 		</main>
