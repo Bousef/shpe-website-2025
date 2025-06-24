@@ -8,7 +8,7 @@ export default function JoinBanner() {
             Join our Familia!
           </h3>
           <p className="font-medium text-sm lg:text-xl 2xl:text-2xl text-slate-400">
-            You don&rsquo;t need to be Hispanic to be part of this change.
+            You don't need to be Hispanic to be part of this change.
           </p>
         </article>
 

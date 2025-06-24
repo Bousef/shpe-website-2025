@@ -76,7 +76,7 @@ export default function Login(){
 					</button>
 					<p className="text-center text-sm">
 					  New to SHPE UCF?{' '}
-					  <Link href="/signup" className="text-[var(--shpe-light-blue)] hover:underline">
+					  <Link href="/signUp" className="text-[var(--shpe-light-blue)] hover:underline">
 					    Sign Up
 					  </Link>
 					</p>

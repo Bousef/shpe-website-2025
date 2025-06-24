@@ -6,7 +6,6 @@ import { VscAccount } from "react-icons/vsc";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
 
 const navItems = [
-  { href: "/about", label: "About" },
   { href: "/board", label: "Board" },
   { href: "/dev-team", label: "Dev team" },
   { href: "/alumni", label: "Alumni" },
