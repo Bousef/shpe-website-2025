@@ -27,26 +27,26 @@ export function DevBioPopup ({ member, onClose }: BioPopupsProps) {
 		>
 			{/* inner content: stops click events from closing */}
 			<div 
-				className="relative bg-white shadow-xl max-w-3xl p-10" 
+				className="relative bg-white rounded-sm shadow-xl w-11/12 md:w-2/3 lg:w-1/2 max-w-3xl p-8 overflow-auto" 
 				onClick={(e) => e.stopPropagation()}
 			>
 				{/* bio content goes here */}
 				<div className="flex flex-col md:flex-row gap-4">
 					{/* profile image */}
-					<div className="md:w-1/3 h-40 aspect-[4/3] md:h-auto">
+					<div className="w-full md:w-1/3 h-60 overflow-hidden flex-shrink-0">
 						<img
 							src={member.pfp}
 							alt={member.name}
-							className="w-full h-full object-cover rounded-md"
+							className="w-full h-full object-cover rounded-sm"
 						/>
 					</div>
 
 					{/* text fields */}
 					<div className="md:w-2/3 space-y-3">
-						<h2 className="text-2xl font-bold text-gray-900">{member.name}</h2>
-						<p className="text-sm font-semibold uppercase text-blue-900">{member.role}</p>
+						<h2 className="text-3xl font-bold text-[var(--shpe-dark-orange)]">{member.name}</h2>
+						<p className="text-lg font-semibold uppercase text-blue-900">{member.role}</p>
 
-						<div className="space-y-2 text-sm text-gray-700">
+						<div className="space-y-2 text-md text-gray-700">
 							<p>
 								<span className="font-semibold">Major:</span> {member.bio.major}
 							</p>
@@ -56,7 +56,7 @@ export function DevBioPopup ({ member, onClose }: BioPopupsProps) {
 						</div>
 
 						{/* contact icons row (email, LinkedIn, etc.) */}
-						<div className="flex flex-row gap-5 mt-2 bottom-2 right-2 absolute items-center">
+						<div className="flex flex-row gap-5 mt-2 bottom-3 right-3 absolute items-center">
 							<a
                 href={member.bio.linkedin}
                 target="_blank"

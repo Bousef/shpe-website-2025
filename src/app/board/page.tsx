@@ -1,10 +1,11 @@
 import Navbar from "../_components/NavBar";
-export default function Board () {
+import Board from "../_components/Board";
+export default function BoardPage () {
 
     return (
         <div>
             <Navbar/>
-            Board
+            <Board/>
         </div>
     );
 }

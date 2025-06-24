@@ -5,7 +5,7 @@ import EventsSection from "./_components/EventsSection";
 
 export const metadata = {
   title: "SHPE UCF",
-  description: "Society of Hispanic Professional Engineers – UCF Chapter",
+  description: "Society of Hispanic Professional Engineers - UCF Chapter",
   icons: { icon: "/favicon.ico" },
 };
 
@@ -15,9 +15,10 @@ export default function HomePage() {
       {/* full page */}
       <div className="bg-[#F7F8F9] text-black overflow-x-hidden flex flex-col">
         <Navbar />
-        <AboutSection />
-        <HeroSection />
+
         <EventsSection />
+        <HeroSection />   
+
       </div>
     </>
   );
