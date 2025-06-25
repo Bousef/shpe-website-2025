@@ -3,7 +3,7 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { alumni } from "~/server/db/schema";
 import { and, eq } from "drizzle-orm";
 
-export const AlumniRouter = createTRPCRouter({
+export const alumniRouter = createTRPCRouter({
     createAlumni: publicProcedure
         .input(
             z.object({

@@ -74,9 +74,12 @@ export default function Login(){
 					<button formAction={loginAction} className="w-full p-2 bg-[var(--shpe-light-blue)] text-white hover:bg-[var(--shpe-blue)] cursor-pointer">
 						LOG IN
 					</button>
-					<button formAction={signupAction} className="w-full p-2 border hover:bg-gray-300 cursor-pointer">
-						NEW TO SHPEUCF? SIGN UP
-					</button>
+					<p className="text-center text-sm">
+					  New to SHPE UCF?{' '}
+					  <Link href="/signUp" className="text-[var(--shpe-light-blue)] hover:underline">
+					    Sign Up
+					  </Link>
+					</p>
 				</div>
 			</form>
 		</section>

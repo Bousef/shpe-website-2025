@@ -1,7 +1,8 @@
 import Navbar          from "./_components/NavBar";
-import HeroSection     from "./_components/HeroSection";
+import WeeklyEvents    from "./_components/WeeklyEvents";
+import Slideshow    from "./_components/MeetFam";
 import AboutSection    from "./_components/AboutSection";
-import EventsSection from "./_components/EventsSection";
+import HeroSection    from "./_components/HeroSection";
 
 export const metadata = {
   title: "SHPE UCF",
@@ -15,8 +16,12 @@ export default function HomePage() {
       {/* full page */}
       <div className="bg-[#F7F8F9] text-black overflow-x-hidden flex flex-col">
         <Navbar />
-        <EventsSection />
         <HeroSection />   
+        <AboutSection />
+        <WeeklyEvents />
+
+        <Slideshow />
+  
       </div>
     </>
   );
