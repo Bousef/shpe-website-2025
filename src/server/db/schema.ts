@@ -37,7 +37,7 @@ export const alumni = createTable(
     last_name: d.varchar({length: 100}),
     grad_year: d.integer(),
     image: d.varchar({length: 2048}),
-    postion: d.text(),
+    position: d.text(),
     linkedIn: d.text(),
 
   })

@@ -38,4 +38,20 @@ export const AlumniRouter = createTRPCRouter({
 
             return newAlumni;
         }),
+
+    // get alumni by id
+    getAlumniById: publicProcedure
+        .input(z.object({ id: z.number() }))
+        .query(async ({ input, ctx }) => {
+            const [record] = await ctx.db
+                .select()
+                .from(alumni)
+                .where(eq(alumni.id, input.id))
+            return record ?? null;
+        }),
+
+    // get all alumni based on year
+
+    // get all alumni based on position
+    
 });
