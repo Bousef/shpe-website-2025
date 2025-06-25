@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { alumni } from "~/server/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 export const AlumniRouter = createTRPCRouter({
     createAlumni: publicProcedure
@@ -9,8 +9,8 @@ export const AlumniRouter = createTRPCRouter({
             z.object({
                 first_name: z.string(),
                 last_name: z.string(),
-                grad_year: z.number(),
                 image: z.string(),
+                grad_year: z.number(),
                 position: z.string(),
                 linkedIn: z.string(),
             })
@@ -19,7 +19,10 @@ export const AlumniRouter = createTRPCRouter({
             const existingAlumni = await ctx.db
             .select()
             .from(alumni)
-            .where(eq(alumni.first_name, input.first_name).append(eq(alumni.last_name, input.last_name)));
+            .where(and(
+                eq(alumni.first_name, input.first_name),
+                eq(alumni.last_name, input.last_name)
+            ));
 
             if (existingAlumni.length > 0) {
                 // Alumni already exists
