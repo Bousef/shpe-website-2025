@@ -61,7 +61,7 @@ export default function AddProductForm({ onAdd, onClose }: AddProductFormProps) 
       const fileName = `${dateStamp}-${imageFile.name}`;
 
       const { error: uploadError } = await supabase.storage
-        .from("product.images")
+        .from("product-images")
         .upload(fileName, imageFile, { cacheControl: "3600", upsert: false });
       if (uploadError) {
         setLoading(false);
@@ -70,7 +70,7 @@ export default function AddProductForm({ onAdd, onClose }: AddProductFormProps) 
       }
 
       const { data: urlData } = supabase.storage
-        .from("product.images")
+        .from("product-images")
         .getPublicUrl(fileName);
       imageUrl = urlData.publicUrl;
     }
