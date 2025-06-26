@@ -2,9 +2,11 @@
 "use client";
 
 import Navbar from "../_components/NavBar";
-import AddProductForm, { Product } from "../_components/AddProductForm";
+import AddProductForm, { type Product } from "../_components/AddProductForm";
 import { supabase } from "../../supabase-client";
 import { useState, useEffect } from "react";
+import router from "next/router";
+import Link from "next/link";
 
 export type CategoryImage = { category: string; image: string };
 
@@ -67,30 +69,29 @@ export default function Shop() {
         <main className="max-w-4xl mx-auto py-10">
           <button
             onClick={() => setSelectedCategory(null)}
-            className="mb-4 text-blue-600"
+            className="mb-4 text-blue-600 hover:text-blue-800 hover:cursor-pointer"
           >
             ← Back to categories
           </button>
+
           <h1 className="text-4xl font-bold mb-6">{selectedCategory}</h1>
           {errorMsg && <p className="text-red-600 mb-4">{errorMsg}</p>}
           <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+
             {products.map((p) => (
-              <div
+              <Link
                 key={p.id}
-                className="border rounded-lg overflow-hidden shadow-md"
+                href={`/shop/${encodeURIComponent(selectedCategory!)}/${p.id}`}
+                className="block border rounded-lg overflow-hidden shadow-md hover:cursor-pointer"
               >
-                <img
-                  src={p.image}
-                  alt={p.name}
-                  className="w-full h-48 object-cover"
-                />
+                <img src={p.image} alt={p.name} className="w-full h-48 object-cover" />
                 <div className="p-4">
                   <p className="font-medium">{p.name}</p>
                   <p className="text-gray-600">{p.description}</p>
-                  <p className="mt-2 font-semibold">${(p.price ?? 0).toFixed(2)}</p>
-                  <p className="text-sm">Stock: {p.stock ?? 0}</p>
+                  <p className="mt-2 font-semibold">${p.price?.toFixed(2)}</p>
+                  <p className="text-sm">Stock: {p.stock}</p>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </main>
@@ -122,6 +123,7 @@ export default function Shop() {
           />
         )}
         {errorMsg && <p className="text-red-600 mb-4 text-center">{errorMsg}</p>}
+
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {categories.map((ci) => (
             <div
