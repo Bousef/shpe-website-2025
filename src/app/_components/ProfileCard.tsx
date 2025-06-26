@@ -1,9 +1,9 @@
 export default function ProfileCard() {
 	return (
 		<main id="profile" className="relative bg-white py-10 px-15 text-[var(--shpe-navy-blue)] max-w-4xl mx-auto h-150">
-			<section className="flex items-stretch space-x-5 p-6 bg-[var(--shpe-blue)] h-full shadow-sm">
+			<section className="flex items-stretch space-x-5 p-6 bg-[var(--shpe-light-blue)] h-full shadow-sm">
 				{/* LEFT */}
-				<div className="w-1/3 bg-[var(--shpe-light-blue)] rounded flex flex-col items-center">
+				<div className="w-1/3 bg-[#b3cad6] rounded flex flex-col items-center">
 					<img 
 						src="/assets/yousefxd.jpeg"
 						alt="Profile"
@@ -25,7 +25,7 @@ export default function ProfileCard() {
 				{/* RIGHT */}
 				<div className="w-2/3 flex flex-col h-full gap-5">
 					{/* MEMBER DETAILS */}
-					<div className="bg-[var(--shpe-light-blue)] rounded p-6 overflow-auto flex-1">
+					<div className="bg-[#b3cad6] rounded p-6 overflow-auto flex-1">
 						<h2 className="text-2xl font-bold mb-3 font-helios tracking-[0.1em]">MEMBER DETAILS</h2>
 						<dl className="space-y-1 text-md">
 							<div className="flex">
@@ -47,7 +47,7 @@ export default function ProfileCard() {
 						</dl>
 					</div>
 					{/* BECOME A MEMBER */}
-					<div className="bg-[var(--shpe-light-blue)] rounded p-6 overflow-auto flex-none">
+					<div className="bg-[#b3cad6] rounded p-6 overflow-auto flex-none">
 						<h3 className="text-lg font-bold mb-2">HAVEN'T PAID YOUR DUES?</h3>
 						<p className="text-md mb-4">Pay below to become a SHPEofficial! 🗣️</p>
 						<a
