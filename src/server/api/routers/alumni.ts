@@ -54,7 +54,38 @@ export const alumniRouter = createTRPCRouter({
         }),
 
     // get all alumni based on year
+    getAlumniByYear: publicProcedure
+        .input(z.object({gradYear:z.number()}))
+        .query(async({input, ctx}) => {
+          if (input.gradYear.toString().length != 4){
+            throw new Error("Please enter a valid 4-digit graduation year, e.g., 2025.")
+
+          }
+            const year = await ctx.db
+                  .select()
+                  .from(alumni)
+                  .where(eq(alumni.grad_year,input.gradYear))
+
+            return year;
+
+        }),
 
     // get all alumni based on position
+    getAlumniByPosition: publicProcedure
+        .input(z.object({position: z.string()}))
+        .query(async({input,ctx}) => {
+            const positionList = await ctx.db
+                  .select()
+                  .from(alumni)
+                  .where(eq(alumni.position, input.position))
+            
+            if (positionList.length == 0){
+              throw new Error("There was no alumni found with that position.")
+            }
+
+
+            return positionList;
+
+        }),
     
 });
