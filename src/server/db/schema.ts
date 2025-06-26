@@ -23,7 +23,6 @@ export const members = createTable(
     last_name: d.varchar({ length: 100 }),
     email: d.varchar({ length: 100 }).unique().notNull(),
     image: varchar({ length: 2048 }), //url
-    bio: text(),
     resume: varchar({ length: 2048 }), //url
     is_member: boolean().default(false),
   })
