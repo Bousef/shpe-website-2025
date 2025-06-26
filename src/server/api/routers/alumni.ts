@@ -10,7 +10,7 @@ export const alumniRouter = createTRPCRouter({
                 first_name: z.string(),
                 last_name: z.string(),
                 image: z.string(),
-                grad_year: z.number(),
+                grad_year: z.string(),
                 position: z.string(),
                 linkedIn: z.string(),
             })
@@ -55,7 +55,7 @@ export const alumniRouter = createTRPCRouter({
 
     // get all alumni based on year
     getAlumniByYear: publicProcedure
-        .input(z.object({gradYear:z.number()}))
+        .input(z.object({gradYear:z.string()}))
         .query(async({input, ctx}) => {
           if (input.gradYear.toString().length != 4){
             throw new Error("Please enter a valid 4-digit graduation year, e.g., 2025.")
