@@ -1,3 +1,5 @@
+"use client";
+
 export default function HeroSection() {
   return (
     <main className="w-full flex justify-center py-16 sm:py-20 px-6 bg-white">
@@ -29,7 +31,7 @@ export default function HeroSection() {
         {/* CTA Button */}
         <div className="flex justify-center">
           <a
-            href="https://form.jotform.com/70387424224151"
+            href="/signUp"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center

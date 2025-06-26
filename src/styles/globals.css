@@ -9,11 +9,6 @@
   }
 }
 
-:root {
-  --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --font-roboto: 'Roboto', sans-serif;
-}
-
 
 
 .hero-title {
@@ -25,6 +20,7 @@
   display: inline-block;      /* needed so transform only affects text */
   transform: scaleX(1.2);     /* stretch to 120% width; tweak as needed */
   transform-origin: left;     /* scale out from left edge */
+
 }
 :root{
   --shpe-dark-orange: #D33A02;
@@ -34,6 +30,8 @@
   --shpe-light-blue:#72A9BE;
   --shpe-gray:#626366;
   --shpe-yellow:#F7A800;
+  --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-roboto: 'Roboto', sans-serif;
 }
 .partner-logo {
   mix-blend-mode: multiply;
