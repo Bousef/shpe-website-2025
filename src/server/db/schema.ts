@@ -43,6 +43,18 @@ export const alumni = createTable(
   })
 );
 
+export const products = createTable(
+  "products",
+  (d) => ({
+    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+    name: d.varchar({ length: 100 }),
+    image: varchar({ length: 2048 }), //url
+    description: varchar({ length: 2048 }), 
+    price: d.real(),
+    stock: d.integer(),
+  })
+);
+
 /*
 export type IdentityType =
   | "email"
