@@ -1,7 +1,9 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { alumni } from "~/server/db/schema";
-import { and, eq, ilike, or, desc, asc, sql } from "drizzle-orm";
+import { and, eq, desc, asc, sql } from "drizzle-orm";
+import { tokenize } from "~/lib/search-parser/tokenizer";
+import { parseSearchQuery } from "~/lib/search-parser/parser";
 
 export const alumniRouter = createTRPCRouter({
     createAlumni: publicProcedure
@@ -100,18 +102,23 @@ export const alumniRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
         const { page, pageSize, query, sortBy, sortDirection } = input;
 
-        const filters = [];
+        tokenize(query ?? "").forEach(token => {
+            console.log("Token:", token);
+        });
 
-        if (query) {
-            const pattern = `%${query}%`;
+        const nodes = parseSearchQuery(query ?? "", [alumni.first_name, alumni.last_name], { year: alumni.grad_year });
 
-            filters.push(
-                or(
-                    ilike(alumni.first_name, pattern),
-                    ilike(alumni.last_name, pattern),
-                )
-            );
-        }
+        nodes.forEach(node => {
+            console.log("Parsed Node:", node);
+        });
+
+        const filters = nodes
+            .map(node => node.toSQL());
+
+        const whereClause =
+            filters.length === 0 ? undefined :
+            filters.length === 1 ? filters[0] :
+            and(...filters);
 
         const defaultSort = [
             sortDirection === "asc" ? asc(alumni.grad_year) : desc(alumni.grad_year),
@@ -127,8 +134,6 @@ export const alumniRouter = createTRPCRouter({
                 sortDirection === "asc" ? asc(alumni.grad_year) : desc(alumni.grad_year),
                 sortDirection === "asc" ? asc(alumni.id) : desc(alumni.id),
             ] : defaultSort;
-
-        const whereClause = filters.length > 0 ? and(...filters) : undefined;
 
         const alumniList = await ctx.db
             .select()
