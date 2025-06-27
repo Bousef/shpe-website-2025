@@ -1,4 +1,4 @@
-import { ilike, not, or, and, gte, lte, eq, gt, lt, type SQL } from "drizzle-orm";
+import { ilike, not, or, and, gte, lte, eq, gt, lt, type SQL, sql } from "drizzle-orm";
 import type { PgColumn } from "drizzle-orm/pg-core";
 
 export abstract class Node {
@@ -29,28 +29,35 @@ export class GroupNode extends Node {
 }
 
 export class FieldNode extends Node {
-    constructor(public field: string, public value: string, public columns: Record<string, PgColumn>) {
+    constructor(public field: string, public value: PrimaryNode, public columns: Record<string, PgColumn>) {
     super();
   }
 
     toSQL(): SQL<boolean> | undefined {
+        console.log("FieldNode:", this.field, "Value:", this.value);
         const column = this.columns[this.field];
         if (!column) return undefined; // ignore unknown fields
 
-        if (this.value.includes('..')) {
-            const [start, end] = this.value.split('..').map(Number);
+        const value = this.value.value;
+
+        if (value.includes('..')) {
+            const [start, end] = value.split('..').map(Number);
             return and(gte(column, start), lte(column, end)) as SQL<boolean>;
         }
 
-        if (this.value.startsWith('>')) {
-            return gt(column, Number(this.value.slice(1))) as SQL<boolean>;
+        if (value.startsWith('>')) {
+            return gt(column, Number(value.slice(1))) as SQL<boolean>;
         }
 
-        if (this.value.startsWith('<')) {
-            return lt(column, Number(this.value.slice(1))) as SQL<boolean>;
+        if (value.startsWith('<')) {
+            return lt(column, Number(value.slice(1))) as SQL<boolean>;
         }
 
-        return eq(column, isNaN(+this.value) ? this.value : Number(this.value)) as SQL<boolean>;
+        if (isNaN(+value)) {
+            return sql`lower(${column}::text) = lower(${value})`;
+        } else {
+            return eq(column, Number(value)) as SQL<boolean>;
+        }
     }
 }
 
