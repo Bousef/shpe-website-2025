@@ -5,28 +5,41 @@ import SearchBar from "./_components/search-bar";
 import { api } from "~/trpc/server";
 import { Dropdown, DropdownButton, DropdownItem } from "./_components/dropdown";
 import { DEFAULT_PAGE_SIZE } from "./_components/constants";
+import Link from "next/link";
 
 
-export default async function Alumni({ searchParams }: { searchParams: { query?: string; pageSize?: string } }) {
+export default async function Alumni({ searchParams }: { searchParams: { query?: string; pageSize?: string; page?: string } }) {
 
   const query = searchParams.query ?? "";
 
   let pageSize = Number(searchParams.pageSize);
 
-  console.log("Page Size:", pageSize);
-
   if (isNaN(pageSize) || pageSize === undefined) {
     pageSize = Number(DEFAULT_PAGE_SIZE);
   }
 
-  console.log("Page Size:", pageSize);
-  console.log("DEFAULT_PAGE_SIZE:", DEFAULT_PAGE_SIZE, typeof DEFAULT_PAGE_SIZE);
+  let page = Number(searchParams.page);
+  if (isNaN(page) || page === undefined) {
+    page = 0;
+  }
 
   const members = await api.alumni.getAlumni({
-    page: 0,
+    page,
     pageSize: pageSize,
     query,
   });
+
+  const totalPages = Math.ceil(members.length / pageSize);
+  console.log("Total Pages:", totalPages);
+
+  const search = (page: number) => {
+      const newQuery = new URLSearchParams();
+      if (query.trim()) newQuery.set("query", query.trim());
+      if (pageSize !== DEFAULT_PAGE_SIZE) newQuery.set("pageSize", pageSize.toString());
+      if (page > 0) newQuery.set("page", page.toString());
+
+    return `?${newQuery ? newQuery.toString() : ""}`;
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-100">
@@ -44,6 +57,15 @@ export default async function Alumni({ searchParams }: { searchParams: { query?:
             {member.first_name + " " + member.last_name}
           </div>
         ))}
+      </div>
+
+      <div className="flex justify-between items-center px-6">
+        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+          <Link href={search(page - 1)}>&lt;</Link>
+        </button>
+        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+          <Link href={search(page + 1)}>&gt;</Link>
+        </button>
       </div>
     </div>
   );
