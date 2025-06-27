@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import { alumni, positionEnumValues, type Position } from "~/server/db/schema";
+import { alumni, positionEnumValues } from "~/server/db/schema";
 import { and, eq, desc, asc, sql } from "drizzle-orm";
 import { tokenize } from "~/lib/search-parser/tokenizer";
 import { parseSearchQuery } from "~/lib/search-parser/parser";
@@ -106,7 +106,7 @@ export const alumniRouter = createTRPCRouter({
             console.log("Token:", token);
         });
 
-        const nodes = parseSearchQuery(query ?? "", [alumni.first_name, alumni.last_name], { year: alumni.grad_year });
+        const nodes = parseSearchQuery(query ?? "", [alumni.first_name, alumni.last_name], { year: alumni.grad_year, position: alumni.position });
 
         nodes.forEach(node => {
             console.log("Parsed Node:", node);
