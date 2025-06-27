@@ -133,18 +133,19 @@ export const alumniRouter = createTRPCRouter({
             );
         } else if (positionEnumValues.includes(sortBy)) {
             console.log("Sorting by position:", sortBy);
-            customSort.push(
-                desc(sql`${alumni.position} = ${sortBy}`),
-                sortDirection === "asc" ? desc(alumni.position) : asc(alumni.position),
-            );
-        } else {
-            console.warn("Unknown sortBy value:", sortBy);
+            const matchExpr = sql`${alumni.position} = ${sortBy}`;
+
+            if (sortDirection === "asc") {
+                customSort.push(asc(matchExpr), desc(alumni.position));
+            } else {
+                customSort.push(desc(matchExpr), asc(alumni.position));
+            }
         }
 
         customSort.push(
             sortDirection === "asc" ? asc(alumni.grad_year) : desc(alumni.grad_year),
-            sortDirection === "asc" ? asc(alumni.first_name) : desc(alumni.first_name),
-            sortDirection === "asc" ? asc(alumni.last_name) : desc(alumni.last_name),
+            asc(alumni.first_name),
+            asc(alumni.last_name),
             sortDirection === "asc" ? asc(alumni.id) : desc(alumni.id),
         );
 
