@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { alumni } from "~/server/db/schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, ilike, or, desc } from "drizzle-orm";
 
 export const alumniRouter = createTRPCRouter({
     createAlumni: publicProcedure
@@ -88,4 +88,37 @@ export const alumniRouter = createTRPCRouter({
 
         }),
     
+    getAlumni: publicProcedure
+        .input(z.object({
+            page: z.number().int().min(0).default(0),
+            pageSize: z.number().int().min(1).max(100).default(10),
+            query: z.string().optional(),
+        })
+    )
+    .query(async ({ input, ctx }) => {
+        const { page, pageSize, query } = input;
+
+        const filters = [];
+
+        if (query) {
+            const pattern = `%${query}%`;
+
+            filters.push(
+                or(
+                    ilike(alumni.first_name, pattern),
+                    ilike(alumni.last_name, pattern),
+                )
+            );
+        }
+
+        const alumniList = await ctx.db
+            .select()
+            .from(alumni)
+            .where(filters.length > 0 ? and(...filters) : undefined)
+            .orderBy(desc(alumni.grad_year)) // Order by graduation year descending
+            .limit(pageSize)
+            .offset(page * pageSize);
+
+        return alumniList;
+    }),
 });
