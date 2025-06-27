@@ -8,7 +8,7 @@ import { DEFAULT_PAGE_SIZE } from "./_components/constants";
 import Link from "next/link";
 
 
-export default async function Alumni({ searchParams }: { searchParams: Promise<{ query?: string; pageSize?: string; page?: string }> }) {
+export default async function Alumni({ searchParams }: { searchParams: Promise<{ query?: string; pageSize?: string; page?: string; sortBy?: string; sortDirection?: string }> }) {
   const awaitedSearchParams = await searchParams;
 
   const query = awaitedSearchParams.query ?? "";
@@ -24,11 +24,19 @@ export default async function Alumni({ searchParams }: { searchParams: Promise<{
     page = 0;
   }
 
+  const sortBy = awaitedSearchParams.sortBy ?? "grad_year";
+  const sortDirection = awaitedSearchParams.sortDirection ?? "asc";
+
   const {alumniList, total} = await api.alumni.getAlumni({
     page,
     pageSize: pageSize,
     query,
+    sortBy: sortBy as "first_name" | "last_name" | "grad_year",
+    sortDirection: sortDirection as "asc" | "desc",
   });
+
+  console.log("first alumni member:", alumniList[0]);
+  console.log("last alumni member:", alumniList[alumniList.length - 1]);
 
   const totalPages = Math.ceil(total / pageSize);
   console.log("Total Pages:", totalPages);
@@ -38,6 +46,8 @@ export default async function Alumni({ searchParams }: { searchParams: Promise<{
       if (query.trim()) newQuery.set("query", query.trim());
       if (pageSize !== DEFAULT_PAGE_SIZE) newQuery.set("pageSize", pageSize.toString());
       if (page > 0) newQuery.set("page", page.toString());
+      if (sortBy) newQuery.set("sortBy", sortBy);
+      if (sortDirection) newQuery.set("sortDirection", sortDirection);
 
     return `?${newQuery ? newQuery.toString() : ""}`;
   };

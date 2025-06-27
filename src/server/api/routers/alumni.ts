@@ -93,10 +93,12 @@ export const alumniRouter = createTRPCRouter({
             page: z.number().int().min(0).default(0),
             pageSize: z.number().int().min(1).max(100).default(10),
             query: z.string().optional(),
+            sortBy: z.enum(["first_name", "last_name", "grad_year"]).optional(),
+            sortDirection: z.enum(["asc", "desc"]).optional(),
         })
     )
     .query(async ({ input, ctx }) => {
-        const { page, pageSize, query } = input;
+        const { page, pageSize, query, sortBy, sortDirection } = input;
 
         const filters = [];
 
@@ -111,17 +113,29 @@ export const alumniRouter = createTRPCRouter({
             );
         }
 
+        const defaultSort = [
+            sortDirection === "asc" ? asc(alumni.grad_year) : desc(alumni.grad_year),
+            asc(alumni.last_name),
+            asc(alumni.first_name),
+            asc(alumni.id),
+        ];
+
+        const customSort =
+            sortBy && sortDirection
+            ? [
+                sortDirection === "asc" ? asc(alumni[sortBy]) : desc(alumni[sortBy]),
+                sortDirection === "asc" ? asc(alumni.grad_year) : desc(alumni.grad_year),
+                sortDirection === "asc" ? asc(alumni.id) : desc(alumni.id),
+            ] : defaultSort;
+
         const whereClause = filters.length > 0 ? and(...filters) : undefined;
 
         const alumniList = await ctx.db
             .select()
             .from(alumni)
             .where(whereClause)
-             .orderBy(
-                desc(alumni.grad_year),
-                asc(alumni.last_name),
-                asc(alumni.first_name),
-                asc(alumni.id)
+            .orderBy(
+                ...customSort,
             )
             .limit(pageSize)
             .offset(page * pageSize);
