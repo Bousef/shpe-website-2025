@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { alumni } from "~/server/db/schema";
-import { and, eq, ilike, or, desc } from "drizzle-orm";
+import { and, eq, ilike, or, desc, asc } from "drizzle-orm";
 
 export const alumniRouter = createTRPCRouter({
     createAlumni: publicProcedure
@@ -115,7 +115,12 @@ export const alumniRouter = createTRPCRouter({
             .select()
             .from(alumni)
             .where(filters.length > 0 ? and(...filters) : undefined)
-            .orderBy(desc(alumni.grad_year)) // Order by graduation year descending
+             .orderBy(
+                desc(alumni.grad_year),
+                asc(alumni.last_name),
+                asc(alumni.first_name),
+                asc(alumni.id)
+            )
             .limit(pageSize)
             .offset(page * pageSize);
 
