@@ -53,6 +53,11 @@ function scanToken(tokenizer: Tokenizer): void {
             tokenizer.tokens.push({ type: 'rightParen', value: ')' });
             advance(tokenizer);
             break;
+        case ':': {
+            tokenizer.tokens.push({ type: 'colon', value: ':' });
+            advance(tokenizer);
+            break;
+        }
         default:
             scanPlainToken(tokenizer);
     }
@@ -76,18 +81,11 @@ function scanQuotedString(tokenizer: Tokenizer): void {
 }
 
 function scanPlainToken(tokenizer: Tokenizer): void {
-    while (!isAtEnd(tokenizer) && ![' ', '|', '-', '"', ')'].includes(peek(tokenizer))) {
+    while (!isAtEnd(tokenizer) && ![' ', '|', '-', '"', ')', ":"].includes(peek(tokenizer))) {
         advance(tokenizer);
     }
 
     const tokenValue = tokenizer.query.slice(tokenizer.start, tokenizer.current);
-
-    if (tokenValue.includes(':')) {
-        const [fieldName, ...rest] = tokenValue.split(':');
-        const value = rest.join(':'); // in case of things like `title:New:World`
-        tokenizer.tokens.push({ type: 'field', field: fieldName ?? "", value });
-        return;
-    } 
 
     addToken(tokenizer, 'plain', String(tokenValue));
 }

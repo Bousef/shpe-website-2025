@@ -28,6 +28,16 @@ export function parseSearchQuery(query: string, match: PgColumn[], columns: Reco
 }
 
 function parseExpression(parser: Parser): Node {
+    if (peek_foward(parser, 1)?.type === 'colon') {
+        const fieldToken = parsePrimaryExpression(parser) as PrimaryNode;
+
+        advance(parser); // consume the colon token
+
+        const valueToken = parsePrimaryExpression(parser) as PrimaryNode;
+
+        return new FieldNode(fieldToken?.value, valueToken, parser.columns);
+    }
+
     return parseBinaryExpression(parser);
 }
 
@@ -77,14 +87,6 @@ function parsePrimaryExpression(parser: Parser): Node {
 
     if (!token) return new ErrorNode("Unexpected EOF");
 
-    if (token.type === 'field') {
-        advance(parser);
-        console.log("next token:", peek(parser));
-        const valueToken = parsePrimaryExpression(parser) as PrimaryNode;
-
-        return new FieldNode(token.field, valueToken, parser.columns);
-    }
-
     if (match(parser, 'phrase') || match(parser, 'plain')) {
         const token = advance(parser);
         return new PrimaryNode(token.value, parser.match);
@@ -124,4 +126,12 @@ function previous(parser: Parser): Token | null  {
 
 function isAtEnd(parser: Parser): boolean {
     return parser.current >= parser.tokens.length;
+}
+
+function peek_foward(parser: Parser, offset: number): Token | null {
+    const index = parser.current + offset;
+    if (index >= parser.tokens.length) {
+        return null;
+    }
+    return parser.tokens[index]!;
 }
