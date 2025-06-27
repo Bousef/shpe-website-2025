@@ -5,7 +5,7 @@ import AlumniCard from "../_components/AlumniCard";
 import { alumniList } from "./AlumniInfo";
 import SearchBar from "./_components/search-bar";
 import { api } from "~/trpc/server";
-
+import { Dropdown, DropdownButton, DropdownItem } from "./_components/dropdown";
 
 export default async function Alumni({ searchParams }: { searchParams: { query?: string } }) {
 
@@ -25,7 +25,7 @@ export default async function Alumni({ searchParams }: { searchParams: { query?:
         <h1 className="text-4xl text-blue-800">2024 - 2025</h1>
       </div>
 
-      <SearchBar initialQuery="" />
+      <SearchBar initialQuery="" initialPageSize={20} />
 
       <div className="grid grid-cols-0 sm:grid-cols-3 md:grid-cols-3 gap-6 px-6 pb-20 justify-items-center">
         {members.map((member) => (
