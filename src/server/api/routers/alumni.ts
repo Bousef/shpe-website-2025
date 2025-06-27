@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import { alumni } from "~/server/db/schema";
+import { alumni, positionEnumValues } from "~/server/db/schema";
 import { and, eq, desc, asc, sql } from "drizzle-orm";
 import { tokenize } from "~/lib/search-parser/tokenizer";
 import { parseSearchQuery } from "~/lib/search-parser/parser";
@@ -13,7 +13,7 @@ export const alumniRouter = createTRPCRouter({
                 last_name: z.string(),
                 image: z.string(),
                 grad_year: z.string(),
-                position: z.string(),
+                position: z.enum(positionEnumValues).default("Member"),
                 linkedIn: z.string(),
             })
         )
@@ -74,7 +74,7 @@ export const alumniRouter = createTRPCRouter({
 
     // get all alumni based on position
     getAlumniByPosition: publicProcedure
-        .input(z.object({position: z.string()}))
+        .input(z.object({position: z.enum(positionEnumValues)}))
         .query(async({input,ctx}) => {
             const positionList = await ctx.db
                   .select()

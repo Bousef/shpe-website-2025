@@ -1,5 +1,4 @@
-import { relations, sql } from "drizzle-orm";
-import { index, pgEnum, pgTableCreator, primaryKey, pgTable, varchar, numeric, timestamp, integer, boolean, text } from "drizzle-orm/pg-core";
+import { pgEnum, pgTableCreator, varchar, boolean } from "drizzle-orm/pg-core";
 
 // taken from https://supabase.com/docs/guides/auth/identities
 // should probably be moved to a separate file
@@ -10,6 +9,29 @@ import { index, pgEnum, pgTableCreator, primaryKey, pgTable, varchar, numeric, t
 export const createTable = pgTableCreator(
   (name) => `shpe-website-2025_${name}`,
 );
+
+// types
+export const positionEnumValues = [
+  "President",
+  "Internal Vice President",
+  "Corporate Vice President",
+  "Secretary",
+  "Marketing Vice President",
+  "Treasurer",
+  "Technology Chair",
+  "Professional Development Chair",
+  "Projects Chair",
+  "Mentorship Chair",
+  "Outreach Chair",
+  "Shpetinas Chair",
+  "Social Chair",
+  "Director",
+  "DevTeam",
+  "Committee",
+  "Member",
+] as const;
+export type Position = typeof positionEnumValues[number];
+export const positionEnum = pgEnum('position', positionEnumValues);
 
 //--------------------  Tables --------------------
 
@@ -25,6 +47,7 @@ export const members = createTable(
     image: varchar({ length: 2048 }), //url
     resume: varchar({ length: 2048 }), //url
     is_member: boolean().default(false),
+    position: positionEnum("position").default("Member"),
   })
 );
 
@@ -36,11 +59,23 @@ export const alumni = createTable(
     last_name: d.varchar({length: 100}),
     grad_year: d.varchar({length: 100}),
     image: d.varchar({length: 2048}),
-    position: d.text(),
     linkedIn: d.text(),
-
+    position: positionEnum("position").default("Member"),
   })
 
+);
+
+export const products = createTable(
+  "products",
+  (d) => ({
+    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+    name: d.varchar({ length: 100 }),
+    category: d.varchar({ length: 100 }).unique().notNull(),
+    image: varchar({ length: 2048 }), //url
+    description: varchar({ length: 2048 }), 
+    price: d.real(),
+    stock: d.integer(),
+  })
 );
 
 /*
