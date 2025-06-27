@@ -68,7 +68,7 @@ export default function SearchBar({ initialQuery, initialPageSize }: { initialQu
                     ))}
                 </DropdownItems>
             </Dropdown>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700" onClick={search}>
+            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 cursor-pointer" onClick={search}>
                 Search
             </button>
         </div>
