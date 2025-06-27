@@ -73,15 +73,18 @@ export class PrimaryNode extends Node {
     }
 
     toSQL(): SQL<boolean> | undefined {
-        const pattern = `%${this.value}%`;
+        const tokens = this.value.trim().split(" ").filter(t => t.length > 0);
 
-        const filter = [];
+        if (tokens.length === 0) return undefined;
 
-        for (const match of this.match) {
-            filter.push(ilike(match, pattern));
-        }
+        // For each token, build an OR across all match columns
+        const perTokenFilters = tokens.map(token => {
+        const pattern = `%${token}%`;
+            return or(...this.match.map(col => ilike(col, pattern))) as SQL<boolean>;
+        });
 
-        return or(...filter) as SQL<boolean>;
+        // All tokens must be found somewhere (AND across tokens)
+        return and(...perTokenFilters) as SQL<boolean>;
     }
 }
 
