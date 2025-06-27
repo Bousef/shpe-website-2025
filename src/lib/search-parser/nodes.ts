@@ -40,6 +40,12 @@ export class FieldNode extends Node {
 
         const value = this.value.value;
 
+        console.log("this.value: ", this.value);
+
+        if (!value) {
+            return undefined; // No value to filter by
+        }
+
         if (value.includes('..')) {
             const [start, end] = value.split('..').map(Number);
             return and(gte(column, start), lte(column, end)) as SQL<boolean>;
