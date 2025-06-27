@@ -23,24 +23,24 @@ export const members = createTable(
     last_name: d.varchar({ length: 100 }),
     email: d.varchar({ length: 100 }).unique().notNull(),
     image: varchar({ length: 2048 }), //url
-    bio: text(),
     resume: varchar({ length: 2048 }), //url
     is_member: boolean().default(false),
   })
 );
 
-//alumni table
 export const alumni = createTable(
   "alumni",
   (d) => ({
-    //id
-    //first name
-    //last name
-    //year
-    //position
-    //linkedin 
-    //image
+    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+    first_name: d.varchar({length: 100}),
+    last_name: d.varchar({length: 100}),
+    grad_year: d.varchar({length: 100}),
+    image: d.varchar({length: 2048}),
+    position: d.text(),
+    linkedIn: d.text(),
+
   })
+
 );
 
 /*
