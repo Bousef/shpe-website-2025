@@ -17,27 +17,20 @@ export function parseSearchQuery(query: string, match: PgColumn[], columns: Reco
         match,
         columns,
     }
+
+    console.log("Tokens:", parser.tokens);
     
     const result: Node[] = [];
     
     while (!isAtEnd(parser)) {
         result.push(parseExpression(parser));
+        console.log("parsed expression:", result[result.length - 1]);
     }
 
     return result;
 }
 
 function parseExpression(parser: Parser): Node {
-    if (peek_foward(parser, 1)?.type === 'colon') {
-        const fieldToken = parsePrimaryExpression(parser) as PrimaryNode;
-
-        advance(parser); // consume the colon token
-
-        const valueToken = parsePrimaryExpression(parser) as PrimaryNode;
-
-        return new FieldNode(fieldToken?.value, valueToken, parser.columns);
-    }
-
     return parseBinaryExpression(parser);
 }
 
@@ -77,6 +70,16 @@ function parseUnaryExpression(parser: Parser): Node {
         const operand = parseUnaryExpression(parser);
         
         return new UnaryNode(operator.value as 'exclude', operand);
+    }
+
+    if (peek_foward(parser, 1)?.type === 'colon') {
+        const fieldToken = parsePrimaryExpression(parser) as PrimaryNode;
+
+        advance(parser); // consume the colon token
+
+        const valueToken = parsePrimaryExpression(parser) as PrimaryNode;
+
+        return new FieldNode(fieldToken?.value, valueToken, parser.columns);
     }
 
     return parsePrimaryExpression(parser);
