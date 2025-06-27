@@ -3,8 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { Dropdown, DropdownButton, DropdownItem, DropdownItems } from "./dropdown";
-
-const DEFAULT_PAGE_SIZE = 20;
+import { DEFAULT_PAGE_SIZE } from "./constants";
 
 export default function SearchBar({ initialQuery, initialPageSize }: { initialQuery: string; initialPageSize: number }) {
     const [query, setQuery] = useState(initialQuery);

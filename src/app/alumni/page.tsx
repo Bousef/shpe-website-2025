@@ -1,19 +1,30 @@
-
-
 import Navbar from "../_components/NavBar";
 import AlumniCard from "../_components/AlumniCard";
 import { alumniList } from "./AlumniInfo";
 import SearchBar from "./_components/search-bar";
 import { api } from "~/trpc/server";
 import { Dropdown, DropdownButton, DropdownItem } from "./_components/dropdown";
+import { DEFAULT_PAGE_SIZE } from "./_components/constants";
 
-export default async function Alumni({ searchParams }: { searchParams: { query?: string } }) {
+
+export default async function Alumni({ searchParams }: { searchParams: { query?: string; pageSize?: string } }) {
 
   const query = searchParams.query ?? "";
 
+  let pageSize = Number(searchParams.pageSize);
+
+  console.log("Page Size:", pageSize);
+
+  if (isNaN(pageSize) || pageSize === undefined) {
+    pageSize = Number(DEFAULT_PAGE_SIZE);
+  }
+
+  console.log("Page Size:", pageSize);
+  console.log("DEFAULT_PAGE_SIZE:", DEFAULT_PAGE_SIZE, typeof DEFAULT_PAGE_SIZE);
+
   const members = await api.alumni.getAlumni({
     page: 0,
-    pageSize: 100,
+    pageSize: pageSize,
     query,
   });
 
