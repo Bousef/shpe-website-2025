@@ -48,7 +48,7 @@ export function DropdownButton({ children }: { children: React.ReactNode }) {
   return (
     <button
       onClick={toggle}
-      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 cursor-pointer"
     >
       {children}
     </button>
@@ -59,7 +59,7 @@ export function DropdownItems({ children }: { children: React.ReactNode }) {
   const { open } = useContext(DropdownContext);
   if (!open) return null;
   return (
-    <div className="absolute mt-2 w-48 bg-white shadow-lg rounded-md border z-10">
+    <div className="absolute mt-2 w-48 bg-white shadow-lg rounded-md border z-10 cursor-pointer">
       <ul className="py-1">{children}</ul>
     </div>
   );
