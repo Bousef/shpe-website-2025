@@ -13,19 +13,19 @@ export default async function Alumni({ searchParams }: { searchParams: Promise<{
 
   const query = awaitedSearchParams.query ?? "";
 
-  let pageSize = Number(awaitedSearchParams.pageSize);
+  let pageSize = parseInt(awaitedSearchParams.pageSize ?? "0");
 
-  if (isNaN(pageSize) || pageSize === undefined) {
+  if (isNaN(pageSize) || pageSize === undefined || pageSize <= 0) {
     pageSize = Number(DEFAULT_PAGE_SIZE);
   }
 
-  let page = Number(awaitedSearchParams.page);
-  if (isNaN(page) || page === undefined) {
+  let page = parseInt(awaitedSearchParams.page ?? "0");
+  if (isNaN(page) || page === undefined || page < 0) {
     page = 0;
   }
 
-  const sortBy = awaitedSearchParams.sortBy ?? "grad_year";
-  const sortDirection = awaitedSearchParams.sortDirection ?? "asc";
+  const sortBy = ["first_name", "last_name", "grad_year"].includes(awaitedSearchParams.sortBy ?? "grad_year") ? awaitedSearchParams.sortBy : undefined;
+  const sortDirection = ["asc", "desc"].includes(awaitedSearchParams.sortDirection ?? "asc") ? awaitedSearchParams.sortDirection : undefined;
 
   const {alumniList, total} = await api.alumni.getAlumni({
     page,
