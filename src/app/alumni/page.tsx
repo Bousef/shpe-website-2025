@@ -8,28 +8,29 @@ import { DEFAULT_PAGE_SIZE } from "./_components/constants";
 import Link from "next/link";
 
 
-export default async function Alumni({ searchParams }: { searchParams: { query?: string; pageSize?: string; page?: string } }) {
+export default async function Alumni({ searchParams }: { searchParams: Promise<{ query?: string; pageSize?: string; page?: string }> }) {
+  const awaitedSearchParams = await searchParams;
 
-  const query = searchParams.query ?? "";
+  const query = awaitedSearchParams.query ?? "";
 
-  let pageSize = Number(searchParams.pageSize);
+  let pageSize = Number(awaitedSearchParams.pageSize);
 
   if (isNaN(pageSize) || pageSize === undefined) {
     pageSize = Number(DEFAULT_PAGE_SIZE);
   }
 
-  let page = Number(searchParams.page);
+  let page = Number(awaitedSearchParams.page);
   if (isNaN(page) || page === undefined) {
     page = 0;
   }
 
-  const members = await api.alumni.getAlumni({
+  const {alumniList, total} = await api.alumni.getAlumni({
     page,
     pageSize: pageSize,
     query,
   });
 
-  const totalPages = Math.ceil(members.length / pageSize);
+  const totalPages = Math.ceil(total / pageSize);
   console.log("Total Pages:", totalPages);
 
   const search = (page: number) => {
@@ -52,7 +53,7 @@ export default async function Alumni({ searchParams }: { searchParams: { query?:
       <SearchBar initialQuery="" initialPageSize={20} />
 
       <div className="grid grid-cols-0 sm:grid-cols-3 md:grid-cols-3 gap-6 px-6 pb-20 justify-items-center">
-        {members.map((member) => (
+        {alumniList.map((member) => (
           <div key={member.id} className="w-full max-w-sm border rounded-lg shadow-lg bg-white p-4">
             {member.first_name + " " + member.last_name}
           </div>
@@ -60,12 +61,18 @@ export default async function Alumni({ searchParams }: { searchParams: { query?:
       </div>
 
       <div className="flex justify-between items-center px-6">
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-          <Link href={search(page - 1)}>&lt;</Link>
-        </button>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-          <Link href={search(page + 1)}>&gt;</Link>
-        </button>
+        <Link href={search(page - 1)}>
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 cursor-pointer disabled:opacity-50 disabled:cursor-default"
+            disabled={page <= 0}>
+            &lt;
+          </button>
+        </Link>
+        <Link href={search(page + 1)}>
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 cursor-pointer disabled:opacity-50 disabled:cursor-default"
+            disabled={page + 1 >= totalPages}>
+            &gt;
+          </button>
+        </Link>
       </div>
     </div>
   );
