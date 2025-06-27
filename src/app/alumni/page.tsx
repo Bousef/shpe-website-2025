@@ -6,9 +6,13 @@ import { api } from "~/trpc/server";
 import { Dropdown, DropdownButton, DropdownItem } from "./_components/dropdown";
 import { DEFAULT_PAGE_SIZE } from "./_components/constants";
 import Link from "next/link";
+import { positionEnumValues, type Position } from "~/server/db/schema";
+
+type SortByType = "first_name" | "last_name" | "grad_year" | Position;
+const sortByWhitelist: SortByType[] = ["first_name", "last_name", "grad_year", ...positionEnumValues];
 
 
-export default async function Alumni({ searchParams }: { searchParams: Promise<{ query?: string; pageSize?: string; page?: string; sortBy?: string; sortDirection?: string }> }) {
+export default async function Alumni({ searchParams }: { searchParams: Promise<{ query?: string; pageSize?: string; page?: string; sortBy?: string; sortDirection?: string; }> }) {
   const awaitedSearchParams = await searchParams;
 
   const query = awaitedSearchParams.query ?? "";
@@ -24,14 +28,21 @@ export default async function Alumni({ searchParams }: { searchParams: Promise<{
     page = 0;
   }
 
-  const sortBy = ["first_name", "last_name", "grad_year"].includes(awaitedSearchParams.sortBy ?? "grad_year") ? awaitedSearchParams.sortBy : undefined;
+  const rawSortBy = awaitedSearchParams.sortBy ?? "grad_year";
+
+  const sortBy = sortByWhitelist.includes(rawSortBy as SortByType)
+  ? (rawSortBy as SortByType)
+  : "grad_year";
+
   const sortDirection = ["asc", "desc"].includes(awaitedSearchParams.sortDirection ?? "asc") ? awaitedSearchParams.sortDirection : undefined;
+
+  console.log("Sorting by alumni page:", sortBy, "Direction:", sortDirection);
 
   const {alumniList, total} = await api.alumni.getAlumni({
     page,
     pageSize: pageSize,
     query,
-    sortBy: sortBy as "first_name" | "last_name" | "grad_year",
+    sortBy: sortBy,
     sortDirection: sortDirection as "asc" | "desc",
   });
 

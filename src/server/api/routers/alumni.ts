@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import { alumni, positionEnumValues } from "~/server/db/schema";
+import { alumni, positionEnumValues, type Position } from "~/server/db/schema";
 import { and, eq, desc, asc, sql } from "drizzle-orm";
 import { tokenize } from "~/lib/search-parser/tokenizer";
 import { parseSearchQuery } from "~/lib/search-parser/parser";
@@ -95,8 +95,8 @@ export const alumniRouter = createTRPCRouter({
             page: z.number().int().min(0).default(0),
             pageSize: z.number().int().min(1).max(100).default(10),
             query: z.string().optional(),
-            sortBy: z.enum(["first_name", "last_name", "grad_year"]).optional(),
-            sortDirection: z.enum(["asc", "desc"]).optional(),
+            sortBy: z.enum(["first_name", "last_name", "grad_year", ...positionEnumValues]).optional().default("grad_year"),
+            sortDirection: z.enum(["asc", "desc"]).optional().default("asc"),
         })
     )
     .query(async ({ input, ctx }) => {
@@ -120,20 +120,33 @@ export const alumniRouter = createTRPCRouter({
             filters.length === 1 ? filters[0] :
             and(...filters);
 
-        const defaultSort = [
-            sortDirection === "asc" ? asc(alumni.grad_year) : desc(alumni.grad_year),
-            asc(alumni.last_name),
-            asc(alumni.first_name),
-            asc(alumni.id),
-        ];
+        const customSort = [];
 
-        const customSort =
-            sortBy && sortDirection
-            ? [
+
+        
+
+        console.log("Sorting by:", sortBy, "Direction:", sortDirection);
+
+        if (sortBy === "first_name" || sortBy === "last_name" || sortBy === "grad_year") {
+            customSort.push(
                 sortDirection === "asc" ? asc(alumni[sortBy]) : desc(alumni[sortBy]),
-                sortDirection === "asc" ? asc(alumni.grad_year) : desc(alumni.grad_year),
-                sortDirection === "asc" ? asc(alumni.id) : desc(alumni.id),
-            ] : defaultSort;
+            );
+        } else if (positionEnumValues.includes(sortBy)) {
+            console.log("Sorting by position:", sortBy);
+            customSort.push(
+                desc(sql`${alumni.position} = ${sortBy}`),
+                sortDirection === "asc" ? desc(alumni.position) : asc(alumni.position),
+            );
+        } else {
+            console.warn("Unknown sortBy value:", sortBy);
+        }
+
+        customSort.push(
+            sortDirection === "asc" ? asc(alumni.grad_year) : desc(alumni.grad_year),
+            sortDirection === "asc" ? asc(alumni.first_name) : desc(alumni.first_name),
+            sortDirection === "asc" ? asc(alumni.last_name) : desc(alumni.last_name),
+            sortDirection === "asc" ? asc(alumni.id) : desc(alumni.id),
+        );
 
         const alumniList = await ctx.db
             .select()

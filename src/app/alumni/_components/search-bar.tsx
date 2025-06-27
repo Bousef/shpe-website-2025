@@ -4,11 +4,12 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { Dropdown, DropdownButton, DropdownItem, DropdownItems } from "./dropdown";
 import { DEFAULT_PAGE_SIZE } from "./constants";
+import { positionEnumValues, type Position } from "~/server/db/schema";
 
 export default function SearchBar({ initialQuery, initialPageSize }: { initialQuery: string; initialPageSize: number }) {
     const [query, setQuery] = useState(initialQuery);
     const [pageSize, setPageSize] = useState(initialPageSize);
-    const [sortBy, setSortBy] = useState<"first_name" | "last_name" | "grad_year">("grad_year");
+    const [sortBy, setSortBy] = useState<"first_name" | "last_name" | "grad_year" | Position>("grad_year");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
     const router = useRouter();
@@ -44,13 +45,13 @@ export default function SearchBar({ initialQuery, initialPageSize }: { initialQu
                 </DropdownItems>
             </Dropdown>
             <Dropdown>
-                <DropdownButton>Sort By: {sortBy === "first_name" ? "First Name" : sortBy === "last_name" ? "Last Name" : "Graduation Year"}</DropdownButton>
+                <DropdownButton>Sort By: {sortBy === "first_name" ? "First Name" : sortBy === "last_name" ? "Last Name" : sortBy === "grad_year" ? "Graduation Year" : sortBy}</DropdownButton>
                 <DropdownItems>
-                    {["grad_year", "first_name", "last_name"].map(field => (
+                    {["grad_year", "first_name", "last_name", ...positionEnumValues].map(field => (
                         <DropdownItem key={field} onClick={() => {
-                            setSortBy(field as "first_name" | "last_name" | "grad_year");
+                            setSortBy(field as "first_name" | "last_name" | "grad_year" | Position);
                         }}>
-                            {field === "first_name" ? "First Name" : field === "last_name" ? "Last Name" : "Graduation Year"}
+                            {field === "first_name" ? "First Name" : field === "last_name" ? "Last Name" : field === "grad_year" ? "Graduation Year" : field}
                         </DropdownItem>
                     ))}
                 </DropdownItems>
