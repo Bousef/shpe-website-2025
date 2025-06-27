@@ -72,7 +72,7 @@ function scanQuotedString(tokenizer: Tokenizer): void {
         }
     }
 
-    addToken(tokenizer, 'phrase', String(tokenizer.query.slice(tokenizer.start, tokenizer.current - 1)));
+    addToken(tokenizer, 'phrase', String(tokenizer.query.slice(tokenizer.start + 1, tokenizer.current - 1)));
 }
 
 function scanPlainToken(tokenizer: Tokenizer): void {

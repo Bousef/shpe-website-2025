@@ -79,7 +79,10 @@ function parsePrimaryExpression(parser: Parser): Node {
 
     if (token.type === 'field') {
         advance(parser);
-        return new FieldNode(token.field, token.value, parser.columns);
+        console.log("next token:", peek(parser));
+        const valueToken = parsePrimaryExpression(parser) as PrimaryNode;
+
+        return new FieldNode(token.field, valueToken, parser.columns);
     }
 
     if (match(parser, 'phrase') || match(parser, 'plain')) {
