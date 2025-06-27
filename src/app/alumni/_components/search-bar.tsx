@@ -10,13 +10,13 @@ export default function SearchBar({ initialQuery, initialPageSize }: { initialQu
     const [pageSize, setPageSize] = useState(initialPageSize);
 
     const router = useRouter();
-    const currentPage = usePathname().split('/')[1]; // 'about', 'alumni', etc.
+    const currentPath = usePathname().split('/')[1]; // 'about', 'alumni', etc.
 
     const search = () => {
         const newQuery = new URLSearchParams();
         if (query.trim()) newQuery.set("query", query.trim());
         if (pageSize !== DEFAULT_PAGE_SIZE) newQuery.set("pageSize", pageSize.toString());
-        router.push(`/${currentPage}?${newQuery}`);
+        router.push(`/${currentPath}?${newQuery}`);
     }
 
     return (
