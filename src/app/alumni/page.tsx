@@ -1,16 +1,13 @@
 import Navbar from "../_components/NavBar";
 import AlumniCard from "../_components/AlumniCard";
-import { alumniList } from "./AlumniInfo";
 import SearchBar from "./_components/search-bar";
 import { api } from "~/trpc/server";
-import { Dropdown, DropdownButton, DropdownItem } from "./_components/dropdown";
 import { DEFAULT_PAGE_SIZE } from "./_components/constants";
 import Link from "next/link";
 import { positionEnumValues, type Position } from "~/server/db/schema";
 
 type SortByType = "first_name" | "last_name" | "grad_year" | Position;
 const sortByWhitelist: SortByType[] = ["first_name", "last_name", "grad_year", ...positionEnumValues];
-
 
 export default async function Alumni({ searchParams }: { searchParams: Promise<{ query?: string; pageSize?: string; page?: string; sortBy?: string; sortDirection?: string; }> }) {
   const awaitedSearchParams = await searchParams;
@@ -73,11 +70,9 @@ export default async function Alumni({ searchParams }: { searchParams: Promise<{
 
       <SearchBar initialQuery="" initialPageSize={20} />
 
-      <div className="grid grid-cols-0 sm:grid-cols-3 md:grid-cols-3 gap-6 px-6 pb-20 justify-items-center">
+      <div className="grid grid-cols-0 sm:grid-cols-3 md:grid-cols-4 gap-6 px-6 pb-20 pt-10 justify-items-center">
         {alumniList.map((member) => (
-          <div key={member.id} className="w-full max-w-sm border rounded-lg shadow-lg bg-white p-4">
-            {member.first_name + " " + member.last_name}
-          </div>
+            <AlumniCard key={member.id} alumni={member} />
         ))}
       </div>
 
