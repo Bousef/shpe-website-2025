@@ -5,36 +5,59 @@ import { useEffect, useState } from "react";
 import { BsLinkedin } from "react-icons/bs";
 import type { Alumni } from "~/server/db/schema";
 
-async function fetchAvatarAsBase64(first: string, last: string): Promise<string> {
-  const key = `${first} ${last}`;
-  const cached = localStorage.getItem(key);
-  if (cached) return cached;
+async function fetchAvatarAsBase64(url: string): Promise<string> {
+    const key = url;
+    const cached = localStorage.getItem(key);
+    if (cached) return cached;
 
-  const url = `https://ui-avatars.com/api/?name=${encodeURIComponent(key)}&background=001f5b&color=ffffff&size=220`;
-  const res = await fetch(url);
-  const blob = await res.blob();
+    const res = await fetch(url);
 
-  return new Promise((resolve) => {
-      const reader = new FileReader();
+    const blob = await res.blob();
 
-    reader.onloadend = () => {
-      const base64data = reader.result as string;
-      localStorage.setItem(key, base64data);
-      resolve(base64data);
-    };
+    return new Promise((resolve) => {
+        const reader = new FileReader();
 
-    // start reading the blob as a data URL
-    reader.readAsDataURL(blob);
-  });
+        reader.onloadend = () => {
+        const base64data = reader.result as string;
+        localStorage.setItem(key, base64data);
+        resolve(base64data);
+        };
+
+        // start reading the blob as a data URL
+        reader.readAsDataURL(blob);
+    });
 }
 
-export default function AlumniCard({ alumni }: { alumni: Alumni }) {
-    useEffect(() => {
-        void fetchAvatarAsBase64(alumni.first_name ?? "", alumni.last_name ?? "")
-            .then(setImageSrc);
-    }, [alumni.first_name, alumni.last_name]);
+async function getCachedOrFallbackImage(alumni: Alumni): Promise<string> {
+    const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(alumni.first_name + " " + alumni.last_name)}&background=001f5b&color=ffffff&size=220`;
 
-    const [imageSrc, setImageSrc] = useState<string>(alumni.image ?? "");
+    // Helper to check if url is valid
+    async function urlExists(url: string) {
+        try {
+            const response = await fetch(url, { method: 'HEAD' }); // HEAD is lighter than GET
+        return response.ok;
+        } catch {
+            return false;
+        }
+    }
+
+    // Check alumni image URL first
+    if (alumni.image && (await urlExists(alumni.image))) {
+        return fetchAvatarAsBase64(alumni.image);
+    }
+
+    // fallback to default avatar
+    return fetchAvatarAsBase64(fallbackUrl);
+}
+
+
+export default function AlumniCard({ alumni }: { alumni: Alumni }) {
+    const [imageSrc, setImageSrc] = useState<string>("");
+
+    useEffect(() => {
+        void getCachedOrFallbackImage(alumni).then(setImageSrc);
+    }, [alumni]);
+
 
     return (
         <div className="w-full max-w-[220px] bg-white shadow-xl rounded-xl overflow-hidden flex flex-col group">
@@ -47,11 +70,13 @@ export default function AlumniCard({ alumni }: { alumni: Alumni }) {
                     className="block w-full h-full"
                     onClick={!alumni.linkedIn ? (e) => e.preventDefault() : undefined}
                 >
-                    <img
-                        src={imageSrc}
-                        alt={alumni.first_name + " " + alumni.last_name}
-                        className="w-full h-full object-cover"
-                    />
+                    {imageSrc ? (
+                        <img
+                            src={imageSrc}
+                            alt={alumni.first_name + " " + alumni.last_name}
+                            className="w-full h-full object-cover"
+                        />) : null
+                    }
                 </a>
 
                 {alumni.linkedIn && (
