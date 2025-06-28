@@ -1,11 +1,39 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BsLinkedin } from "react-icons/bs";
 import type { Alumni } from "~/server/db/schema";
 
+async function fetchAvatarAsBase64(first: string, last: string): Promise<string> {
+  const key = `${first} ${last}`;
+  const cached = localStorage.getItem(key);
+  if (cached) return cached;
+
+  const url = `https://ui-avatars.com/api/?name=${encodeURIComponent(key)}&background=001f5b&color=ffffff&size=220`;
+  const res = await fetch(url);
+  const blob = await res.blob();
+
+  return new Promise((resolve) => {
+      const reader = new FileReader();
+
+    reader.onloadend = () => {
+      const base64data = reader.result as string;
+      localStorage.setItem(key, base64data);
+      resolve(base64data);
+    };
+
+    // start reading the blob as a data URL
+    reader.readAsDataURL(blob);
+  });
+}
+
 export default function AlumniCard({ alumni }: { alumni: Alumni }) {
+    useEffect(() => {
+        void fetchAvatarAsBase64(alumni.first_name ?? "", alumni.last_name ?? "")
+            .then(setImageSrc);
+    }, [alumni.first_name, alumni.last_name]);
+
     const [imageSrc, setImageSrc] = useState<string>(alumni.image ?? "");
 
     return (
@@ -23,9 +51,6 @@ export default function AlumniCard({ alumni }: { alumni: Alumni }) {
                         src={imageSrc}
                         alt={alumni.first_name + " " + alumni.last_name}
                         className="w-full h-full object-cover"
-                        onError={() => {
-                            setImageSrc(`https://ui-avatars.com/api/?name=${encodeURIComponent(alumni.first_name + " " + alumni.last_name)}&background=001f5b&color=ffffff&size=220`); // Fallback image if the original fails to load
-                        }}
                     />
                 </a>
 
