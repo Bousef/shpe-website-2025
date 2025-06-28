@@ -1,3 +1,4 @@
+import type { InferSelectModel } from "drizzle-orm";
 import { pgEnum, pgTableCreator, varchar, boolean } from "drizzle-orm/pg-core";
 
 // taken from https://supabase.com/docs/guides/auth/identities
@@ -32,6 +33,8 @@ export const positionEnumValues = [
 ] as const;
 export type Position = typeof positionEnumValues[number];
 export const positionEnum = pgEnum('position', positionEnumValues);
+
+export type Alumni = InferSelectModel<typeof alumni>;
 
 //--------------------  Tables --------------------
 
