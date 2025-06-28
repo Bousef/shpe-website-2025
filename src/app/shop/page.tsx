@@ -6,6 +6,7 @@ import Link from "next/link";
 
 import Navbar from "../_components/NavBar";
 import { supabase } from "../../supabase-client";
+import Image from "next/image";
 
 // Represents a category image mapping for display
 export type CategoryImage = {
@@ -63,34 +64,37 @@ export default function Shop() {
       {/* Navigation bar */}
       <Navbar />
 
-      <main className="max-w-4xl mx-auto py-10">
+      <main className="px-4 py-10 lg:px-48">
         {/* Page header */}
-        <h1 className="text-blue-800 text-5xl text-center mb-8">
+        <h1 className="mb-8 text-center text-5xl text-yellow-500 lg:mb-20 lg:text-6xl">
           CATEGORIES
         </h1>
 
         {/* Display error message if present */}
         {errorMsg && (
-          <p className="text-red-600 mb-4 text-center">{errorMsg}</p>
+          <p className="mb-4 text-center text-red-600">{errorMsg}</p>
         )}
 
         {/* Category grid */}
-        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-16 sm:grid-cols-2 lg:grid-cols-3 lg:gap-32">
           {categories.map(({ category, image }) => (
             <Link
               key={category}
               href={`/shop/${encodeURIComponent(category)}`}
-              className="block text-center rounded-lg overflow-hidden shadow-md hover:shadow-lg transition"
+              className="block overflow-hidden text-center"
             >
-              {/* Category image */}
-              <img
-                src={image}
-                alt={category}
-                className="w-full h-64 object-cover"
-              />
+              <div className="relative mb-4 aspect-[3/4] lg:mb-8">
+                {/* Category image */}
+                <Image
+                  src={image}
+                  alt={category}
+                  className="object-cover"
+                  fill
+                />
+              </div>
 
               {/* Category label */}
-              <p className="mt-2 text-lg font-medium text-gray-700">
+              <p className="text-5xl font-bold tracking-wider text-blue-900 uppercase">
                 {category}
               </p>
             </Link>
