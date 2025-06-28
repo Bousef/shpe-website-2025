@@ -6,10 +6,15 @@ import Link from "next/link";
 import Navbar from "../../_components/NavBar";
 import AddProductForm, { type Product } from "../../_components/AddProductForm";
 import { supabase } from "../../../supabase-client";
+import Image from "next/image";
 
 // Props for category page route
-interface CategoryParams { category: string; }
-interface CategoryPageProps { params: Promise<CategoryParams>; }
+interface CategoryParams {
+  category: string;
+}
+interface CategoryPageProps {
+  params: Promise<CategoryParams>;
+}
 
 /**
  * CategoryPage component
@@ -53,16 +58,18 @@ export default function CategoryPage({ params }: CategoryPageProps) {
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-100">
       <Navbar />
 
-      <main className="max-w-4xl mx-auto py-10 px-4">
+      <main className="px-4 py-10 lg:px-96">
         {/* Header with category title and add button */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="mb-8 flex flex-col items-center justify-between lg:mb-20 lg:flex-row">
           <Link href="/shop" className="text-blue-600 hover:text-blue-800">
             ← Back to categories
           </Link>
-          <h1 className="text-4xl font-bold">{category}</h1>
+          <h1 className="text-5xl font-medium tracking-wider text-yellow-500 uppercase lg:text-6xl">
+            {category}
+          </h1>
           <button
             onClick={() => setShowForm(true)}
-            className="text-white bg-blue-600 hover:bg-blue-700 rounded-full w-10 h-10 flex items-center justify-center"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white hover:bg-blue-700"
             aria-label="Add Product"
           >
             +
@@ -79,26 +86,31 @@ export default function CategoryPage({ params }: CategoryPageProps) {
         )}
 
         {/* Error message */}
-        {errorMsg && <p className="text-red-600 mb-4">{errorMsg}</p>}
+        {errorMsg && <p className="mb-4 text-red-600">{errorMsg}</p>}
 
         {/* Product grid */}
-        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-16 sm:grid-cols-2 lg:grid-cols-3 lg:gap-32">
           {products.map((p) => (
             <Link
-              key={p.id}
+              key={category}
               href={`/shop/${encodeURIComponent(category)}/${p.id}`}
-              className="block border rounded-lg overflow-hidden shadow-md hover:shadow-lg transition"
+              className="block overflow-hidden"
             >
-              <img
-                src={p.image}
-                alt={p.name}
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4">
-                <p className="font-medium">{p.name}</p>
-                <p className="text-gray-600 truncate">{p.description}</p>
-                <p className="mt-2 font-semibold">${p.price.toFixed(2)}</p>
-                <p className="text-sm">Stock: {p.stock}</p>
+              <div className="relative mb-2 aspect-[3/4]">
+                <Image
+                  src={p.image}
+                  alt={p.category}
+                  className="object-cover"
+                  fill
+                />
+              </div>
+
+              <div>
+                <p className="mb-2 text-blue-900">Limited edition</p>
+                <p className="text-lg font-bold tracking-wider text-blue-900 uppercase">
+                  {p.name}
+                </p>
+                <p className="text-xl text-blue-900">$ {p.price?.toFixed(2)}</p>
               </div>
             </Link>
           ))}
