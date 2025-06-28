@@ -1,3 +1,5 @@
+"use server";
+
 import Navbar from "../_components/NavBar";
 import AlumniCard from "../_components/AlumniCard";
 import SearchBar from "./_components/search-bar";
@@ -5,9 +7,31 @@ import { api } from "~/trpc/server";
 import { DEFAULT_PAGE_SIZE } from "./_components/constants";
 import Link from "next/link";
 import { positionEnumValues, type Position } from "~/server/db/schema";
+import type { Alumni } from "~/server/db/schema";
 
 type SortByType = "first_name" | "last_name" | "grad_year" | Position;
 const sortByWhitelist: SortByType[] = ["first_name", "last_name", "grad_year", ...positionEnumValues];
+
+async function replaceInvalidImagesByDefault(alumni: Alumni) {
+    const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(alumni.first_name + " " + alumni.last_name)}&background=001f5b&color=ffffff&size=220`;
+
+    // Helper to check if url is valid
+    async function urlExists(url: string) {
+      try {
+          const response = await fetch(url, { method: 'HEAD' }); // HEAD is lighter than GET
+          return response.ok;
+      } catch {
+          return false;
+      }
+    }
+
+    // Check alumni image URL first
+    if (!alumni.image || !(await urlExists(alumni.image))) {
+        alumni.image = fallbackUrl;
+    } 
+
+    return;
+}
 
 export default async function Alumni({ searchParams }: { searchParams: Promise<{ query?: string; pageSize?: string; page?: string; sortBy?: string; sortDirection?: string; }> }) {
   const awaitedSearchParams = await searchParams;
@@ -71,9 +95,10 @@ export default async function Alumni({ searchParams }: { searchParams: Promise<{
       <SearchBar initialQuery="" initialPageSize={20} />
 
       <div className="grid grid-cols-0 sm:grid-cols-3 md:grid-cols-4 gap-6 px-6 pb-20 pt-10 justify-items-center">
-        {alumniList.map((member) => (
-            <AlumniCard key={member.id} alumni={member} />
-        ))}
+        {alumniList.map(async (member) => {
+          await replaceInvalidImagesByDefault(member);
+          return <AlumniCard key={member.id} alumni={member} />;
+        })}
       </div>
 
       <div className="flex justify-between items-center px-6">
