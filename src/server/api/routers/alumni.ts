@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import { alumni, positionEnumValues } from "~/server/db/schema";
+import { alumni, positionEnumValues, type Alumni } from "~/server/db/schema";
 import { and, eq, desc, asc, sql } from "drizzle-orm";
 import { tokenize } from "~/lib/search-parser/tokenizer";
 import { parseSearchQuery } from "~/lib/search-parser/parser";
@@ -157,7 +157,7 @@ export const alumniRouter = createTRPCRouter({
                 ...customSort,
             )
             .limit(pageSize)
-            .offset(page * pageSize);
+            .offset(page * pageSize) as Alumni[];
 
         const countResult = await ctx.db
             .select({ count: sql<number>`count(*)` })
