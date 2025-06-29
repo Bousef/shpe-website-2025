@@ -34,13 +34,10 @@ export class FieldNode extends Node {
   }
 
     toSQL(): SQL<boolean> | undefined {
-        console.log("FieldNode:", this.field, "Value:", this.value);
         const column = this.columns[this.field];
         if (!column) return undefined; // ignore unknown fields
 
         const value = this.value.value;
-
-        console.log("this.value: ", this.value);
 
         if (!value) {
             return undefined; // No value to filter by

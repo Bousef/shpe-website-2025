@@ -2,7 +2,6 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { alumni, positionEnumValues, type Alumni } from "~/server/db/schema";
 import { and, eq, desc, asc, sql } from "drizzle-orm";
-import { tokenize } from "~/lib/search-parser/tokenizer";
 import { parseSearchQuery } from "~/lib/search-parser/parser";
 
 export const alumniRouter = createTRPCRouter({
@@ -102,15 +101,7 @@ export const alumniRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
         const { page, pageSize, query, sortBy, sortDirection } = input;
 
-        tokenize(query ?? "").forEach(token => {
-            console.log("Token:", token);
-        });
-
         const nodes = parseSearchQuery(query ?? "", [alumni.first_name, alumni.last_name], { year: alumni.grad_year, position: alumni.position });
-
-        nodes.forEach(node => {
-            console.log("Parsed Node:", node);
-        });
 
         const filters = nodes
             .map(node => node.toSQL());
@@ -122,17 +113,11 @@ export const alumniRouter = createTRPCRouter({
 
         const customSort = [];
 
-
-        
-
-        console.log("Sorting by:", sortBy, "Direction:", sortDirection);
-
         if (sortBy === "first_name" || sortBy === "last_name" || sortBy === "grad_year") {
             customSort.push(
                 sortDirection === "asc" ? asc(alumni[sortBy]) : desc(alumni[sortBy]),
             );
         } else if (positionEnumValues.includes(sortBy)) {
-            console.log("Sorting by position:", sortBy);
             const matchExpr = sql`${alumni.position} = ${sortBy}`;
 
             if (sortDirection === "asc") {

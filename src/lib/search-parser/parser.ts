@@ -17,14 +17,11 @@ export function parseSearchQuery(query: string, match: PgColumn[], columns: Reco
         match,
         columns,
     }
-
-    console.log("Tokens:", parser.tokens);
     
     const result: Node[] = [];
     
     while (!isAtEnd(parser)) {
         result.push(parseExpression(parser));
-        console.log("parsed expression:", result[result.length - 1]);
     }
 
     return result;

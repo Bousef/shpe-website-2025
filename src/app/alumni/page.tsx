@@ -59,8 +59,6 @@ export default async function Alumni({ searchParams }: { searchParams: Promise<{
 
   const sortDirection = ["asc", "desc"].includes(awaitedSearchParams.sortDirection ?? "asc") ? awaitedSearchParams.sortDirection : undefined;
 
-  console.log("Sorting by alumni page:", sortBy, "Direction:", sortDirection);
-
   const {alumniList, total} = await api.alumni.getAlumni({
     page,
     pageSize: pageSize,
@@ -69,11 +67,7 @@ export default async function Alumni({ searchParams }: { searchParams: Promise<{
     sortDirection: sortDirection as "asc" | "desc",
   });
 
-  console.log("first alumni member:", alumniList[0]);
-  console.log("last alumni member:", alumniList[alumniList.length - 1]);
-
   const totalPages = Math.ceil(total / pageSize);
-  console.log("Total Pages:", totalPages);
 
   const search = (page: number) => {
       const newQuery = new URLSearchParams();
