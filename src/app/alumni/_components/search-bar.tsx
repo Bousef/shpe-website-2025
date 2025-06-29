@@ -10,7 +10,7 @@ export default function SearchBar({ initialQuery, initialPageSize }: { initialQu
     const [query, setQuery] = useState(initialQuery);
     const [pageSize, setPageSize] = useState(initialPageSize);
     const [sortBy, setSortBy] = useState<"first_name" | "last_name" | "grad_year" | Position>("grad_year");
-    const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+    const [sortDirection, setSortDirection] = useState<"desc" | "asc">("desc");
 
     const router = useRouter();
     const currentPath = usePathname().split('/')[1]; // 'about', 'alumni', etc.
@@ -57,13 +57,13 @@ export default function SearchBar({ initialQuery, initialPageSize }: { initialQu
                 </DropdownItems>
             </Dropdown>
             <Dropdown>
-                <DropdownButton>{sortDirection === "asc" ? "Ascending" : "Descending"}</DropdownButton>
+                <DropdownButton>{sortDirection === "desc" ? "Descending" : "Ascending"}</DropdownButton>
                 <DropdownItems>
-                    {["asc", "desc"].map(direction => (
+                    {["desc", "asc"].map(direction => (
                         <DropdownItem key={direction} onClick={() => {
-                            setSortDirection(direction as "asc" | "desc");
+                            setSortDirection(direction as "desc" | "asc");
                         }}>
-                            {direction === "asc" ? "Ascending" : "Descending"}
+                            {direction === "desc" ? "Descending" : "Ascending"}
                         </DropdownItem>
                     ))}
                 </DropdownItems>
