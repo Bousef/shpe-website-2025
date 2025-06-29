@@ -25,8 +25,10 @@ async function replaceInvalidImagesByDefault(alumni: Alumni) {
       }
     }
 
+    const localUrl = new URL(alumni.image ?? "", process.env.BASE_URL ?? "http://localhost:3000").href;
+
     // Check alumni image URL first
-    if (!alumni.image || !(await urlExists(alumni.image))) {
+    if ((!alumni.image || !(await urlExists(alumni.image)) && !(await urlExists(localUrl)))) {
         alumni.image = fallbackUrl;
     } 
 
