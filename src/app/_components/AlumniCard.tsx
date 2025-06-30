@@ -5,6 +5,8 @@ import { BsLinkedin } from "react-icons/bs";
 import type { Alumni } from "~/server/db/schema";
 
 export default function AlumniCard({ alumni }: { alumni: Alumni }) {
+    const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(alumni.first_name + " " + alumni.last_name)}&background=001f5b&color=ffffff&size=220`;
+
     return (
         <div className="w-full max-w-[220px] bg-white shadow-xl rounded-xl overflow-hidden flex flex-col group">
             {/* Image section with LinkedIn button */}
@@ -17,9 +19,13 @@ export default function AlumniCard({ alumni }: { alumni: Alumni }) {
                     onClick={!alumni.linkedIn ? (e) => e.preventDefault() : undefined}
                 >
                     <img
-                        src={alumni.image ?? ""}
+                        src={alumni.image ?? fallbackUrl}
                         alt={alumni.first_name + " " + alumni.last_name}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                            e.currentTarget.onerror = null; // Prevent infinite loop
+                            e.currentTarget.src = fallbackUrl;
+                        }}
                     />
                 </a>
 

@@ -12,29 +12,6 @@ import type { Alumni } from "~/server/db/schema";
 type SortByType = "first_name" | "last_name" | "grad_year" | Position;
 const sortByWhitelist: SortByType[] = ["first_name", "last_name", "grad_year", ...positionEnumValues];
 
-async function replaceInvalidImagesByDefault(alumni: Alumni) {
-    const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(alumni.first_name + " " + alumni.last_name)}&background=001f5b&color=ffffff&size=220`;
-
-    // Helper to check if url is valid
-    async function urlExists(url: string) {
-      try {
-          const response = await fetch(url, { method: 'HEAD' }); // HEAD is lighter than GET
-          return response.ok;
-      } catch {
-          return false;
-      }
-    }
-
-    const localUrl = new URL(alumni.image ?? "", process.env.BASE_URL ?? "http://localhost:3000").href;
-
-    // Check alumni image URL first
-    if ((!alumni.image || !(await urlExists(alumni.image)) && !(await urlExists(localUrl)))) {
-        alumni.image = fallbackUrl;
-    } 
-
-    return;
-}
-
 export default async function Alumni({ searchParams }: { searchParams: Promise<{ query?: string; pageSize?: string; page?: string; sortBy?: string; sortDirection?: string; }> }) {
   const awaitedSearchParams = await searchParams;
 
@@ -80,6 +57,11 @@ export default async function Alumni({ searchParams }: { searchParams: Promise<{
     return `?${newQuery ? newQuery.toString() : ""}`;
   };
 
+  const alumniListStart = performance.now();
+
+  const alumniListEnd = performance.now();
+  console.log(`Alumni list processed in ${alumniListEnd - alumniListStart}ms`);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-100">
       <Navbar />
@@ -92,7 +74,6 @@ export default async function Alumni({ searchParams }: { searchParams: Promise<{
 
       <div className="grid grid-cols-0 sm:grid-cols-3 md:grid-cols-4 gap-6 px-6 pb-20 pt-10 justify-items-center">
         {alumniList.map(async (member) => {
-          await replaceInvalidImagesByDefault(member);
           return <AlumniCard key={member.id} alumni={member} />;
         })}
       </div>
