@@ -127,8 +127,6 @@ export const alumniRouter = createTRPCRouter({
             }
         }
 
-        customSort.push(sortDirection === "asc" ? asc(alumni.grad_year) : desc(alumni.grad_year));
-
         if (sortBy !== "first_name") {
             customSort.push(asc(alumni.first_name))
         }
@@ -136,6 +134,8 @@ export const alumniRouter = createTRPCRouter({
         if (sortBy !== "last_name") {
             customSort.push(asc(alumni.last_name))
         }
+
+        customSort.push(sortDirection === "asc" ? asc(alumni.grad_year) : desc(alumni.grad_year));
 
         customSort.push(
             sortDirection === "asc" ? asc(alumni.id) : desc(alumni.id),
