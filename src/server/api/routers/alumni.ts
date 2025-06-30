@@ -134,7 +134,7 @@ export const alumniRouter = createTRPCRouter({
             sortDirection === "asc" ? asc(alumni.id) : desc(alumni.id),
         );
 
-        const alumniList = await ctx.db
+        const alumniListPromise = ctx.db
             .select()
             .from(alumni)
             .where(whereClause)
@@ -142,12 +142,17 @@ export const alumniRouter = createTRPCRouter({
                 ...customSort,
             )
             .limit(pageSize)
-            .offset(page * pageSize) as Alumni[];
+            .offset(page * pageSize);
 
-        const countResult = await ctx.db
+        const countResultPromise = ctx.db
             .select({ count: sql<number>`count(*)` })
             .from(alumni)
             .where(whereClause);
+
+        const [alumniList, countResult] = await Promise.all([
+            alumniListPromise,
+            countResultPromise
+        ]) as [Alumni[], { count: number }[]];
 
         const total = Number(countResult[0]?.count ?? 0);
 
