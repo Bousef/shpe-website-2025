@@ -1,7 +1,7 @@
 import { postRouter } from "~/server/api/routers/post";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
-import { memberRouter } from "~/trpc/member";
 import { alumniRouter } from "~/trpc/alumni";
+import { memberRouter } from "~/server/api/routers/member";
 
 /**
  * This is the primary router for your server.
