@@ -1,22 +1,53 @@
+"use client";
+
+import { useSession } from '@supabase/auth-helpers-react'
+import { api } from '~/trpc/react'
+
 export default function ProfileCard() {
+	const session = useSession()
+	// grab the numeric ucf id stashed in the user's metadata at signup
+  const ucfId = session?.user?.user_metadata?.ucf_id
+    ? Number(session.user.user_metadata.ucf_id)
+    : undefined
+
+	 // call existing getMember endpoint
+  const {
+    data: profile,
+    isLoading,
+    error,
+  } = api.member.getMember.useQuery(
+    { ucf_id: ucfId! },
+    { enabled: !!ucfId }
+  )
+	// if not signed in
+	if (!session) return <p>Please sign in</p>
+	// if no ucf id found from session
+  if (!ucfId) return <p>Oops, no UCF ID on your session.</p>
+	// still loading
+  if (isLoading || !profile) return <p>Loading profile…</p>
+	// query error
+  if (error) return <p>Error: {error.message}</p>
+
 	return (
 		<main id="profile" className="relative bg-white py-10 px-15 text-[var(--shpe-navy-blue)] max-w-4xl mx-auto h-150">
 			<section className="flex items-stretch space-x-5 p-6 bg-[var(--shpe-light-blue)] h-full shadow-sm">
 				{/* LEFT */}
 				<div className="w-1/3 bg-[#b3cad6] rounded flex flex-col items-center">
-					<img 
-						src="/assets/yousefxd.jpeg"
-						alt="Profile"
-						className="w-50 h-50 object-cover mt-5 mb-2"
-					/>
+					{profile.image &&
+						<img 
+							src={profile.image}
+							alt="Profile"
+							className="w-50 h-50 object-cover mt-5 mb-2"
+						/>
+					}
 					<div className="text-center">
-						<h2 className="font-bold text-lg">FIRST_NAME</h2>
-						<p className="text-sm">SURNAME</p>
+						<h2 className="font-bold text-lg">{profile.first_name}</h2>
+						<p className="text-sm">{profile.last_name}</p>
 					</div>
 					<div className="text-center space-y-1">
-						<p className="font-mono font-bold text-xl">XXXXXX</p>
+						<p className="font-mono font-bold text-xl">{profile.id}</p>
 						<p className="text-xs">Member ID</p>
-						<p className="font-mono font-bold text-xl>">XXXXXX</p>
+						<p className="font-mono font-bold text-xl>">{profile.ucf_id}</p>
 						<p className="text-xs">UCF ID</p>
 					</div>
 					<img src="/assets/round_logo.png" alt="SHPE UCF Logo" className="h-30 w-30 mt-2" />
@@ -30,19 +61,19 @@ export default function ProfileCard() {
 						<dl className="space-y-1 text-md">
 							<div className="flex">
 								<dt className="w-24 font-semibold">Name:</dt>
-								<dd>FULL_NAME</dd>
+								<dd>{profile.first_name} {profile.last_name}</dd>
 							</div>
 							<div className="flex">
 								<dt className="w-24 font-semibold">Major:</dt>
-								<dd>Computer Science B.S.</dd>
+								<dd>HARDCODED ATM: Computer Science B.S.</dd>
 							</div>
 							<div className="flex">
 								<dt className="w-24 font-semibold">Email:</dt>
-								<dd>example@ucf.edu</dd>
+								<dd>{profile.email}</dd>
 							</div>
 							<div className="flex">
 								<dt className="w-24 font-semibold">Phone:</dt>
-								<dd>123-456-7890</dd>
+								<dd>HARDCODED ATM: 123-456-7890</dd>
 							</div>		
 						</dl>
 					</div>
