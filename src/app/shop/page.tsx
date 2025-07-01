@@ -3,30 +3,20 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-
 import Navbar from "../_components/NavBar";
+import AddProductForm, { type Product } from "../_components/AddProductForm";
 import { supabase } from "../../supabase-client";
 import Image from "next/image";
 
-// Represents a category image mapping for display
 export type CategoryImage = {
   category: string;
-  image: string;
+  image: string; // semicolon-separated filenames
 };
 
-/**
- * Shop page component
- * Displays all product categories with a representative image
- */
 export default function Shop() {
-  // State: list of category-image pairs
   const [categories, setCategories] = useState<CategoryImage[]>([]);
-  // State: error message (if any) during data fetch
   const [errorMsg, setErrorMsg] = useState<string>("");
 
-  /**
-   * Loads one image per category from Supabase
-   */
   useEffect(() => {
     async function loadCategories() {
       const { data, error } = await supabase
@@ -35,20 +25,24 @@ export default function Shop() {
         .order("category", { ascending: true });
 
       if (error) {
-        // Capture and display load error
         setErrorMsg(error.message);
         return;
       }
 
-      // Build a map to ensure unique categories
+      // pick first image per category
       const map: Record<string, string> = {};
-      (data ?? []).forEach(({ category, image }) => {
-        if (!map[category]) {
-          map[category] = image;
-        }
-      });
-
-      // Convert map entries back to array and sort by category name
+(data ?? []).forEach(({ category, image }) => {
+  if (!map[category]) {
+    // grab the first filename
+    const fileName = image.split(";")[0] ?? "";
+    // turn it into a public URL
+    const { data: urlData } = supabase
+      .storage
+      .from("product-images")
+      .getPublicUrl(fileName);
+    map[category] = urlData.publicUrl;    // now a full https://… URL
+  }
+});
       const list = Object.entries(map)
         .map(([category, image]) => ({ category, image }))
         .sort((a, b) => a.category.localeCompare(b.category));
@@ -57,25 +51,38 @@ export default function Shop() {
     }
 
     loadCategories();
-  }, []); // Empty dependency array => runs once on mount
+  }, []);
+
+// Handler when new product is added
+const handleAdd = (product: Product) => {
+  setCategories(prev => {
+    if (prev.some(c => c.category === product.category)) return prev;
+
+    // grab the first image (or "" if somehow missing)
+    const firstImage = product.image.split(";")[0] ?? "";
+
+    // Append new category with a guaranteed string image
+    return [...prev, { category: product.category, image: firstImage }]
+      .sort((a, b) => a.category.localeCompare(b.category));
+  });
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-100">
-      {/* Navigation bar */}
       <Navbar />
-
       <main className="px-4 py-10 lg:px-48">
-        {/* Page header */}
-        <h1 className="mb-8 text-center text-5xl text-yellow-500 lg:mb-20 lg:text-6xl">
-          CATEGORIES
-        </h1>
+        <div className="flex items-center mb-8">
+          <h1 className="flex-1 text-center text-5xl text-yellow-500 lg:text-6xl">
+            CATEGORIES
+          </h1>
+          <div className="ml-4">
+            <AddProductForm onAdd={handleAdd} />
+          </div>
+        </div>
 
-        {/* Display error message if present */}
-        {errorMsg && (
-          <p className="mb-4 text-center text-red-600">{errorMsg}</p>
-        )}
+        {errorMsg && <p className="mb-4 text-center text-red-600">{errorMsg}</p>}
 
-        {/* Category grid */}
         <div className="grid grid-cols-1 gap-16 sm:grid-cols-2 lg:grid-cols-3 lg:gap-32">
           {categories.map(({ category, image }) => (
             <Link
@@ -84,16 +91,8 @@ export default function Shop() {
               className="block overflow-hidden text-center"
             >
               <div className="relative mb-4 aspect-[3/4] lg:mb-8">
-                {/* Category image */}
-                <Image
-                  src={image}
-                  alt={category}
-                  className="object-cover"
-                  fill
-                />
+                <Image src={image} alt={category} fill className="object-cover" />
               </div>
-
-              {/* Category label */}
               <p className="text-5xl font-bold tracking-wider text-blue-900 uppercase">
                 {category}
               </p>
