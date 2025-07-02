@@ -1,15 +1,33 @@
 "use client";
-import { useState } from "react";
+import { useActionState, useState } from "react";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
 import Navbar from "../_components/NavBar";
+import { supabase } from "~/supabase-client";
+import { api } from "~/trpc/react";
+import { signup } from "./actions";
 
 export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [ucfId, setUcfId] = useState("");
   const [status, setStatus] = useState("");
+  const [first_name, setFirstName] = useState("");
+  const [last_name, setLastName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
+  const [signupState, signupAction] = useActionState(signup, { error: "" });
+       const createMember = api.member.createMember.useMutation({
+        onSuccess: (data) => {
+            if (data) {
+                // Handle successful signup, e.g., redirect or show a success message
+                console.log("Member created successfully:", data);
+            }
+        },
+        onError: (error) => {
+            // Handle error during signup
+            console.error("Error creating member:", error);
+        },
+    });
 
   return (
     <div>
@@ -28,6 +46,7 @@ export default function SignUp() {
             required
             placeholder="First Name"
             className="placeholder-[#0b1e57] w-full mb-4 border-b border-[#82a8bc] focus:outline-none py-1"
+            onChange={(e) => setFirstName(e.target.value)}
           />
         </div>
 
@@ -39,6 +58,7 @@ export default function SignUp() {
             required
             placeholder="Last Name"
             className="placeholder-[#0b1e57] w-full mb-4 border-b border-blue-300 focus:outline-none py-1"
+            onChange={(e) => setLastName(e.target.value)}
           />
         </div>
 
@@ -106,7 +126,8 @@ export default function SignUp() {
       <div className="flex justify-center">
         <button
           className="py-4 bg-[#82a8bc] hover:bg-[#6c92a8] text-[#0b1e57] w-md mt-10 mx-auto font-medium"
-          onClick={() => {
+          formAction={signupAction}
+          onClick={async() => {
             const newErrors = [];
             if (!/^[\w.-]+@ucf\.edu$/.test(email)) {
               newErrors.push("Email must be a valid @ucf.edu address.");
@@ -125,7 +146,28 @@ export default function SignUp() {
               setErrors([]);
               setStatus("Signing up...");
               // Add signup logic here
-            }
+
+      
+
+    createMember.mutate({
+        ucf_id: +ucfId,
+        first_name: first_name,
+        last_name: last_name,
+        email: email,
+    });
+
+
+                // ucf_id: +ucfId,
+                // first_name: "",
+                // last_name: "",
+                // email: ""
+             
+                // would have same logic as above but it would be for admins.
+                // would aslo have an admins table for them to be inserted into.
+                console.log("trying to insert into members");
+
+               }
+
           }}
         >
           SIGN UP
