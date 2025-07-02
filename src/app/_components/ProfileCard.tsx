@@ -1,32 +1,36 @@
 "use client";
 
-import { useSession } from '@supabase/auth-helpers-react'
 import { api } from '~/trpc/react'
 
 export default function ProfileCard() {
-	const session = useSession()
-	// grab the numeric ucf id stashed in the user's metadata at signup
-  const ucfId = session?.user?.user_metadata?.ucf_id
-    ? Number(session.user.user_metadata.ucf_id)
-    : undefined
+	// const session = useSession()
+	// grab the ucf id stashed in the user's metadata at signup
+  // const ucfId = session?.user?.user_metadata?.ucf_id
+  //   ? Number(session.user.user_metadata.ucf_id)
+  //   : undefined
 
-	 // call existing getMember endpoint
+	const id = 5;
+
+	// call existing getMember endpoint
   const {
     data: profile,
     isLoading,
     error,
   } = api.member.getMember.useQuery(
-    { ucf_id: ucfId! },
-    { enabled: !!ucfId }
+    { id: id },
+    { enabled: true }
   )
 	// if not signed in
-	if (!session) return <p>Please sign in</p>
+	// if (!session) return <p>Please sign in</p>
+
 	// if no ucf id found from session
-  if (!ucfId) return <p>Oops, no UCF ID on your session.</p>
-	// still loading
-  if (isLoading || !profile) return <p>Loading profile…</p>
-	// query error
+  if (!id) return <p>Oops, no UCF ID on your session.</p>
+	// if still loading
+  if (isLoading) return <p>Loading profile…</p>
+	if (!profile)  return <p>No member found for UCF ID {id}</p>
+	// if query error
   if (error) return <p>Error: {error.message}</p>
+	
 
 	return (
 		<main id="profile" className="relative bg-white py-10 px-15 text-[var(--shpe-navy-blue)] max-w-4xl mx-auto h-150">
