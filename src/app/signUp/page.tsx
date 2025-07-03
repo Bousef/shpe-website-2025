@@ -2,7 +2,6 @@
 import { useActionState, useState } from "react";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
 import Navbar from "../_components/NavBar";
-import { supabase } from "~/supabase-client";
 import { api } from "~/trpc/react";
 import { signup } from "./actions";
 
@@ -16,18 +15,17 @@ export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [signupState, signupAction] = useActionState(signup, { error: "" });
-       const createMember = api.member.createMember.useMutation({
-        onSuccess: (data) => {
-            if (data) {
+
+  const createMember = api.member.createMember.useMutation({
+        onSuccess: (data) => {if (data) {
                 // Handle successful signup, e.g., redirect or show a success message
-                console.log("Member created successfully:", data);
-            }
-        },
+                console.log("Member created successfully:", data); }
+               },
         onError: (error) => {
-            // Handle error during signup
-            console.error("Error creating member:", error);
-        },
-    });
+                // Handle error during signup
+              console.error("Error creating member:", error);
+              },
+          });
 
   return (
     <div>
@@ -36,7 +34,7 @@ export default function SignUp() {
       <h1 className="h2 text-center text-5xl text-[var(--shpe-orange)] font-medium py-3">
         SIGN UP
       </h1>
-
+<form>
       <div className="border-4 border-solid border-[#82a8bc] px-2 py-4 w-full max-w-md mx-auto mt-10">
         {/* First name */}
         <div>
@@ -65,6 +63,7 @@ export default function SignUp() {
         {/* UCF Email */}
         <div>
           <input
+            name="email"
             id="email"
             type="text"
             required
@@ -96,6 +95,7 @@ export default function SignUp() {
         <div>
           <div className="relative mb-1">
             <input
+              name="password"
               id="password"
               type={showPassword ? "text" : "password"}
               required
@@ -146,24 +146,13 @@ export default function SignUp() {
               setErrors([]);
               setStatus("Signing up...");
               // Add signup logic here
-
-      
-
-    createMember.mutate({
-        ucf_id: +ucfId,
-        first_name: first_name,
-        last_name: last_name,
-        email: email,
-    });
-
-
-                // ucf_id: +ucfId,
-                // first_name: "",
-                // last_name: "",
-                // email: ""
-             
-                // would have same logic as above but it would be for admins.
-                // would aslo have an admins table for them to be inserted into.
+              createMember.mutate({
+                ucf_id: +ucfId,
+                first_name: first_name,
+                last_name: last_name,
+                email,
+              });
+              
                 console.log("trying to insert into members");
 
                }
@@ -173,6 +162,7 @@ export default function SignUp() {
           SIGN UP
         </button>
       </div>
+      
 
       <div className="text-center mt-4 text-red-600 font-medium">{status}</div>
 
@@ -184,6 +174,8 @@ export default function SignUp() {
           </a>
         </p>
       </div>
+      </form>
     </div>
+
   );
 }
