@@ -1,7 +1,8 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import { alumni } from "~/server/db/schema";
-import { and, eq } from "drizzle-orm";
+import { alumni, positionEnumValues, type Alumni } from "~/server/db/schema";
+import { and, eq, desc, asc, sql } from "drizzle-orm";
+import { parseSearchQuery } from "~/lib/search-parser/parser";
 
 export const alumniRouter = createTRPCRouter({
     createAlumni: publicProcedure
@@ -11,7 +12,7 @@ export const alumniRouter = createTRPCRouter({
                 last_name: z.string(),
                 image: z.string(),
                 grad_year: z.string(),
-                position: z.string(),
+                position: z.enum(positionEnumValues).default("Member"),
                 linkedIn: z.string(),
             })
         )
@@ -72,7 +73,7 @@ export const alumniRouter = createTRPCRouter({
 
     // get all alumni based on position
     getAlumniByPosition: publicProcedure
-        .input(z.object({position: z.string()}))
+        .input(z.object({position: z.enum(positionEnumValues)}))
         .query(async({input,ctx}) => {
             const positionList = await ctx.db
                   .select()
@@ -88,4 +89,80 @@ export const alumniRouter = createTRPCRouter({
 
         }),
     
+    getAlumni: publicProcedure
+        .input(z.object({
+            page: z.number().int().min(0).default(0),
+            pageSize: z.number().int().min(1).max(100).default(10),
+            query: z.string().optional(),
+            sortBy: z.enum(["first_name", "last_name", "grad_year", ...positionEnumValues]).optional().default("grad_year"),
+            sortDirection: z.enum(["asc", "desc"]).optional().default("asc"),
+        })
+    )
+    .query(async ({ input, ctx }) => {
+        const { page, pageSize, query, sortBy, sortDirection } = input;
+
+        const nodes = parseSearchQuery(query ?? "", [alumni.first_name, alumni.last_name], { year: alumni.grad_year, position: alumni.position });
+
+        const filters = nodes
+            .map(node => node.toSQL());
+
+        const whereClause =
+            filters.length === 0 ? undefined :
+            filters.length === 1 ? filters[0] :
+            and(...filters);
+
+        const customSort = [];
+
+        if (sortBy === "first_name" || sortBy === "last_name" || sortBy === "grad_year") {
+            customSort.push(
+                sortDirection === "asc" ? asc(alumni[sortBy]) : desc(alumni[sortBy]),
+            );
+        } else if (positionEnumValues.includes(sortBy)) {
+            const matchExpr = sql`${alumni.position} = ${sortBy}`;
+
+            if (sortDirection === "asc") {
+                customSort.push(asc(matchExpr), desc(alumni.position));
+            } else {
+                customSort.push(desc(matchExpr), asc(alumni.position));
+            }
+        }
+
+        if (sortBy !== "first_name") {
+            customSort.push(asc(alumni.first_name))
+        }
+
+        if (sortBy !== "last_name") {
+            customSort.push(asc(alumni.last_name))
+        }
+
+        customSort.push(sortDirection === "asc" ? asc(alumni.grad_year) : desc(alumni.grad_year));
+
+        customSort.push(
+            sortDirection === "asc" ? asc(alumni.id) : desc(alumni.id),
+        );
+
+        const alumniListPromise = ctx.db
+            .select()
+            .from(alumni)
+            .where(whereClause)
+            .orderBy(
+                ...customSort,
+            )
+            .limit(pageSize)
+            .offset(page * pageSize);
+
+        const countResultPromise = ctx.db
+            .select({ count: sql<number>`count(*)` })
+            .from(alumni)
+            .where(whereClause);
+
+        const [alumniList, countResult] = await Promise.all([
+            alumniListPromise,
+            countResultPromise
+        ]) as [Alumni[], { count: number }[]];
+
+        const total = Number(countResult[0]?.count ?? 0);
+
+        return {alumniList, total};
+    }),
 });
