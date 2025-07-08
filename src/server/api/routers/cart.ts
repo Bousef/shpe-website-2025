@@ -45,4 +45,33 @@ export const cartRouter = createTRPCRouter({
 
       return items;
     }),
+
+    updateItemQuantity: protectedProcedure.input(
+      z.object({
+        id: z.number(),
+        quantity: z.number().min(1).max(1000).default(1),
+      })
+    ).mutation(async ({ input, ctx }) => {
+        const { db } = ctx;
+
+        console.log(`Updating item ${input.id} quantity to ${input.quantity}`);
+
+        const item = await db.update(cart).set({
+          quantity: input.quantity,
+        }).where(eq(cart.product_id, input.id)).returning();
+
+        return item;
+    }),
+
+    removeItem: protectedProcedure.input(
+      z.object({
+        id: z.number(),
+      })
+    ).mutation(async ({ input, ctx }) => {
+        const { db } = ctx;
+
+        const item = await db.delete(cart).where(eq(cart.id, input.id)).returning();
+
+        return item;
+    }),
 });
