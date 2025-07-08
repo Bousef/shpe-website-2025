@@ -9,6 +9,7 @@ import Navbar from "../../../_components/NavBar";
 import { supabase } from "../../../../supabase-client";
 import type { Product } from "../../../_components/AddProductForm";
 import { boolean } from "drizzle-orm/gel-core";
+import { api } from "~/trpc/react";
 
 /**
  * ItemPage component
@@ -30,6 +31,12 @@ export default function ItemPage() {
 
   const sizes = ["S", "M", "L", "XL", "XXL", "XXXL"];
   const [sizeStock, setSizeStock] = useState<Record<string, number>>({});
+
+  const addProduct = api.user.cart.addProduct.useMutation({
+    onSuccess: () => {
+      return; // Handle successful addition to cart
+    },
+  });
 
   useEffect(() => {
     async function loadProduct() {
@@ -200,7 +207,14 @@ export default function ItemPage() {
 
           <button
             onClick={() =>
-              alert(`Added ${product.name} (size ${selectedSize} x${quantity}) to cart!`)
+              {
+                addProduct.mutate({
+                  product_id: product.id,
+                  quantity,
+                });
+                
+                alert(`Added ${product.name} (size ${selectedSize} x${quantity}) to cart!`)
+              }
             }
             disabled={maxQty < 1}
             className="bg-yellow-500 text-black font-semibold py-3 hover:bg-yellow-600 disabled:opacity-50"
