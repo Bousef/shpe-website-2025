@@ -1,5 +1,5 @@
 import { relations, sql } from "drizzle-orm";
-import { index, pgEnum, pgTableCreator, primaryKey, pgTable, varchar, numeric, timestamp, integer, boolean, text, unique } from "drizzle-orm/pg-core";
+import { index, pgEnum, pgTableCreator, primaryKey, pgTable, varchar, numeric, timestamp, integer, boolean, text, unique, pgSchema } from "drizzle-orm/pg-core";
 
 // taken from https://supabase.com/docs/guides/auth/identities
 // should probably be moved to a separate file
@@ -17,7 +17,10 @@ export const createTable = pgTableCreator(
 export const members = createTable(
   "members",
   (d) => ({
-    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+    // id has to mirror the id from Supabase's auth.users table
+    // at the moment it isn't possible to reference it directly due to the way drizzle-orm works
+    // so we have to assert it in the code that creates the members
+    uuid: d.uuid().primaryKey().notNull(),
     ucf_id: d.integer().unique().notNull(),
     first_name: d.varchar({ length: 100 }),
     last_name: d.varchar({ length: 100 }),
@@ -61,12 +64,12 @@ export const cart = createTable(
   (d) => ({
     id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
     created_at: d.timestamp({ withTimezone: true }).defaultNow(),
-    member_id: d.integer().notNull().references(() => members.id),
+    member_uuid: d.uuid().notNull().references(() => members.uuid),
     product_id: d.integer().notNull().references(() => products.id),
     quantity: d.integer().notNull(),
   }), (table) => [
-    unique().on(table.member_id, table.product_id),
-    unique("cart_unique").on(table.member_id, table.created_at),
+    unique().on(table.member_uuid, table.product_id),
+    unique("cart_member_product_unique").on(table.member_uuid, table.created_at),
   ]
 );
 
