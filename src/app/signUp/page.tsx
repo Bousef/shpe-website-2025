@@ -5,6 +5,7 @@ import Navbar from "../_components/NavBar";
 import { api } from "~/trpc/react";
 import { signup } from "./actions";
 
+
 export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,27 +15,21 @@ export default function SignUp() {
   const [last_name, setLastName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
-  const [signupState, signupAction] = useActionState(signup, { error: "" });
+  const [signupState, signupAction] = useActionState(signup, { error: ""});
 
-  const createMember = api.member.createMember.useMutation({
-        onSuccess: (data) => {if (data) {
-                // Handle successful signup, e.g., redirect or show a success message
-                console.log("Member created successfully:", data); }
-               },
-        onError: (error) => {
-                // Handle error during signup
-              console.error("Error creating member:", error);
-              },
-          });
+   const createMember = api.member.createMember.useMutation({
+        onSuccess: (data) => {if (data) {console.log("Member created successfully:", data);}},
+        onError: (error) => {setErrors([error.message])},
+        });
 
-  return (
+return(
     <div>
       <Navbar />
 
       <h1 className="h2 text-center text-5xl text-[var(--shpe-orange)] font-medium py-3">
         SIGN UP
       </h1>
-<form>
+<form >
       <div className="border-4 border-solid border-[#82a8bc] px-2 py-4 w-full max-w-md mx-auto mt-10">
         {/* First name */}
         <div>
@@ -123,11 +118,32 @@ export default function SignUp() {
         <div />
       </div>
 
-      <div className="flex justify-center">
+             
+      {errors.map((err, i) => {
+          if (
+                err.includes("ucf.edu") ||
+                err.includes("UCF ID") ||
+                err.includes("Password")
+              ) {
+                return null;
+              }
+              return (
+                <p key={i} className="text-red-600 text-sm mb-2 text-center">
+                  {err}
+                </p>
+              );
+      })}
+     
+      <div className="flex justify-center"> 
+        
         <button
+          type="submit"
           className="py-4 bg-[#82a8bc] hover:bg-[#6c92a8] text-[#0b1e57] w-md mt-10 mx-auto font-medium"
           formAction={signupAction}
-          onClick={async() => {
+          
+          onClick={async(e) => {
+            e.preventDefault();
+
             const newErrors = [];
             if (!/^[\w.-]+@ucf\.edu$/.test(email)) {
               newErrors.push("Email must be a valid @ucf.edu address.");
@@ -145,16 +161,21 @@ export default function SignUp() {
             } else {
               setErrors([]);
               setStatus("Signing up...");
-              // Add signup logic here
-              createMember.mutate({
+
+              const { error } = await signup(undefined, new FormData(document.querySelector("form")!));
+    
+              if (error) {
+                setErrors([error]);
+                setStatus("");
+              }
+              
+                createMember.mutate({
                 ucf_id: +ucfId,
                 first_name: first_name,
                 last_name: last_name,
                 email,
               });
-              
-                console.log("trying to insert into members");
-
+       
                }
 
           }}
@@ -162,7 +183,6 @@ export default function SignUp() {
           SIGN UP
         </button>
       </div>
-      
 
       <div className="text-center mt-4 text-red-600 font-medium">{status}</div>
 
@@ -176,6 +196,5 @@ export default function SignUp() {
       </div>
       </form>
     </div>
-
   );
 }
