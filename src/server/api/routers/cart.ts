@@ -70,7 +70,7 @@ export const cartRouter = createTRPCRouter({
     ).mutation(async ({ input, ctx }) => {
         const { db } = ctx;
 
-        const item = await db.delete(cart).where(eq(cart.id, input.id)).returning();
+        const item = await db.delete(cart).where(eq(cart.product_id, input.id)).returning();
 
         return item;
     }),
