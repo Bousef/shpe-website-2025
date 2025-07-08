@@ -1,55 +1,18 @@
-"use client";
-
-import React, { useState } from "react";
+/* eslint-disable @next/next/no-img-element */
 import Navbar from "../_components/NavBar";
+import { api } from "~/trpc/server";
 
-type CartItem = {
-  id: string;
-  name: string;
-  image: string;
-  price: number;
-  quantity: number;
-};
+export default async function Cart() {
 
-export default function Cart() {
-  const [items, setItems] = useState<CartItem[]>([
-    // Temporary placeholder items
-    {
-      id: "1",
-      name: "Supreme Tee",
-      image: "/placeholder.jpg",
-      price: 25.0,
-      quantity: 2,
-    },
-    {
-      id: "2",
-      name: "Bucket Hat",
-      image: "/placeholder.jpg",
-      price: 18.0,
-      quantity: 1,
-    },
-  ]);
-
-  const updateQuantity = (id: string, qty: number) => {
-    setItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, quantity: qty } : item
-      )
-    );
-  };
-
-  const removeItem = (id: string) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
-  };
+  const items = await api.user.cart.getItems();
 
   const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   return (
     <>
-<Navbar/>
-    <div className="max-w-3xl mx-auto px-4 py-8">
-        
-      <h1 className="text-3xl font-bold mb-6">Your Cart</h1>
+      <Navbar />
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6">Your Cart</h1>
 
       {items.length === 0 ? (
         <p className="text-gray-600">Your cart is empty.</p>
@@ -61,8 +24,8 @@ export default function Cart() {
               className="flex items-center gap-4 border-b pb-4"
             >
               <img
-                src={item.image}
-                alt={item.name}
+                src={item.image ?? ""} // this should be a placeholder image 
+                alt={item.name ?? ""}
                 className="w-20 h-20 object-contain bg-gray-100 rounded"
               />
 
@@ -73,12 +36,12 @@ export default function Cart() {
                   <label className="text-sm">Qty:</label>
                   <select
                     value={item.quantity}
-                    onChange={(e) =>
-                      updateQuantity(item.id, parseInt(e.target.value))
-                    }
+                    // onChange={(e) =>
+                    //   updateQuantity(item.id, parseInt(e.target.value))
+                    // }
                     className="border px-2 py-1"
                   >
-                    {[...Array(10)].map((_, i) => (
+                    {[...Array<number>(10)].map((_, i) => (
                       <option key={i + 1} value={i + 1}>
                         {i + 1}
                       </option>
@@ -88,7 +51,7 @@ export default function Cart() {
               </div>
 
               <button
-                onClick={() => removeItem(item.id)}
+                // onClick={() => removeItem(item.id)}
                 className="text-sm text-red-600 hover:underline"
               >
                 Remove
