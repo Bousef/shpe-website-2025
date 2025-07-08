@@ -106,6 +106,15 @@ export default function ItemPage() {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
+      <div className="flex justify-end px-4 lg:px-48 mt-4">
+  <Link
+    href="/cart"
+    className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-2 px-4 rounded shadow"
+  >
+    🛒 View Cart
+  </Link>
+</div>
+
       <main className="max-w-6xl mx-auto py-10 px-4 lg:px-0 flex flex-col lg:flex-row lg:space-x-8">
         <div className="hidden lg:flex flex-col gap-4 flex-shrink-0 w-24">
           {thumbs.map((src, idx) => (

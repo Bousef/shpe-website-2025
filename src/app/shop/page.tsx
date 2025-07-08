@@ -71,6 +71,15 @@ const handleAdd = (product: Product) => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-100">
       <Navbar />
+      <div className="flex justify-end px-4 lg:px-48 mt-4">
+  <Link
+    href="/cart"
+    className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-2 px-4 rounded shadow"
+  >
+    🛒 View Cart
+  </Link>
+</div>
+
       <main className="px-4 py-10 lg:px-48">
         <div className="flex items-center mb-8">
           <h1 className="flex-1 text-center text-5xl text-yellow-500 lg:text-6xl">
