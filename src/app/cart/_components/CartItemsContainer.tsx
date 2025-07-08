@@ -15,8 +15,8 @@ type CartItem = {
     createdAt: Date | null;
 };
 
-export default function CartItemsContainer({ items }: { items: CartItem[] }) {
-    const [currentItemQuantities, setCurrentItemQuantities] = useState<Array<number>>([]);
+export default function CartItemsContainer({ items: initialItems }: { items: CartItem[] }) {
+    const [items, setItems] = useState(initialItems);
 
     const updateItemQuantity = api.user.cart.updateItemQuantity.useMutation({
         onSuccess: () => {
@@ -39,10 +39,6 @@ export default function CartItemsContainer({ items }: { items: CartItem[] }) {
     };
 
     const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-
-    useEffect(() => {
-        setCurrentItemQuantities(items.map((item) => item.quantity));
-    }, [items]);
 
     return <>
         {items.length === 0 ? (
@@ -67,7 +63,7 @@ export default function CartItemsContainer({ items }: { items: CartItem[] }) {
                 <div className="mt-2 flex items-center gap-2">
                   <label className="text-sm">Qty:</label>
                   <select
-                    value={currentItemQuantities[item.id] ?? item.quantity}
+                    value={item.quantity}
                     onChange={(e) => {
                       const newQuantity = parseInt(e.target.value);
 
@@ -88,7 +84,7 @@ export default function CartItemsContainer({ items }: { items: CartItem[] }) {
 
               <button
                 onClick={() => {
-                    setCurrentItemQuantities(currentItemQuantities.filter((_, i) => i !== item.id));
+                    setItems((prevItems) => prevItems.filter((item2) => item.id !== item2.id));
                     removeItemAction(item.id);
                 }}
                 className="text-sm text-red-600 hover:underline"
