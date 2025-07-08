@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { cart } from "~/server/db/schema";
-import { sql } from "drizzle-orm";
+import { cart, products } from "~/server/db/schema";
+import { eq, sql } from "drizzle-orm";
 
 export const cartRouter = createTRPCRouter({
   addProduct: protectedProcedure.input(
@@ -24,5 +24,25 @@ export const cartRouter = createTRPCRouter({
         }).returning();
 
         return product;
+    }),
+
+    getItems: protectedProcedure.query(async ({ ctx }) => {
+        const { db } = ctx;
+
+        const items = await db.select({
+            id:   products.id,
+            name:        products.name,
+            category:    products.category,
+            image:       products.image,
+            description: products.description,
+            price:       products.price,
+            quantity:    cart.quantity,
+            createdAt:   cart.created_at,
+        }).from(cart).innerJoin(
+            products,
+            eq(cart.product_id, products.id)
+      );
+
+      return items;
     }),
 });
