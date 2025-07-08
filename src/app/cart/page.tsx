@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Navbar from "../_components/NavBar";
+import Link from "next/link";
 
 type CartItem = {
   id: string;
@@ -100,9 +101,11 @@ export default function Cart() {
             <p className="text-lg font-semibold">
               Subtotal: ${subtotal.toFixed(2)}
             </p>
-            <button className="mt-4 bg-yellow-500 text-black font-bold px-6 py-2 rounded hover:bg-yellow-600">
+            <Link 
+            href={"/checkout"}
+            className=" bg-yellow-500 text-black font-bold px-6 py-2 rounded hover:bg-yellow-600">
               Checkout
-            </button>
+            </Link>
           </div>
         </div>
       )}
