@@ -19,6 +19,7 @@ export const memberRouter = createTRPCRouter({
   createMember: publicProcedure
   .input(
     z.object({
+      uuid: z.string().uuid(),
       ucf_id: z.number(),
       first_name: z.string(),
       last_name: z.string(),
