@@ -3,17 +3,27 @@
 import { useState } from "react";
 import { supabase } from "../../supabase-client";
 
-export type Product = {
+export interface Product {
   id: number;
   name: string;
   description: string;
-  category: string;
-  image: string; // semicolon-separated file names
+  image: string;
   price: number;
   stock: number;
-};
+  category: string;
+}
 
-export default function AddProductForm({ onAdd }: { onAdd?: (product: Product) => void }) {
+interface AddProductFormProps {
+  defaultCategory?: string;
+  onAdd?: (product: Product) => void;
+  onClose?: () => void;
+}
+
+export default function AddProductForm({
+  defaultCategory = "",
+  onAdd,
+  onClose,
+}: AddProductFormProps) {
   const [newProduct, setNewProduct] = useState({
     name: "",
     description: "",
@@ -114,7 +124,7 @@ export default function AddProductForm({ onAdd }: { onAdd?: (product: Product) =
       const imageField = storedNames.join(";");
 
       const { data: prod, error: prodErr } = await supabase
-        .from<Product>("shpe-website-2025_products")
+        .from("shpe-website-2025_products")
         .insert({
           ...newProduct,
           image: imageField,
@@ -122,7 +132,9 @@ export default function AddProductForm({ onAdd }: { onAdd?: (product: Product) =
           price: newProduct.price,
         })
         .select()
-        .single();
+        .single() 
+
+        
       if (prodErr || !prod) throw new Error(prodErr?.message || "Insert failed");
 
       if (isClothes) {

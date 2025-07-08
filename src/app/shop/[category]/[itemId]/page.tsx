@@ -8,6 +8,7 @@ import Link from "next/link";
 import Navbar from "../../../_components/NavBar";
 import { supabase } from "../../../../supabase-client";
 import type { Product } from "../../../_components/AddProductForm";
+import { boolean } from "drizzle-orm/gel-core";
 
 /**
  * ItemPage component
@@ -27,13 +28,13 @@ export default function ItemPage() {
   const [selectedSize, setSelectedSize] = useState<string>("M");
   const [quantity, setQuantity] = useState<number>(1);
 
-  const sizes = ["S", "M", "L", "XL", "XXL"];
+  const sizes = ["S", "M", "L", "XL", "XXL", "XXXL"];
   const [sizeStock, setSizeStock] = useState<Record<string, number>>({});
 
   useEffect(() => {
     async function loadProduct() {
       const { data, error } = await supabase
-        .from<Product>("shpe-website-2025_products")
+        .from("shpe-website-2025_products")
         .select("id, name, description, category, image, price, stock")
         .eq("id", Number(itemId))
         .single();
@@ -45,10 +46,12 @@ export default function ItemPage() {
       setProduct(data);
 
       // Convert filenames into public URLs
-      const rawFiles = data!.image.split(";")
-        .map((f) => f.trim())
-        .filter((f) => f.length);
-      const publicUrls = rawFiles.map((fileName) => {
+      const rawFiles = data!.image
+        .split(";")
+        .map((f: string) => f.trim())
+        .filter(Boolean); // filter out empty strings
+
+      const publicUrls = rawFiles.map((fileName: string) => {
         const { data: urlData } = supabase
           .storage
           .from("product-images")
@@ -62,31 +65,35 @@ export default function ItemPage() {
     loadProduct();
   }, [itemId]);
 
-  useEffect(() => {
-    if (!product) return;
-    async function loadSizeStock() {
-      const { data, error } = await supabase
-        .from("shpe-website-2025_clothes_sizes")
-        .select(sizes.join(", "))
-        .eq("id", Number(itemId))
-        .single();
+  const showSizes = (category === "Clothes");
 
-      if (error) {
-        setErrorMsg(error.message);
-        return;
+  if (showSizes) {
+    useEffect(() => {
+      if (!product) return;
+      async function loadSizeStock() {
+        const { data, error } = await supabase
+          .from("shpe-website-2025_clothes_sizes")
+          .select(sizes.join(", "))
+          .eq("id", Number(itemId))
+          .single();
+
+        if (error) {
+          setErrorMsg(error.message);
+          return;
+        }
+        const stockMap: Record<string, number> = {};
+        sizes.forEach((sz) => {
+          stockMap[sz] = (data as any)[sz] ?? 0;
+        });
+        setSizeStock(stockMap);
+        if ((stockMap[selectedSize] ?? 0) < 1) {
+          const avail = sizes.find((sz) => (stockMap[sz] ?? 0) > 0);
+          if (avail) setSelectedSize(avail);
+        }
       }
-      const stockMap: Record<string, number> = {};
-      sizes.forEach((sz) => {
-        stockMap[sz] = (data as any)[sz] ?? 0;
-      });
-      setSizeStock(stockMap);
-      if (stockMap[selectedSize] < 1) {
-        const avail = sizes.find((sz) => stockMap[sz] > 0);
-        if (avail) setSelectedSize(avail);
-      }
-    }
-    loadSizeStock();
-  }, [product, itemId]);
+      loadSizeStock();
+    }, [product, itemId]);
+  }
 
   if (errorMsg)
     return <p className="text-red-600 text-center mt-10">{errorMsg}</p>;
@@ -97,7 +104,7 @@ export default function ItemPage() {
   const qtyOptions = Array.from({ length: Math.max(maxQty, 1) }, (_, i) => i + 1);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-blue-100">
+    <div className="min-h-screen bg-white">
       <Navbar />
       <main className="max-w-6xl mx-auto py-10 px-4 lg:px-0 flex flex-col lg:flex-row lg:space-x-8">
         <div className="hidden lg:flex flex-col gap-4 flex-shrink-0 w-24">
@@ -122,7 +129,7 @@ export default function ItemPage() {
 
         <div className="flex flex-col lg:w-1/3">
           <Link
-            href={`/shop/${encodeURIComponent(category)}`}
+            href={`/shop/${encodeURIComponent(category as string)}`}
             className="mb-2 text-blue-600 hover:text-blue-800"
           >
             ← Back to {category}
@@ -132,37 +139,37 @@ export default function ItemPage() {
           <p className="text-2xl font-semibold mb-1">${product.price.toFixed(2)}</p>
           <p className="text-sm text-gray-600 mb-6">
             Pay in 4 interest-free payments of ${(
-            product.price / 4
-          ).toFixed(2)} with <span className="font-semibold">Afterpay</span>
+              product.price / 4
+            ).toFixed(2)} with <span className="font-semibold">Afterpay</span>
           </p>
 
-          <div className="mb-6">
-            <p className="font-medium mb-2">Size:</p>
-            <div className="flex flex-wrap gap-2">
-              {sizes.map((sz) => {
-                const stock = sizeStock[sz] || 0;
-                const disabled = stock < 1;
-                const selected = selectedSize === sz;
-                return (
-                  <button
-                    key={sz}
-                    onClick={() => !disabled && setSelectedSize(sz)}
-                    disabled={disabled}
-                    className={`w-10 h-10 border flex items-center justify-center ${
-                      disabled
-                        ? "opacity-50 cursor-not-allowed"
-                        : selected
-                        ? "bg-blue-900 text-white"
-                        : "hover:border-blue-900"
-                    }`}
-                  >
-                    {sz}
-                  </button>
-                );
-              })}
+          {showSizes && (
+            <div className="mb-6">
+              <p className="font-medium mb-2">Size:</p>
+              <div className="flex flex-wrap gap-2">
+                {sizes.map((sz) => {
+                  const stock = sizeStock[sz] || 0;
+                  const disabled = stock < 1;
+                  const selected = selectedSize === sz;
+                  return (
+                    <button
+                      key={sz}
+                      onClick={() => !disabled && setSelectedSize(sz)}
+                      disabled={disabled}
+                      className={`w-10 h-10 border flex items-center justify-center ${disabled
+                          ? "opacity-50 cursor-not-allowed"
+                          : selected
+                            ? "bg-blue-900 text-white"
+                            : "hover:border-blue-900"
+                        }`}
+                    >
+                      {sz}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-
+          )}
           <div className="flex items-center gap-4 mb-6">
             <label htmlFor="qty" className="font-medium">
               Qty:
