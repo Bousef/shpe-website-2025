@@ -1,5 +1,5 @@
 import { relations, sql } from "drizzle-orm";
-import { index, pgEnum, pgTableCreator, primaryKey, pgTable, varchar, numeric, timestamp, integer, boolean, text } from "drizzle-orm/pg-core";
+import { index, pgEnum, pgTableCreator, primaryKey, pgTable, varchar, numeric, timestamp, integer, boolean, text, unique } from "drizzle-orm/pg-core";
 
 // taken from https://supabase.com/docs/guides/auth/identities
 // should probably be moved to a separate file
@@ -54,6 +54,20 @@ export const products = createTable(
     price: d.real(),
     stock: d.integer(),
   })
+);
+
+export const cart = createTable(
+  "cart",
+  (d) => ({
+    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+    created_at: d.timestamp({ withTimezone: true }).defaultNow(),
+    member_id: d.integer().notNull().references(() => members.id),
+    product_id: d.integer().notNull().references(() => products.id),
+    quantity: d.integer().notNull(),
+  }), (table) => [
+    unique().on(table.member_id, table.product_id),
+    unique("cart_unique").on(table.member_id, table.created_at),
+  ]
 );
 
 /*
