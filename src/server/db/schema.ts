@@ -54,7 +54,7 @@ export const products = createTable(
     category: d.varchar({ length: 100 }).unique().notNull(),
     image: varchar({ length: 2048 }), //url
     description: varchar({ length: 2048 }), 
-    price: d.real(),
+    price: d.real().notNull(),
     stock: d.integer(),
   })
 );
