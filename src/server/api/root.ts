@@ -1,6 +1,6 @@
 import { postRouter } from "~/server/api/routers/post";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
-import { memberRouter } from "~/trpc/member";
+import { memberRouter } from "~/server/api/routers/member";
 import { alumniRouter } from "~/trpc/alumni";
 
 /**
