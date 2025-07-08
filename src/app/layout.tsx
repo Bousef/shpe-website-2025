@@ -3,6 +3,7 @@ import { type Metadata } from "next";
 import { Geist } from "next/font/google";
 import FooterSection from "./_components/FooterSection";
 import { TRPCReactProvider } from "~/trpc/react";
+import { env } from "~/env";
 
 export const metadata: Metadata = {
   title: "SHPE UCF",
@@ -20,6 +21,29 @@ const geist = Geist({
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const warnings: string[] = [];
+
+  if (!env.SUPABASE_URL) {
+    warnings.push("Missing SUPABASE_URL! Server auth features will be disabled.");
+  }
+
+  if (!env.SUPABASE_ANON_KEY) {
+    warnings.push("Missing SUPABASE_ANON_KEY! Server auth features will be disabled.");
+  }
+
+  if (!env.NEXT_PUBLIC_SUPABASE_URL) {
+    warnings.push("Missing NEXT_PUBLIC_SUPABASE_URL! Client auth features will be disabled.");
+  }
+  if (!env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    warnings.push("Missing NEXT_PUBLIC_SUPABASE_ANON_KEY! Client auth features will be disabled.");
+  }
+
+  if (warnings.length > 0) {
+    console.warn("\x1b[33m Environment variable warnings:\n", warnings.join("\n "));
+  }
+
+  console.warn("\x1b[0m");
+
   return (
     <html lang="en" className={`${geist.variable}`}>
       {/* 
