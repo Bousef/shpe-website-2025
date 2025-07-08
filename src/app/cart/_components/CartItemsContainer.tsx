@@ -1,6 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { useEffect, useState } from "react";
+import { api } from "~/trpc/react";
+
 type CartItem = {
     id: number;
     name: string | null;
@@ -13,22 +16,41 @@ type CartItem = {
 };
 
 export default function CartItemsContainer({ items }: { items: CartItem[] }) {
-     const updateQuantity = (id: number, qty: number) => {
-       return;
+    const [currentItemQuantities, setCurrentItemQuantities] = useState<Array<number>>([]);
+
+    const updateItemQuantity = api.user.cart.updateItemQuantity.useMutation({
+        onSuccess: () => {
+            return;
+        },
+    });
+
+    const removeItem = api.user.cart.removeItem.useMutation({
+        onSuccess: () => {
+            return;
+        },
+    });
+
+    const updateQuantityAction = (id: number, qty: number) => {
+        updateItemQuantity.mutate({ id, quantity: qty });
     };
 
-    const removeItem = (id: number) => {
-        return;
+    const removeItemAction = (id: number) => {
+        removeItem.mutate({ id });
     };
 
     const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
+    useEffect(() => {
+        setCurrentItemQuantities(items.map((item) => item.quantity));
+    }, [items]);
 
     return <>
         {items.length === 0 ? (
         <p className="text-gray-600">Your cart is empty.</p>
       ) : (
         <div className="space-y-6">
-          {items.map((item) => (
+          {items.map((item) => {
+            return (
             <div
               key={item.id}
               className="flex items-center gap-4 border-b pb-4"
@@ -45,10 +67,14 @@ export default function CartItemsContainer({ items }: { items: CartItem[] }) {
                 <div className="mt-2 flex items-center gap-2">
                   <label className="text-sm">Qty:</label>
                   <select
-                    value={item.quantity}
-                    onChange={(e) =>
-                      updateQuantity(item.id, parseInt(e.target.value))
-                    }
+                    value={currentItemQuantities[item.id] ?? item.quantity}
+                    onChange={(e) => {
+                      const newQuantity = parseInt(e.target.value);
+
+                      item.quantity = newQuantity;
+
+                      updateQuantityAction(item.id, newQuantity);
+                    }}
                     className="border px-2 py-1"
                   >
                     {[...Array<number>(10)].map((_, i) => (
@@ -61,13 +87,17 @@ export default function CartItemsContainer({ items }: { items: CartItem[] }) {
               </div>
 
               <button
-                onClick={() => removeItem(item.id)}
+                onClick={() => {
+                    setCurrentItemQuantities(currentItemQuantities.filter((_, i) => i !== item.id));
+                    removeItemAction(item.id);
+                }}
                 className="text-sm text-red-600 hover:underline"
               >
                 Remove
               </button>
             </div>
-          ))}
+            );
+          })}
 
           <div className="text-right pt-4 border-t">
             <p className="text-lg font-semibold">
