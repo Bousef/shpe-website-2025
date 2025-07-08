@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use, type Usable } from "react";
 import Link from "next/link";
 import Navbar from "../../_components/NavBar";
 import AddProductForm, { type Product } from "../../_components/AddProductForm";
@@ -11,11 +11,11 @@ interface CategoryParams {
   category: string;
 }
 interface CategoryPageProps {
-  params: { category: string };
+  params: Usable<CategoryParams>;
 }
 
 export default function CategoryPage({ params }: CategoryPageProps) {
-  const { category } = params;
+  const { category } = use(params);
   const [products, setProducts] = useState<Product[]>([]);
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [showForm, setShowForm] = useState(false);
@@ -23,7 +23,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
   useEffect(() => {
     async function loadProducts() {
       const { data, error } = await supabase
-        .from<Product>("shpe-website-2025_products")
+        .from("shpe-website-2025_products")
         .select("id, name, description, image, price, stock, category")
         .eq("category", category)
         .order("name", { ascending: true });
@@ -62,7 +62,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-blue-100">
+    <div className="min-h-screen bg-white">
       <Navbar />
 
       <main className="px-4 py-10 lg:px-96">
@@ -71,20 +71,12 @@ export default function CategoryPage({ params }: CategoryPageProps) {
             ← Back to categories
           </Link>
           <h1 className="text-5xl font-medium text-yellow-500 uppercase lg:text-6xl">
-            {category}
+            {decodeURIComponent(category ?? "")}
           </h1>
-          <button
-            onClick={() => setShowForm(true)}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white hover:bg-blue-700"
-            aria-label="Add Product"
-          >
-            +
-          </button>
+          <div className="ml-4">
+            <AddProductForm onAdd={handleAdd} />
+          </div>
         </div>
-
-        {showForm && (
-          <AddProductForm defaultCategory={category} onAdd={handleAdd} onClose={() => setShowForm(false)} />
-        )}
 
         {errorMsg && <p className="mb-4 text-red-600">{errorMsg}</p>}
 
@@ -95,15 +87,15 @@ export default function CategoryPage({ params }: CategoryPageProps) {
               href={`/shop/${encodeURIComponent(category)}/${p.id}`}
               className="block overflow-hidden"
             >
-              <div className="relative mb-2 aspect-[3/4]">
+              <div className="relative mb-2 aspect-[3/4] bg-[#d9d9d9]">
                 <Image
                   src={p.image}
                   alt={p.name}
                   fill
-                  className="object-cover"
+                  className="object-fill"
                 />
               </div>
-              <p className="mb-2 text-blue-900">Limited edition</p>
+              <p className="mb-2 text-blue-900">{p.description}</p>
               <p className="text-lg font-bold tracking-wider text-blue-900 uppercase">
                 {p.name}
               </p>
