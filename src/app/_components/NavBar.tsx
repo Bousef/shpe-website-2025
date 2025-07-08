@@ -6,7 +6,6 @@ import { VscAccount } from "react-icons/vsc";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
 
 const navItems = [
-  { href: "/about", label: "About" },
   { href: "/board", label: "Board" },
   { href: "/dev-team", label: "Dev team" },
   { href: "/alumni", label: "Alumni" },
@@ -47,21 +46,26 @@ export default function Navbar() {
           <a
             key={href}
             href={href}
+
             className="px-3 py-1 text-[#001f5b] hover:text-[#001133] hover:scale-105 transition-transform duration-150 rounded-3xl"
           >
             {label.toUpperCase()}
+
           </a>
         ) : (
           <Link
             key={href}
             href={href}
+
             className="px-3 py-1 text-[#001f5b] hover:text-[#001133] hover:scale-105 transition-transform duration-150 rounded-3xl"
           >
             {label.toUpperCase()}
           </Link>
         )
       )}
-      <VscAccount className="text-3xl sm:text-4xl text-[#001f5b]" />
+      <Link href="/login">
+        <VscAccount className="text-3xl sm:text-4xl text-[#001f5b] cursor-pointer" />
+      </Link>
     </div>
   </div>
 
@@ -88,7 +92,9 @@ export default function Navbar() {
           </Link>
         )
       )}
-      <VscAccount className="text-3xl text-[#001f5b] mt-2" />
+      <Link href="/login">
+        <VscAccount className="text-3xl text-[#001f5b] mt-2 cursor-pointer" />
+      </Link>
     </div>
   )}
 </nav>

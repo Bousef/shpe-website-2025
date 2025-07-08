@@ -22,11 +22,37 @@ export const members = createTable(
     first_name: d.varchar({ length: 100 }),
     last_name: d.varchar({ length: 100 }),
     email: d.varchar({ length: 100 }).unique().notNull(),
-    password: d.varchar({ length: 100 }).notNull(),
     image: varchar({ length: 2048 }), //url
     bio: text(),
     resume: varchar({ length: 2048 }), //url
     is_member: boolean().default(false),
+  })
+);
+
+//alumni table
+export const alumni = createTable(
+  "alumni",
+  (d) => ({
+    //id
+    //first name
+    //last name
+    //year
+    //position
+    //linkedin 
+    //image
+  })
+);
+
+export const products = createTable(
+  "products",
+  (d) => ({
+    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+    name: d.varchar({ length: 100 }),
+    category: d.varchar({ length: 100 }).unique().notNull(),
+    image: varchar({ length: 2048 }), //url
+    description: varchar({ length: 2048 }), 
+    price: d.real(),
+    stock: d.integer(),
   })
 );
 
