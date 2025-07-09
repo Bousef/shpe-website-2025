@@ -4,7 +4,7 @@ import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
 import Navbar from "../_components/NavBar";
 import { api } from "~/trpc/react";
 import { signup } from "./actions";
-
+import { useRouter } from "next/navigation";
 
 export default function SignUp() {
   const [email, setEmail] = useState("");
@@ -16,6 +16,7 @@ export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [signupState, signupAction] = useActionState(signup, { error: ""});
+  const router = useRouter();
 
    const createMember = api.member.createMember.useMutation({
         onSuccess: (data) => {if (data) {console.log("Member created successfully:", data);}},
@@ -161,22 +162,36 @@ return(
             } else {
               setErrors([]);
               setStatus("Signing up...");
+             
 
-              const { error } = await signup(undefined, new FormData(document.querySelector("form")!));
+              const form = new FormData(document.querySelector("form")!);
+
+              const { error, data } = await signup(undefined, form);
     
               if (error) {
                 setErrors([error]);
-                setStatus("");
+                setStatus("")
+                return
+                
               }
-              
-                createMember.mutate({
+
+              const uuid = data?.user?.id;
+
+           
+               
+              createMember.mutate({
+                uuid,
                 ucf_id: +ucfId,
                 first_name: first_name,
                 last_name: last_name,
                 email,
-              });
-       
-               }
+              },
+            {
+              onSuccess:() => {
+                router.push('/');
+              }
+            });
+              }
 
           }}
         >
