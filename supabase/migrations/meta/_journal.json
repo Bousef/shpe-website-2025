@@ -22,6 +22,20 @@
       "when": 1751043323391,
       "tag": "0002_green_raider",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1752023155892,
+      "tag": "0003_glossy_shadowcat",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1752023155893,
+      "tag": "0004_glossy_shadowcat",
+      "breakpoints": true
     }
   ]
 }
