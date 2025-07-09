@@ -8,6 +8,20 @@
       "when": 1748062081466,
       "tag": "0000_awesome_paibok",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1752008988591,
+      "tag": "0001_stormy_tana_nile",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1751043323391,
+      "tag": "0002_green_raider",
+      "breakpoints": true
     }
   ]
 }

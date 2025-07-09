@@ -24,7 +24,14 @@ export const env = createEnv({
    * Specify your client-side environment variables schema here.
    */
   client: {
-    // NEXT_PUBLIC_CLIENTVAR: z.string(),
+    NEXT_PUBLIC_SUPABASE_URL:
+      process.env.NODE_ENV === "production"
+      ? z.string()
+      : z.string().optional(),
+    NEXT_PUBLIC_SUPABASE_ANON_KEY:
+      process.env.NODE_ENV === "production"
+      ? z.string()
+      : z.string().optional(),
   },
 
   /**
@@ -33,6 +40,8 @@ export const env = createEnv({
   runtimeEnv: {
     SUPABASE_URL: process.env.SUPABASE_URL,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
   },
