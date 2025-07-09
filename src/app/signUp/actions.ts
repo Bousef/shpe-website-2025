@@ -7,7 +7,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '~/server/auth/server'
 
 
-export async function signup(prevState: unknown, formData: FormData): Promise<{error?: string}> {
+export async function signup(prevState: unknown, formData: FormData): Promise<{error?: string, data?: any}> {
   const supabase = await createClient();
 
   if (!supabase) {
@@ -24,11 +24,14 @@ export async function signup(prevState: unknown, formData: FormData): Promise<{e
   
 
 
-  const { error, data} = await supabase.auth.signUp(data2)
+  const {error, data} = await supabase.auth.signUp(data2)
+
+  const uuid = data.user?.id;
+
 
   if((data.user?.identities?.length === 0 || !data.user?.identities) && data.user?.app_metadata.provider === 'email'){
     console.error('Signup error: E-mailaddress already in use');
-    return {error: 'email already exists.'};
+    return {error: 'Email address already in use.'};
   }
 
   if (data.user?.identities?.length === 0 || !data.user?.identities) {
@@ -44,6 +47,7 @@ export async function signup(prevState: unknown, formData: FormData): Promise<{e
   }
 
 
+  return { error: undefined, data };
   revalidatePath('/', 'layout');
   redirect('/');
 }
