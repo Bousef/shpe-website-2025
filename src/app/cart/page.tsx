@@ -1,114 +1,16 @@
-"use client";
-
-import React, { useState } from "react";
 import Navbar from "../_components/NavBar";
-import Link from "next/link";
+import { api } from "~/trpc/server";
+import CartItemsContainer from "./_components/CartItemsContainer";
 
-type CartItem = {
-  id: string;
-  name: string;
-  image: string;
-  price: number;
-  quantity: number;
-};
-
-export default function Cart() {
-  const [items, setItems] = useState<CartItem[]>([
-    // Temporary placeholder items
-    {
-      id: "1",
-      name: "Supreme Tee",
-      image: "/placeholder.jpg",
-      price: 25.0,
-      quantity: 2,
-    },
-    {
-      id: "2",
-      name: "Bucket Hat",
-      image: "/placeholder.jpg",
-      price: 18.0,
-      quantity: 1,
-    },
-  ]);
-
-  const updateQuantity = (id: string, qty: number) => {
-    setItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, quantity: qty } : item
-      )
-    );
-  };
-
-  const removeItem = (id: string) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+export default async function Cart() {
+  const items = await api.user.cart.getItems();
 
   return (
     <>
-<Navbar/>
-    <div className="max-w-3xl mx-auto px-4 py-8">
-        
-      <h1 className="text-3xl font-bold mb-6">Your Cart</h1>
-
-      {items.length === 0 ? (
-        <p className="text-gray-600">Your cart is empty.</p>
-      ) : (
-        <div className="space-y-6">
-          {items.map((item) => (
-            <div
-              key={item.id}
-              className="flex items-center gap-4 border-b pb-4"
-            >
-              <img
-                src={item.image}
-                alt={item.name}
-                className="w-20 h-20 object-contain bg-gray-100 rounded"
-              />
-
-              <div className="flex-1">
-                <h2 className="font-semibold">{item.name}</h2>
-                <p className="text-gray-600">${item.price.toFixed(2)}</p>
-                <div className="mt-2 flex items-center gap-2">
-                  <label className="text-sm">Qty:</label>
-                  <select
-                    value={item.quantity}
-                    onChange={(e) =>
-                      updateQuantity(item.id, parseInt(e.target.value))
-                    }
-                    className="border px-2 py-1"
-                  >
-                    {[...Array(10)].map((_, i) => (
-                      <option key={i + 1} value={i + 1}>
-                        {i + 1}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <button
-                onClick={() => removeItem(item.id)}
-                className="text-sm text-red-600 hover:underline"
-              >
-                Remove
-              </button>
-            </div>
-          ))}
-
-          <div className="text-right pt-4 border-t">
-            <p className="text-lg font-semibold">
-              Subtotal: ${subtotal.toFixed(2)}
-            </p>
-            <Link 
-            href={"/checkout"}
-            className=" bg-yellow-500 text-black font-bold px-6 py-2 rounded hover:bg-yellow-600">
-              Checkout
-            </Link>
-          </div>
-        </div>
-      )}
+      <Navbar />
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6">Your Cart</h1>
+        <CartItemsContainer items={items} />
     </div>
     </>
   );
