@@ -1,5 +1,5 @@
-import { relations, sql } from "drizzle-orm";
-import { index, pgEnum, pgTableCreator, primaryKey, pgTable, varchar, numeric, timestamp, integer, boolean, text } from "drizzle-orm/pg-core";
+import { pgEnum, pgTableCreator, varchar, boolean, unique } from "drizzle-orm/pg-core";
+import type { InferSelectModel } from "drizzle-orm";
 
 // taken from https://supabase.com/docs/guides/auth/identities
 // should probably be moved to a separate file
@@ -11,36 +11,64 @@ export const createTable = pgTableCreator(
   (name) => `shpe-website-2025_${name}`,
 );
 
+// types
+export const positionEnumValues = [
+  "President",
+  "Internal Vice President",
+  "Corporate Vice President",
+  "Secretary",
+  "Marketing Vice President",
+  "Treasurer",
+  "Technology Chair",
+  "Professional Development Chair",
+  "Projects Chair",
+  "Mentorship Chair",
+  "Outreach Chair",
+  "Shpetinas Chair",
+  "Social Chair",
+  "Director",
+  "DevTeam",
+  "Committee",
+  "Member",
+] as const;
+export type Position = typeof positionEnumValues[number];
+export const positionEnum = pgEnum('position', positionEnumValues);
+
+export type Alumni = InferSelectModel<typeof alumni>;
+
 //--------------------  Tables --------------------
 
 //members table
 export const members = createTable(
   "members",
   (d) => ({
-    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+    // id has to mirror the id from Supabase's auth.users table
+    // at the moment it isn't possible to reference it directly due to the way drizzle-orm works
+    // so we have to assert it in the code that creates the members
+    uuid: d.uuid().primaryKey().notNull(),
     ucf_id: d.integer().unique().notNull(),
     first_name: d.varchar({ length: 100 }),
     last_name: d.varchar({ length: 100 }),
     email: d.varchar({ length: 100 }).unique().notNull(),
     image: varchar({ length: 2048 }), //url
-    bio: text(),
     resume: varchar({ length: 2048 }), //url
     is_member: boolean().default(false),
+    position: positionEnum("position").default("Member"),
   })
 );
 
-//alumni table
 export const alumni = createTable(
   "alumni",
   (d) => ({
-    //id
-    //first name
-    //last name
-    //year
-    //position
-    //linkedin 
-    //image
+    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+    first_name: d.varchar({length: 100}),
+    last_name: d.varchar({length: 100}),
+    grad_year: d.varchar({length: 100}),
+    image: d.varchar({length: 2048}),
+    linkedIn: d.text(),
+    position: positionEnum("position").default("Member"),
   })
+
 );
 
 export const products = createTable(
@@ -51,9 +79,23 @@ export const products = createTable(
     category: d.varchar({ length: 100 }).unique().notNull(),
     image: varchar({ length: 2048 }), //url
     description: varchar({ length: 2048 }), 
-    price: d.real(),
+    price: d.real().notNull(),
     stock: d.integer(),
   })
+);
+
+export const cart = createTable(
+  "cart",
+  (d) => ({
+    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+    created_at: d.timestamp({ withTimezone: true }).defaultNow(),
+    member_uuid: d.uuid().notNull().references(() => members.uuid),
+    product_id: d.integer().notNull().references(() => products.id),
+    quantity: d.integer().notNull(),
+  }), (table) => [
+    unique().on(table.member_uuid, table.product_id),
+    unique("cart_member_product_unique").on(table.member_uuid, table.created_at),
+  ]
 );
 
 /*
