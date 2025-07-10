@@ -1,4 +1,4 @@
-import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { cartRouter } from "./cart";
 import { members } from "~/server/db/schema";
 import { eq } from "drizzle-orm";
@@ -7,13 +7,27 @@ import { eq } from "drizzle-orm";
 export const userRouter = createTRPCRouter({
   cart: cartRouter,
 
-  getCurrentMember: protectedProcedure.query(async ({ ctx }) => {
+  getCurrentMember: publicProcedure.query(async ({ ctx }) => {
+    if (!ctx.supabase) return null;
+
+    const {
+      data: { user },
+    } = await ctx.supabase.auth.getUser();
+
+    if (!user) return null;
+
     const member = await ctx.db
-        .select()
-        .from(members)
-        .where(eq(members.uuid, ctx.user.id));
+      .select()
+      .from(members)
+      .where(eq(members.uuid, user.id));
 
+    return member[0] ?? null;
+  }),
 
-    return member[0];
+  logout: publicProcedure.mutation(async ({ ctx }) => {
+    if (!ctx.supabase) return null;
+
+    await ctx.supabase.auth.signOut();
+    return { success: true };
   }),
 });

@@ -38,39 +38,34 @@ export default function ItemPage() {
     },
   });
 
-  useEffect(() => {
-    async function loadProduct() {
-      const { data, error } = await supabase
-        .from("shpe-website-2025_products")
-        .select("id, name, description, category, image, price, stock")
-        .eq("id", Number(itemId))
-        .single();
+useEffect(() => {
+  async function loadProduct() {
+    const { data, error } = await supabase
+      .from("shpe-website-2025_products")
+      .select("id, name, description, category, image, price, stock, status")
+      .eq("id", Number(itemId))
+      .single();
 
-      if (error) {
-        setErrorMsg(error.message);
-        return;
-      }
-      setProduct(data);
-
-      // Convert filenames into public URLs
-      const rawFiles = data!.image
-        .split(";")
-        .map((f: string) => f.trim())
-        .filter(Boolean); // filter out empty strings
-
-      const publicUrls = rawFiles.map((fileName: string) => {
-        const { data: urlData } = supabase
-          .storage
-          .from("product-images")
-          .getPublicUrl(fileName);
-        return urlData.publicUrl;
-      });
-
-      setThumbs(publicUrls);
-      setGalleryImage(publicUrls[0] || "");
+    if (error) {
+      setErrorMsg(error.message);
+      return;
     }
-    loadProduct();
-  }, [itemId]);
+
+    setProduct(data);
+
+    // image is already "https://...;https://...;…"
+    const rawUrls = data!.image
+      .split(";")
+      .map((s: string) => s.trim())
+      .filter(Boolean);
+
+    setThumbs(rawUrls);
+    setGalleryImage(rawUrls[0] || "");
+  }
+
+  loadProduct();
+}, [itemId]);
+
 
   const showSizes = (category === "Clothes");
 

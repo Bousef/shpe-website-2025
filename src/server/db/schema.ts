@@ -1,6 +1,7 @@
 import { pgEnum, pgTableCreator, varchar, boolean, unique } from "drizzle-orm/pg-core";
 import type { InferSelectModel } from "drizzle-orm";
 
+
 // taken from https://supabase.com/docs/guides/auth/identities
 // should probably be moved to a separate file
 // and we should probably also make a providers type
@@ -10,7 +11,7 @@ import type { InferSelectModel } from "drizzle-orm";
 export const createTable = pgTableCreator(
   (name) => `shpe-website-2025_${name}`,
 );
-
+export const active_status_enum = pgEnum("active_status", ["Active", "Inactive"]);
 // types
 export const positionEnumValues = [
   "President",
@@ -62,10 +63,10 @@ export const alumni = createTable(
   "alumni",
   (d) => ({
     id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
-    first_name: d.varchar({length: 100}),
-    last_name: d.varchar({length: 100}),
-    grad_year: d.varchar({length: 100}),
-    image: d.varchar({length: 2048}),
+    first_name: d.varchar({ length: 100 }),
+    last_name: d.varchar({ length: 100 }),
+    grad_year: d.varchar({ length: 100 }),
+    image: d.varchar({ length: 2048 }),
     linkedIn: d.text(),
     position: positionEnum("position").default("Member"),
   })
@@ -76,14 +77,33 @@ export const products = createTable(
   "products",
   (d) => ({
     id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
-    name: d.varchar({ length: 100 }),
-    category: d.varchar({ length: 100 }).unique().notNull(),
-    image: varchar({ length: 2048 }), //url
-    description: varchar({ length: 2048 }), 
+    name: d.varchar({ length: 100 }).notNull(),
+    description: d.varchar({ length: 100 }).notNull(),
     price: d.real().notNull(),
-    stock: d.integer(),
+    image: d.varchar({ length: 500 }).notNull(),
+    stock: d.integer().notNull(),
+    category: varchar("category", { length: 255 }).notNull().default("Accessories"),
+    status: active_status_enum("status").notNull().default("Active"),
+    created_at: d.timestamp({ withTimezone: true }).defaultNow(),
+  })
+
+);
+
+export const clothes_sizes = createTable(
+  "clothes_sizes",
+  (d) => ({
+    id: d.integer().primaryKey().references(() => products.id, {
+      onDelete: "cascade",
+    }),
+    S: d.integer().default(0),
+    M: d.integer().default(0),
+    L: d.integer().default(0),
+    XL: d.integer().default(0),
+    XXL: d.integer().default(0),
+    XXXL: d.integer().default(0),
   })
 );
+
 
 export const cart = createTable(
   "cart",
