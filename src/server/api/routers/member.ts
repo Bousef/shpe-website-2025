@@ -15,10 +15,11 @@ import { eq } from "drizzle-orm";
 
 export const memberRouter = createTRPCRouter({
 
-  //create member -> looks longer than it actually is
+  //create member ->looks longer than it actually is
   createMember: publicProcedure
   .input(
     z.object({
+      uuid: z.string().uuid(),
       ucf_id: z.number(),
       first_name: z.string(),
       last_name: z.string(),
@@ -56,32 +57,37 @@ export const memberRouter = createTRPCRouter({
 
   }),
 
+
   //get member
   getMember: publicProcedure
-    .input(z.object({ id: z.number() }))
-    .query(async ({ input }) => {
-      const member = await db.select().from(members).where(eq(members.id, input.id));
+  .input(z.object({uuid : z.string().uuid()}))
+  .query(async ({input}) => {
+    const member = await db
+      .select()
+      .from(members)
+      .where(eq(members.uuid, input.uuid));
 
-      if (member.length === 0) throw new Error("Error: Member Not Found");
-
+      if (member.length == 0){
+        throw new Error("No member found!");
+      }
       return member[0];
-    }),
+  }),
 
   //delete member - debugging
   deleteMember: publicProcedure
-  .input(z.object({id: z.number()}))
+  .input(z.object({uuid: z.string().uuid()}))
   .mutation(async ({input}) => {
     const delteMem = await db
       .select()
       .from(members)
-      .where(eq(members.id, input.id));
-    
+      .where(eq(members.uuid, input.uuid));
+
     if (delteMem.length == 0){
       throw new Error("No member with that Id");
     }
 
 
-    await db.delete(members).where(eq(members.id, input.id));
+    await db.delete(members).where(eq(members.uuid, input.uuid));
 
 
     return delteMem[0];

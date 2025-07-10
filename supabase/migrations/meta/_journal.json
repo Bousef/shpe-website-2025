@@ -8,6 +8,34 @@
       "when": 1748062081466,
       "tag": "0000_awesome_paibok",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1752008988591,
+      "tag": "0001_stormy_tana_nile",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1751043323391,
+      "tag": "0002_green_raider",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1752023155892,
+      "tag": "0003_glossy_shadowcat",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1752023155893,
+      "tag": "0004_glossy_shadowcat",
+      "breakpoints": true
     }
   ]
 }
