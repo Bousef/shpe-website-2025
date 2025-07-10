@@ -4,9 +4,10 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Navbar from "../_components/NavBar";
-import AddProductForm, { type Product } from "../_components/AddProductForm";
+import AddProductForm from "../_components/AddProductForm";
 import { supabase } from "../../supabase-client";
 import Image from "next/image";
+import { api } from '~/trpc/react'
 
 export type CategoryImage = {
   category: string;
@@ -16,6 +17,25 @@ export type CategoryImage = {
 export default function Shop() {
   const [categories, setCategories] = useState<CategoryImage[]>([]);
   const [errorMsg, setErrorMsg] = useState<string>("");
+
+  const {
+    data: data,
+    isLoading,
+    error, // <---- will only exist if getCurrentMember throws an exception
+  } = api.user.getCurrentMember.useQuery();
+
+  let showEdit = false;
+
+  if (error) {
+    console.log(error.message);
+  }
+
+  if (data?.position === "Treasurer") {
+    showEdit = true;
+  } else if (!data && !isLoading) {
+    console.log("No user Found");
+  }
+
 
   useEffect(() => {
     async function loadCategories() {
@@ -31,18 +51,14 @@ export default function Shop() {
 
       // pick first image per category
       const map: Record<string, string> = {};
-(data ?? []).forEach(({ category, image }) => {
-  if (!map[category]) {
-    // grab the first filename
-    const fileName = image.split(";")[0] ?? "";
-    // turn it into a public URL
-    const { data: urlData } = supabase
-      .storage
-      .from("product-images")
-      .getPublicUrl(fileName);
-    map[category] = urlData.publicUrl;    // now a full https://… URL
-  }
-});
+      (data ?? []).forEach(({ category, image }) => {
+        if (!map[category]) {
+          // image is already a semicolon-delimited list of URLs
+          const firstUrl = image.split(";")[0] || "";
+          map[category] = firstUrl;
+        }
+      });
+
       const list = Object.entries(map)
         .map(([category, image]) => ({ category, image }))
         .sort((a, b) => a.category.localeCompare(b.category));
@@ -53,41 +69,36 @@ export default function Shop() {
     loadCategories();
   }, []);
 
-// Handler when new product is added
-const handleAdd = (product: Product) => {
-  setCategories(prev => {
-    if (prev.some(c => c.category === product.category)) return prev;
-
-    // grab the first image (or "" if somehow missing)
-    const firstImage = product.image.split(";")[0] ?? "";
-
-    // Append new category with a guaranteed string image
-    return [...prev, { category: product.category, image: firstImage }]
-      .sort((a, b) => a.category.localeCompare(b.category));
-  });
-};
-
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-100">
       <Navbar />
       <div className="flex justify-end px-4 lg:px-48 mt-4">
-  <Link
-    href="/cart"
-    className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-2 px-4 rounded shadow"
-  >
-    🛒 View Cart
-  </Link>
-</div>
+        {showEdit && (
+          <Link
+            href="/manage_inv"
+            className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-2 px-4 rounded shadow mr-2">
+            Manage Inventory
+          </Link>
+        )}
+
+        <Link
+          href="/cart"
+          className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-2 px-4 rounded shadow"
+        >
+          🛒 View Cart
+        </Link>
+
+      </div>
 
       <main className="px-4 py-10 lg:px-48">
         <div className="flex items-center mb-8">
           <h1 className="flex-1 text-center text-5xl text-yellow-500 lg:text-6xl">
             CATEGORIES
           </h1>
-          <div className="ml-4">
-            <AddProductForm onAdd={handleAdd} />
-          </div>
+
+
+
         </div>
 
         {errorMsg && <p className="mb-4 text-center text-red-600">{errorMsg}</p>}
