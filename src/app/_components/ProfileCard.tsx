@@ -9,25 +9,18 @@ export default function ProfileCard() {
   //   ? Number(session.user.user_metadata.ucf_id)
   //   : undefined
 
-	const id = 5;
-
 	// call existing getMember endpoint
   const {
     data: profile,
     isLoading,
     error,
-  } = api.member.getMember.useQuery(
-    { id: id },
-    { enabled: true }
-  )
+  } = api.user.getCurrentMember.useQuery();
 	// if not signed in
 	// if (!session) return <p>Please sign in</p>
 
-	// if no ucf id found from session
-  if (!id) return <p>Oops, no UCF ID on your session.</p>
 	// if still loading
   if (isLoading) return <p>Loading profile…</p>
-	if (!profile)  return <p>No member found for UCF ID {id}</p>
+	if (!profile)  return <p>You are not logged in.</p>
 	// if query error
   if (error) return <p>Error: {error.message}</p>
 	
@@ -49,10 +42,8 @@ export default function ProfileCard() {
 						<p className="text-sm">{profile.last_name}</p>
 					</div>
 					<div className="text-center space-y-1">
-						<p className="font-mono font-bold text-xl">{profile.id}</p>
-						<p className="text-xs">Member ID</p>
+						<p className="text-xs">Member ID/UCF ID</p>
 						<p className="font-mono font-bold text-xl>">{profile.ucf_id}</p>
-						<p className="text-xs">UCF ID</p>
 					</div>
 					<img src="/assets/round_logo.png" alt="SHPE UCF Logo" className="h-30 w-30 mt-2" />
 				</div>
