@@ -7,13 +7,21 @@ import { createClient } from '~/server/auth/server'
 import { api } from '~/trpc/server';
 
 
-export async function signup(prevState: unknown, formData: FormData): Promise<{errors: string[]}> {
+export async function signup(prevState: unknown, formData: FormData): Promise<{errors: string[], formData?: {first_name?: string, last_name?: string, email?: string, ucf_id?: string}}> {
   const supabase = await createClient();
 
   console.log("here")
 
   if (!supabase) {
-    return {errors: ['Supabase client is not initialized.']};
+    return {
+      errors: ['Supabase client is not initialized.'],
+      formData: {
+        first_name: formData.get('first_name') as string,
+        last_name: formData.get('last_name') as string,
+        email: formData.get('email') as string,
+        ucf_id: formData.get('ucf_id') as string,
+      }
+    };
   }
 
   const email = formData.get('email') as string;
@@ -36,7 +44,15 @@ export async function signup(prevState: unknown, formData: FormData): Promise<{e
 
   if (inputErrors.length > 0) {
     console.error('Signup input errors:', inputErrors);
-    return {errors: inputErrors};
+    return {
+      errors: inputErrors,
+      formData: {
+        first_name: formData.get('first_name') as string,
+        last_name: formData.get('last_name') as string,
+        email: formData.get('email') as string,
+        ucf_id: formData.get('ucf_id') as string,
+      }
+    };
   }
 
   // type-casting here for convenience
@@ -52,17 +68,41 @@ export async function signup(prevState: unknown, formData: FormData): Promise<{e
 
   if((data.user?.identities?.length === 0 || !data.user?.identities) && data.user?.app_metadata.provider === 'email'){
     console.error('Signup error: E-mailaddress already in use');
-    return {errors: ['Email address already in use.']};
+    return {
+      errors: ['Email address already in use.'],
+      formData: {
+        first_name: formData.get('first_name') as string,
+        last_name: formData.get('last_name') as string,
+        email: formData.get('email') as string,
+        ucf_id: formData.get('ucf_id') as string,
+      }
+    };
   }
 
   if (data.user?.identities?.length === 0 || !data.user?.identities) {
     console.error('Signup error: User already exists.');
-    return {errors: ['User already exists.']};
+    return {
+      errors: ['User already exists.'],
+      formData: {
+        first_name: formData.get('first_name') as string,
+        last_name: formData.get('last_name') as string,
+        email: formData.get('email') as string,
+        ucf_id: formData.get('ucf_id') as string,
+      }
+    };
   }
 
   if (error) {
     console.error('Signup error:', error);
-    return {errors: [error.message]};
+    return {
+      errors: [error.message],
+      formData: {
+        first_name: formData.get('first_name') as string,
+        last_name: formData.get('last_name') as string,
+        email: formData.get('email') as string,
+        ucf_id: formData.get('ucf_id') as string,
+      }
+    };
   }
 
   console.log('Signup successful:', data);

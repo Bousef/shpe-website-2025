@@ -5,11 +5,16 @@ import { redirect } from 'next/navigation'
 
 import { createClient } from '~/server/auth/server'
 
-export async function login(prevState: unknown, formData: FormData): Promise<{error: string}> {
+export async function login(prevState: unknown, formData: FormData): Promise<{error: string, formData?: {email?: string}}> {
   const supabase = await createClient();
 
   if (!supabase) {
-    return {error: 'Supabase client is not initialized.'};
+    return {
+      error: 'Supabase client is not initialized.',
+      formData: {
+        email: formData.get('email') as string
+      }
+    };
   }
 
   // type-casting here for convenience
@@ -23,7 +28,12 @@ export async function login(prevState: unknown, formData: FormData): Promise<{er
 
   if (error) {
     console.error('Login error:', error);
-    return {error: error.message};
+    return {
+      error: error.message,
+      formData: {
+        email: formData.get('email') as string
+      }
+    };
   }
 
   revalidatePath('/', 'layout');
