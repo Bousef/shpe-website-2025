@@ -9,6 +9,7 @@ export default function Login(){
 	const [loginState, loginAction] = useActionState(login, { error: "" });
 
 	const currentError = loginState.error;
+	const formData = loginState.formData;
 
 	return (
 		<section className="flex flex-col items-center pb-[6rem] py-[2rem] px-4 min-w-[280px]">
@@ -26,6 +27,7 @@ export default function Login(){
 					name="email"
 					required
 					placeholder="UCF Email"
+					defaultValue={formData?.email ?? ""}
 				 />
 				 <PasswordInputField
 				 	id='password'

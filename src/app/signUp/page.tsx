@@ -8,6 +8,7 @@ export default function SignUp() {
   const [signupState, signupAction] = useActionState(signup, { errors: [] });
 
   const errors = signupState.errors;
+  const formData = signupState.formData;
 
   return(
     <div>
@@ -24,6 +25,7 @@ export default function SignUp() {
             name="first_name"
             required
             placeholder="First Name"
+            defaultValue={formData?.first_name ?? ""}
           />
           <InputField
             id="lastname"
@@ -31,6 +33,7 @@ export default function SignUp() {
             name="last_name"
             required
             placeholder="Last Name"
+            defaultValue={formData?.last_name ?? ""}
           />
           <InputField
             id="email"
@@ -38,6 +41,7 @@ export default function SignUp() {
             name="email"
             required
             placeholder="UCF Email"
+            defaultValue={formData?.email ?? ""}
           />
           {errors.includes("Email must be a valid @ucf.edu address.") && (
             <div className="text-red-600 text-sm mb-1">Email must be a valid @ucf.edu address.</div>
@@ -48,6 +52,7 @@ export default function SignUp() {
             name="ucf_id"
             required
             placeholder="UCF ID"
+            defaultValue={formData?.ucf_id ?? ""}
           />
           {errors.includes("UCF ID must be exactly 7 digits.") && (
             <div className="text-red-600 text-sm mb-1">UCF ID must be exactly 7 digits.</div>
