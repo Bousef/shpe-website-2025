@@ -4,14 +4,14 @@ import { useFormContext } from "react-hook-form";
 import Input from "../_components/Input";
 import { type GeneralSchema } from "./page";
 import FieldError from "./FieldError";
+import ToggleButton from "./ToggleButton";
 
 export default function GeneralFields() {
   const {
     register,
-    watch,
     formState: { errors },
   } = useFormContext<GeneralSchema>();
-  const memberStatus = watch("memberStatus");
+
   return (
     <>
       <div>
@@ -19,36 +19,22 @@ export default function GeneralFields() {
           What is your current status at SHPE UCF?
         </p>
         <div className="mt-2 flex items-center gap-4">
-          <input
-            type="radio"
-            className="hidden"
+          <ToggleButton
             {...register("memberStatus", { required: true })}
             id="member-status-new"
+            fieldName="memberStatus"
             value="new"
-          />
-          <label
-            htmlFor="member-status-new"
-            className={`cursor-pointer rounded-md border-2 border-yellow-500 px-3 py-2 text-[#001f5b] focus:ring-2 focus:outline-none ${
-              memberStatus === "new" ? "bg-yellow-500" : ""
-            }`}
           >
             New Member
-          </label>
-          <input
-            type="radio"
-            className="hidden"
+          </ToggleButton>
+          <ToggleButton
             {...register("memberStatus", { required: true })}
-            id="member-status-recurring"
-            value="recurring"
-          />
-          <label
-            htmlFor="member-status-recurring"
-            className={`cursor-pointer rounded-md border-2 border-yellow-500 px-3 py-2 text-[#001f5b] focus:ring-2 focus:outline-none ${
-              memberStatus === "recurring" ? "bg-yellow-500" : ""
-            }`}
+            id="member-status-returning"
+            fieldName="memberStatus"
+            value="returning"
           >
-            Recurring Member
-          </label>
+            Returning Member
+          </ToggleButton>
         </div>
         <FieldError error={errors.memberStatus} />
       </div>

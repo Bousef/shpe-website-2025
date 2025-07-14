@@ -6,9 +6,10 @@ import { defineStepper } from "@stepperize/react";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import GeneralFields from "./GeneralFields";
+import DemographicFields from "./DemographicFields";
 
 const generalSchema = z.object({
-  memberStatus: z.enum(["new", "recurring"]),
+  memberStatus: z.enum(["new", "returning"]),
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Invalid email address"),
@@ -26,6 +27,7 @@ const demographicSchema = z.object({
   country: z.string().min(1, "Country is required"),
   legalStatus: z.string().min(1, "Legal status is required"),
 });
+export type DemographicSchema = z.infer<typeof demographicSchema>;
 
 const academicSchema = z.object({
   studentStatus: z.enum(["undergraduate", "graduate"]),
@@ -111,19 +113,20 @@ export default function MemberRegistrationPage() {
           >
             {stepper.switch({
               general: () => <GeneralFields />,
+              demographic: () => <DemographicFields />,
             })}
             <div className="float-right flex items-center gap-2">
               <button
                 type="button"
                 onClick={stepper.prev}
                 disabled={stepper.isFirst}
-                className="rounded-md border-2 border-gray-300 px-4 py-2 text-[#001f5b] hover:bg-yellow-500 disabled:border-none disabled:bg-gray-300 disabled:text-[#001f5b]/40"
+                className="cursor-pointer rounded-md border-2 border-gray-300 px-4 py-2 text-[#001f5b] hover:bg-yellow-500 disabled:cursor-not-allowed disabled:border-none disabled:bg-gray-300 disabled:text-[#001f5b]/40"
               >
                 Back
               </button>
               <button
                 type="submit"
-                className="rounded-md bg-yellow-500 px-4 py-2 text-[#001f5b]"
+                className="cursor-pointer rounded-md bg-yellow-500 px-4 py-2 text-[#001f5b] disabled:cursor-not-allowed"
               >
                 {stepper.isLast ? "Submit" : "Next"}
               </button>
@@ -134,12 +137,3 @@ export default function MemberRegistrationPage() {
     </>
   );
 }
-
-/*
-                <input
-                  type="text"
-                  name="reference"
-                  placeholder="ex: Juan del Pueblo"
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                />
-                */
