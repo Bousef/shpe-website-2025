@@ -16,7 +16,7 @@ export default function ToggleButton({
       <input type="radio" className="hidden" {...inputProps} />
       <label
         htmlFor={inputProps.id}
-        className={`cursor-pointer rounded-md border-2 border-yellow-500 px-3 py-2 text-[#001f5b] focus:ring-2 focus:outline-none ${
+        className={`cursor-pointer rounded-md border-2 border-yellow-500 px-3 py-2 text-[#001f5b] transition-colors hover:bg-yellow-500 focus:ring-2 focus:outline-none ${
           fieldValue === inputProps.value ? "bg-yellow-500" : ""
         }`}
       >

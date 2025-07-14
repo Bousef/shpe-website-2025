@@ -146,13 +146,13 @@ export default function MemberRegistrationPage() {
                 type="button"
                 onClick={stepper.prev}
                 disabled={stepper.isFirst}
-                className="cursor-pointer rounded-md border-2 border-gray-300 px-4 py-2 text-[#001f5b] hover:bg-yellow-500 disabled:cursor-not-allowed disabled:border-none disabled:bg-gray-300 disabled:text-[#001f5b]/40"
+                className="cursor-pointer rounded-md border-2 border-gray-300 px-4 py-2 text-[#001f5b] transition-colors hover:bg-yellow-500 disabled:cursor-not-allowed disabled:border-none disabled:bg-gray-300 disabled:text-[#001f5b]/40"
               >
                 Back
               </button>
               <button
                 type="submit"
-                className="cursor-pointer rounded-md bg-yellow-500 px-4 py-2 text-[#001f5b] disabled:cursor-not-allowed"
+                className="cursor-pointer rounded-md border-2 border-yellow-500 bg-yellow-500 px-4 py-2 text-[#001f5b] transition-colors hover:bg-yellow-600 disabled:cursor-not-allowed"
               >
                 {stepper.isLast ? "Submit" : "Next"}
               </button>

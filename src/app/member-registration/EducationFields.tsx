@@ -222,7 +222,7 @@ export default function EducationFields() {
           <button
             type="button"
             onClick={() => setShowSecondMajor(true)}
-            className={`cursor-pointer rounded-md border-2 border-yellow-500 px-3 py-2 text-[#001f5b] focus:ring-2 focus:outline-none ${
+            className={`cursor-pointer rounded-md border-2 border-yellow-500 px-3 py-2 text-[#001f5b] transition-colors hover:bg-yellow-500 focus:ring-2 focus:outline-none ${
               showSecondMajor ? "bg-yellow-500" : ""
             }`}
           >
@@ -231,7 +231,7 @@ export default function EducationFields() {
           <button
             type="button"
             onClick={() => setShowSecondMajor(false)}
-            className={`cursor-pointer rounded-md border-2 border-yellow-500 px-3 py-2 text-[#001f5b] focus:ring-2 focus:outline-none ${
+            className={`cursor-pointer rounded-md border-2 border-yellow-500 px-3 py-2 text-[#001f5b] transition-colors hover:bg-yellow-500 focus:ring-2 focus:outline-none ${
               showSecondMajor === false ? "bg-yellow-500" : ""
             }`}
           >
@@ -263,7 +263,7 @@ export default function EducationFields() {
           <button
             type="button"
             onClick={() => setShowMinor(true)}
-            className={`cursor-pointer rounded-md border-2 border-yellow-500 px-3 py-2 text-[#001f5b] focus:ring-2 focus:outline-none ${
+            className={`cursor-pointer rounded-md border-2 border-yellow-500 px-3 py-2 text-[#001f5b] transition-colors hover:bg-yellow-500 focus:ring-2 focus:outline-none ${
               showMinor ? "bg-yellow-500" : ""
             }`}
           >
@@ -272,7 +272,7 @@ export default function EducationFields() {
           <button
             type="button"
             onClick={() => setShowMinor(false)}
-            className={`cursor-pointer rounded-md border-2 border-yellow-500 px-3 py-2 text-[#001f5b] focus:ring-2 focus:outline-none ${
+            className={`cursor-pointer rounded-md border-2 border-yellow-500 px-3 py-2 text-[#001f5b] transition-colors hover:bg-yellow-500 focus:ring-2 focus:outline-none ${
               showMinor === false ? "bg-yellow-500" : ""
             }`}
           >

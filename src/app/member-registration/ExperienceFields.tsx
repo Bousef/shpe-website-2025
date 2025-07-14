@@ -27,7 +27,7 @@ export default function ExperienceFields() {
         <button
           type="button"
           onClick={() => setShowInternship(true)}
-          className={`cursor-pointer rounded-md border-2 border-yellow-500 px-3 py-2 text-[#001f5b] focus:ring-2 focus:outline-none ${
+          className={`cursor-pointer rounded-md border-2 border-yellow-500 px-3 py-2 text-[#001f5b] transition-colors hover:bg-yellow-500 focus:ring-2 focus:outline-none ${
             showInternship ? "bg-yellow-500" : ""
           }`}
         >
@@ -36,7 +36,7 @@ export default function ExperienceFields() {
         <button
           type="button"
           onClick={() => setShowInternship(false)}
-          className={`cursor-pointer rounded-md border-2 border-yellow-500 px-3 py-2 text-[#001f5b] focus:ring-2 focus:outline-none ${
+          className={`cursor-pointer rounded-md border-2 border-yellow-500 px-3 py-2 text-[#001f5b] transition-colors hover:bg-yellow-500 focus:ring-2 focus:outline-none ${
             showInternship === false ? "bg-yellow-500" : ""
           }`}
         >
@@ -65,7 +65,7 @@ export default function ExperienceFields() {
               <div className="mt-4 flex items-center justify-end">
                 <button
                   type="button"
-                  className="rounded-md bg-red-500 px-3 py-2 text-white"
+                  className="cursor-pointer rounded-md bg-red-500 px-3 py-2 text-white transition-colors hover:bg-red-600"
                   onClick={() => {
                     const newInternships = [...internships];
                     newInternships.splice(index, 1);
@@ -206,7 +206,7 @@ export default function ExperienceFields() {
                   });
                   setValue("internships", newInternships);
                 }}
-                className="cursor-pointer rounded-md bg-yellow-500 px-3 py-2 text-white hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-500 focus:outline-none"
+                className="cursor-pointer rounded-md bg-yellow-500 px-3 py-2 text-[#001f5b] transition-colors hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-500 focus:outline-none"
               >
                 Add Internship
               </button>
