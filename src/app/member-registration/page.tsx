@@ -7,6 +7,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import GeneralFields from "./GeneralFields";
 import DemographicFields from "./DemographicFields";
+import EducationFields from "./EducationFields";
 
 const generalSchema = z.object({
   memberStatus: z.enum(["new", "returning"]),
@@ -29,17 +30,38 @@ const demographicSchema = z.object({
 });
 export type DemographicSchema = z.infer<typeof demographicSchema>;
 
-const academicSchema = z.object({
+const educationSchema = z.object({
   studentStatus: z.enum(["undergraduate", "graduate"]),
-  ucfId: z.number().min(1000000, "UCF ID must be at least 7 digits"),
+  ucfId: z.preprocess(
+    (val) => {
+      if (typeof val === "string") {
+        const parsed = parseInt(val, 10);
+        if (!isNaN(parsed)) {
+          return parsed;
+        }
+      }
+      return val;
+    },
+    z.number().min(1000000, "UCF ID must be at least 7 digits"),
+  ),
   academicYear: z.string().min(1, "Academic year is required"),
   major: z.string().min(1, "Major is required"),
-  projectedGraduation: z
-    .number()
-    .min(2024, "Projected graduation year must be valid"),
+  projectedGraduation: z.preprocess(
+    (val) => {
+      if (typeof val === "string") {
+        const parsed = parseInt(val, 10);
+        if (!isNaN(parsed)) {
+          return parsed;
+        }
+      }
+      return val;
+    },
+    z.number().min(2025, "Projected graduation year must be valid"),
+  ),
   secondMajor: z.string().optional(),
   minor: z.string().optional(),
 });
+export type EducationSchema = z.infer<typeof educationSchema>;
 
 const internshipSchema = z.object({
   companyName: z.string().min(1, "Company name is required"),
@@ -56,7 +78,7 @@ const internshipExperienceSchema = z.object({
 const { useStepper, steps, utils } = defineStepper(
   { id: "general", title: "General", schema: generalSchema },
   { id: "demographic", title: "Demographic", schema: demographicSchema },
-  { id: "academic", title: "Academic", schema: academicSchema },
+  { id: "education", title: "Education", schema: educationSchema },
   { id: "experience", title: "Experience", schema: internshipExperienceSchema },
 );
 
@@ -114,6 +136,7 @@ export default function MemberRegistrationPage() {
             {stepper.switch({
               general: () => <GeneralFields />,
               demographic: () => <DemographicFields />,
+              education: () => <EducationFields />,
             })}
             <div className="float-right flex items-center gap-2">
               <button
