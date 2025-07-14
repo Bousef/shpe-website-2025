@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import GeneralFields from "./GeneralFields";
 import DemographicFields from "./DemographicFields";
 import EducationFields from "./EducationFields";
+import ExperienceFields from "./ExperienceFields";
 
 const generalSchema = z.object({
   memberStatus: z.enum(["new", "returning"]),
@@ -71,15 +72,16 @@ const internshipSchema = z.object({
   modeOfWork: z.string().min(1, "Mode of work is required"),
 });
 
-const internshipExperienceSchema = z.object({
+const experienceSchema = z.object({
   internships: z.array(internshipSchema).optional(),
 });
+export type ExperienceSchema = z.infer<typeof experienceSchema>;
 
 const { useStepper, steps, utils } = defineStepper(
   { id: "general", title: "General", schema: generalSchema },
   { id: "demographic", title: "Demographic", schema: demographicSchema },
   { id: "education", title: "Education", schema: educationSchema },
-  { id: "experience", title: "Experience", schema: internshipExperienceSchema },
+  { id: "experience", title: "Experience", schema: experienceSchema },
 );
 
 export default function MemberRegistrationPage() {
@@ -137,6 +139,7 @@ export default function MemberRegistrationPage() {
               general: () => <GeneralFields />,
               demographic: () => <DemographicFields />,
               education: () => <EducationFields />,
+              experience: () => <ExperienceFields />,
             })}
             <div className="float-right flex items-center gap-2">
               <button
