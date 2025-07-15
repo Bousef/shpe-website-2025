@@ -21,7 +21,27 @@ export default function CodeVerification() {
 	// 	}
 	// }, [email, router])
 
-	const handleSubmit = async (e: React.FormEvent) => {}
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault()
+		setLoading(true)
+		setError("")
+
+		const res = await fetch("/api/verify-reset-code", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({ email, code })
+		})
+		const data = await res.json()
+
+		setLoading(false)
+
+		if (!res.ok)
+			setError(data.message || "Invalid code")
+		else
+			router.push(`/reset-password?email=${email}&verified=true`)
+	}
 
 	return (
 		<section className="flex flex-col items-center justify-center pb-[6rem] py-[2rem] px-4 min-w-[280px]">

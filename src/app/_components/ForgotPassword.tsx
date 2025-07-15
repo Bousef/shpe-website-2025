@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react"
 import { useRouter } from "next/navigation"
-import React, { useState } from "react"
+import { supabase } from "~/supabase-client";
 
 export default function ForgotPassword() {
 	const router = useRouter()
@@ -9,7 +10,21 @@ export default function ForgotPassword() {
 	const [loading, setLoading] = useState(false)
 	
 	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault()
+		setLoading(true)
 
+		const { error } = await supabase.auth.resetPasswordForEmail(email, {
+			// send user to reset password page after they click on link in email
+			redirectTo: `${window.location.origin}/forgot-password/reset`
+		})
+
+		setLoading(false)
+		if (error)
+			alert(error.message)
+		else
+			// redirect to the verify code page tho supabase's email link skips it
+			// router.push("/forgot-password/verify?email=" + encodeURIComponent(email))
+			router.push("/forgot-password/reset?email=" + encodeURIComponent(email))
 	}
 
 	return (
@@ -23,7 +38,7 @@ export default function ForgotPassword() {
 					type="email"
 					required
 					value={email}
-					placeholder="example@gmail.com"
+					placeholder="example@ucf.edu"
 					onChange={e => setEmail(e.target.value)}
 					className="w-full px-3 py-2 mb-4 border rounded"
 				/>
