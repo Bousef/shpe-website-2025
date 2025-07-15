@@ -1,52 +1,79 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { supabase } from "../../supabase-client";
 
 export interface Product {
   id: number;
   name: string;
   description: string;
-  image: string;   // semicolon-delimited string of file names
+  image: string;
   price: number;
   stock: number;
   category: string;
-  status: "Active" | "Inactive"; // added status field
+  status: "Active" | "Inactive";
 }
 
 interface AddProductFormProps {
+  product?: Product; // <-- new prop
   defaultCategory?: string;
   onAdd?: (product: Product) => void;
   onClose?: () => void;
 }
 
 export default function AddProductForm({
+  product,
   defaultCategory = "Accessories",
   onAdd,
   onClose,
 }: AddProductFormProps) {
-  /* ——— form state (no showForm here!) ——— */
+  const isEditing = !!product;
+  const existingImages = isEditing && product?.image
+    ? product.image.split(";").filter(Boolean)
+    : [];
+
   const [newProduct, setNewProduct] = useState({
-    name: "",
-    description: "",
-    category: defaultCategory,
-    price: 0,
-    stock: 0,
+    name: product?.name || "",
+    description: product?.description || "",
+    category: product?.category || defaultCategory,
+    price: product?.price || 0,
+    stock: product?.stock || 0,
+    status: product?.status || "Active",
   });
-  const [priceInput, setPriceInput] = useState("0");
+
+
+  const [priceInput, setPriceInput] = useState(product?.price.toString() || "0");
   const [priceError, setPriceError] = useState("");
-  const [stockInput, setStockInput] = useState("0");
+  const [stockInput, setStockInput] = useState(product?.stock.toString() || "0");
   const [stockError, setStockError] = useState("");
+
   const [sizes, setSizes] = useState<Record<string, number>>({
     S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0,
   });
+
   const [imageFiles, setImageFiles] = useState<(File | null)[]>([null]);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
   const isClothes = newProduct.category === "Clothes";
 
-  /* ——— handlers ——— */
+  // Load sizes if editing clothes
+  useEffect(() => {
+    if (isEditing && isClothes) {
+      supabase
+        .from("shpe-website-2025_clothes_sizes")
+        .select("*")
+        .eq("id", product!.id)
+        .single()
+        .then(({ data, error }) => {
+          if (data) {
+            const { id, ...sizeData } = data;
+            setSizes(sizeData);
+          }
+        });
+    }
+  }, [isEditing, isClothes]);
+
   const handleSizeChange = (size: string, val: string) => {
     setSizes(prev => ({ ...prev, [size]: parseInt(val, 10) || 0 }));
   };
@@ -69,85 +96,86 @@ export default function AddProductForm({
     }
   };
   const resetForm = () => {
-    setNewProduct({ name: "", description: "", category: defaultCategory, price: 0, stock: 0 });
-    setPriceInput("0");
+    setNewProduct({
+      name: product?.name || "",
+      description: product?.description || "",
+      category: product?.category || defaultCategory,
+      price: product?.price || 0,
+      stock: product?.stock || 0,
+      status: product?.status || "Active",
+    });
+    setPriceInput(product?.price?.toString() || "0");
     setPriceError("");
-    setStockInput("0");
+    setStockInput(product?.stock?.toString() || "0");
     setStockError("");
     setSizes({ S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0 });
     setImageFiles([null]);
     setErrorMsg("");
   };
 
-  /* ——— submit ——— */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
 
-    // validation omitted for brevity…
-    // ...
-
-    // filter out nulls
     const files = imageFiles.filter((f): f is File => !!f);
-    if (!files.length) {
-      setErrorMsg("Upload at least one image");
-      return;
-    }
+    let storedUrls: string[] = [];
 
-    setLoading(true);
     try {
-// upload each, gather PUBLIC URLs
-const storedUrls: string[] = [];
+      setLoading(true);
 
-for (const file of files) {
-  const stamp    = new Date().toISOString().replace(/[:.]/g, "-");
-  const fileName = `${stamp}-${file.name.replace(/\s+/g, "")}`;
+      if (files.length) {
+        for (const file of files) {
+          const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+          const fileName = `${stamp}-${file.name.replace(/\s+/g, "")}`;
 
-  // 1) upload
-  const { error: uploadErr } = await supabase
-    .storage
-    .from("product-images")
-    .upload(fileName, file);
-  if (uploadErr) throw uploadErr;
+          const { error: uploadErr } = await supabase.storage.from("product-images").upload(fileName, file);
+          if (uploadErr) throw uploadErr;
 
-  // 2) get the public URL
-  const { data } = supabase
-    .storage
-    .from("product-images")
-    .getPublicUrl(fileName);
-  // no `error` property here, so just grab data.publicUrl
-  if (!data?.publicUrl) {
-    throw new Error("Failed to generate public URL");
-  }
-  storedUrls.push(data.publicUrl);
-}
+          const { data } = supabase.storage.from("product-images").getPublicUrl(fileName);
+          if (!data?.publicUrl) throw new Error("Failed to generate public URL");
 
-const imageField = storedUrls.join(";");
-
-
-      // insert product
-      const { data: prod, error: prodErr } = await supabase
-        .from("shpe-website-2025_products")
-        .insert({
-          ...newProduct,
-          name: newProduct.name ?? "",
-          image: imageField,
-          stock: isClothes ? 0 : newProduct.stock,
-          status: "Active", 
-        })
-        .select()
-        .single();
-      if (prodErr || !prod) throw prodErr || new Error("Insert failed");
-
-      // if clothes, insert sizes
-      if (isClothes) {
-        const { error: szErr } = await supabase
-          .from("shpe-website-2025_clothes_sizes")
-          .insert({ id: prod.id, ...sizes });
-        if (szErr) throw szErr;
+          storedUrls.push(data.publicUrl);
+        }
       }
 
-      onAdd?.(prod);
+      const imageField = [...existingImages, ...storedUrls].join(";");
+
+      const payload = {
+        ...newProduct,
+        name: newProduct.name ?? "",
+        image: imageField,
+        stock: isClothes ? 0 : newProduct.stock,
+        status: newProduct.status,
+      };
+
+      let result;
+      if (isEditing) {
+        const { data, error } = await supabase
+          .from("shpe-website-2025_products")
+          .update(payload)
+          .eq("id", product!.id)
+          .select()
+          .single();
+        if (error || !data) throw error || new Error("Update failed");
+        result = data;
+      } else {
+        const { data, error } = await supabase
+          .from("shpe-website-2025_products")
+          .insert(payload)
+          .select()
+          .single();
+        if (error || !data) throw error || new Error("Insert failed");
+        result = data;
+      }
+
+      if (isClothes) {
+        const { error: sizeError } = await supabase
+          .from("shpe-website-2025_clothes_sizes")
+          .upsert({ id: result.id, ...sizes }); // upsert handles both insert/update
+        if (sizeError) throw sizeError;
+      }
+
+      onAdd?.(result);
       resetForm();
       onClose?.();
     } catch (err: any) {
@@ -156,7 +184,6 @@ const imageField = storedUrls.join(";");
       setLoading(false);
     }
   };
-
   return (
     <>
 
@@ -243,8 +270,38 @@ const imageField = storedUrls.join(";");
           {priceError && <p className="text-red-600 mt-1">{priceError}</p>}
         </div>
 
+        {/* Status */}
+        <div className="mb-4">
+          <label className="block mb-1 font-medium">Status</label>
+          <select
+            value={newProduct.status}
+            onChange={e => setNewProduct({ ...newProduct, status: e.target.value as "Active" | "Inactive" })}
+            className="w-full border rounded px-3 py-2"
+          >
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+        </div>
+
+        {/* Images */}
         <div className="mb-4">
           <label className="block mb-1 font-medium">Images</label>
+
+          {/* Existing image previews */}
+          {existingImages.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-2">
+              {existingImages.map((url, idx) => (
+                <img
+                  key={idx}
+                  src={url}
+                  alt={`Existing image ${idx + 1}`}
+                  className="w-20 h-20 object-cover border rounded"
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Image file inputs */}
           {imageFiles.map((file, idx) => (
             <input
               key={idx}
@@ -259,7 +316,7 @@ const imageField = storedUrls.join(";");
                 });
               }}
               className="w-full mb-2"
-              required={idx === 0}
+              required={!isEditing && idx === 0} // required only on first field for create
             />
           ))}
           <button
@@ -286,11 +343,10 @@ const imageField = storedUrls.join(";");
             disabled={loading}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
           >
-            {loading ? 'Saving…' : 'Save Product'}
+            {loading ? "Saving…" : isEditing ? "Update Product" : "Save Product"}
           </button>
         </div>
       </form>
-
     </>
   );
 }
