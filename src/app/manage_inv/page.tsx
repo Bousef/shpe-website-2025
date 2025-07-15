@@ -19,47 +19,11 @@ export default function InventoryManagement() {
     const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
     const [showAdd, setShowAdd] = useState(false);
 
+
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
     if (isLoading) return <p className="text-center mt-10">Loading products...</p>;
     if (!products) return <p className="text-center mt-10 text-red-600">Failed to load products.</p>;
-
-    // Prompt the user, then run the update
-    const handleEdit = (prod: Product) => {
-        // 1) Which field?
-        const field = prompt(
-            "Which field would you like to edit?\n" +
-            "Options: name, description, category, price, stock, status"
-        )?.trim();
-        if (!field || !(field in prod)) {
-            alert("Invalid field");
-            return;
-        }
-
-        // 2) New value
-        const raw = prompt(`Enter new value for ${field}:`);
-        if (raw == null) return;
-
-        // 3) Build the updated object
-        const updatePayload: any = { id: prod.id };
-        switch (field) {
-            case "price":
-            case "stock":
-                updatePayload[field] = Number(raw);
-                break;
-            default:
-                updatePayload[field] = raw;
-        }
-        // carry over the other required properties
-        updatePayload.name = prod.name;
-        updatePayload.description = prod.description;
-        updatePayload.category = prod.category;
-        updatePayload.price = prod.price;
-        updatePayload.stock = prod.stock;
-        updatePayload.image = prod.image;
-        updatePayload.status = prod.status;
-
-        // 4) Fire the mutation
-        api.product.update.useMutation(updatePayload);
-    };
 
     return (
         <>
@@ -122,13 +86,29 @@ export default function InventoryManagement() {
                                     <td className="py-2 px-4 border-b text-sm">{product.stock}</td>
                                     <td className="py-2 px-4 border-b text-sm">{product.status}</td>
                                     <td className="py-2 px-4 border-b text-sm text-center">
+
+                                        {/* Edit Button */}
                                         <button
-                                            onClick={() => handleEdit(product)}
+                                            onClick={() => setSelectedProduct(product)}
                                             className="mr-3 text-blue-600 hover:underline"
                                             title="Edit"
                                         >
                                             <PencilIcon className="h-5 w-5 inline" />
                                         </button>
+
+                                        {selectedProduct && (
+                                            <AddProductForm
+                                                product={selectedProduct}
+                                                onAdd={(updatedProduct) => {
+                                                    setSelectedProduct(null);
+                                                    refetch();
+                                                }}
+                                                onClose={() => setSelectedProduct(null)}
+                                            />
+                                        )}
+
+
+                                        {/* Delete Button */}
                                         <button
                                             onClick={() => deleteProduct.mutate(product.id)}
                                             className="text-red-600 hover:underline"
