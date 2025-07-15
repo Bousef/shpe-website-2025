@@ -1,29 +1,61 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation"
-import React, { useState, useEffect } from "react"
+import { supabase } from "~/supabase-client";
 
 export default function ResetPassword() {
 	const router = useRouter()
 	const searchParams = useSearchParams();
 
-	// read the email
-	const email = searchParams.get("email") ?? "";
-	const token = searchParams.get("token") ?? "";
-
-  const [password, setPassword] = useState('')
+	// supabase includes 'access_token' in the URL when redirecting here
+	const accessToken = searchParams.get("access_token") || ""
+	const [password, setPassword] = useState('')
 	const [confirm, setConfirm] = useState('')
 	const [error, setError] = useState('')
 	const [loading, setLoading] = useState(false)
 
-	// useEffect(() => {
-	// 	if (!email || !token) {
-	// 		// if no email or no token in query, redirect back
-	// 		router.replace('/forgot-password')
-	// 	}
-	// }, [email, token])
+	useEffect(() => {
+		const checkSession = async () => {
+			const {
+				data: { session },
+			} = await supabase.auth.getSession()
 
-	const handleSubmit = async (e: React.FormEvent) => {}
+			if (!session) {
+				// wait a little if token is present but session isnt ready yet
+				if (accessToken) {
+					// wait for supabase to pick up token from url and set session
+					setTimeout(checkSession, 500) // retry after 500 ms
+					return
+				}
+				// if no token, kick them back
+				router.replace('/forgot-password')
+			}
+		}
+		checkSession()
+	}, [accessToken, router])
+
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault()
+		if (password !== confirm) {
+			setError("Passwords must match.")
+			return
+		}
+		setLoading(true)
+
+		const { error: updateError } = await supabase.auth.updateUser({
+			password,
+		}, {
+			// pass the access token so supabase knows which user
+			// in supabase v2, the client auto-reads the token from url by default
+		})
+
+		setLoading(false)
+		if (updateError) 
+			setError(updateError.message)
+		else
+			router.push("/login?reset=success")
+	}
 
 	return (
 		<section className="flex flex-col items-center justify-center pb-[6rem] py-[2rem] px-4 min-w-[280px]">
