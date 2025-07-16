@@ -189,7 +189,7 @@ export default function AddProductForm({
 
       <form
         onSubmit={handleSubmit}
-        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 p-6 bg-white rounded shadow max-w-lg"
+        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 max-h-[90vh] w-[90vw] max-w-lg overflow-y-auto p-4 sm:p-6 bg-white rounded shadow"
       >
         <div className="mb-4">
           <label className="block mb-1 font-medium">Name</label>

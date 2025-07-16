@@ -4,7 +4,6 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Navbar from "../_components/NavBar";
-import AddProductForm from "../_components/AddProductForm";
 import { supabase } from "../../supabase-client";
 import Image from "next/image";
 import { api } from '~/trpc/react'
@@ -42,6 +41,7 @@ export default function Shop() {
       const { data, error } = await supabase
         .from("shpe-website-2025_products")
         .select("category, image")
+        .eq("status", "Active")
         .order("category", { ascending: true });
 
       if (error) {
@@ -102,23 +102,31 @@ export default function Shop() {
         </div>
 
         {errorMsg && <p className="mb-4 text-center text-red-600">{errorMsg}</p>}
-
-        <div className="grid grid-cols-1 gap-16 sm:grid-cols-2 lg:grid-cols-3 lg:gap-32">
+        <div
+          className={`grid gap-10  ${categories.length === 1
+            ? "grid-cols-1 justify-center"
+            : categories.length === 2
+              ? "grid-cols-2 justify-center"
+              : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+            }`}
+        >
           {categories.map(({ category, image }) => (
             <Link
               key={category}
               href={`/shop/${encodeURIComponent(category)}`}
               className="block overflow-hidden text-center"
             >
-              <div className="relative mb-4 aspect-[3/4] lg:mb-8">
+              <div className="relative mb-4 aspect-[9/11] w-full max-w-[450px] lg:mb-8 mx-auto">
                 <Image src={image} alt={category} fill className="object-cover" />
               </div>
-              <p className="text-5xl font-bold tracking-wider text-blue-900 uppercase">
+              <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-wider text-blue-900 uppercase">
                 {category}
               </p>
+
             </Link>
           ))}
         </div>
+
       </main>
     </div>
   );
