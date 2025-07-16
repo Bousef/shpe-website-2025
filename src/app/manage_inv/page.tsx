@@ -50,7 +50,7 @@ export default function InventoryManagement() {
                 )}
 
                 <div className="overflow-x-auto">
-                    <table className="min-w-full bg-white border border-gray-200 rounded shadow">
+                    <table className=" table-fixed min-w-full bg-white border border-gray-200 shadow">
                         <thead>
                             <tr className="bg-gray-100 text-gray-700">
                                 <th className="py-3 px-4 border-b">Image</th>
@@ -63,9 +63,9 @@ export default function InventoryManagement() {
                                 <th className="py-3 px-4 border-b text-center">Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="">
                             {products.map(product => (
-                                <tr key={product.id} className="hover:bg-gray-50">
+                                <tr key={product.id} className="hover:bg-gray-50 h-24">
                                     <td className="py-2 px-4 border-b text-sm">
                                         {product.image ? (
                                             <Image
@@ -79,18 +79,18 @@ export default function InventoryManagement() {
                                             "No image"
                                         )}
                                     </td>
-                                    <td className="py-2 px-4 border-b text-sm">{product.id}</td>
-                                    <td className="py-2 px-4 border-b text-sm">{product.name}</td>
-                                    <td className="py-2 px-4 border-b text-sm">{product.category}</td>
-                                    <td className="py-2 px-4 border-b text-sm">${product.price.toFixed(2)}</td>
-                                    <td className="py-2 px-4 border-b text-sm">{product.stock}</td>
-                                    <td className="py-2 px-4 border-b text-sm">{product.status}</td>
+                                    <td className="py-2 px-4 border-b text-sm text-center">{product.id}</td>
+                                    <td className="py-2 px-4 border-b text-sm text-center">{product.name}</td>
+                                    <td className="py-2 px-4 border-b text-sm text-center">{product.category}</td>
+                                    <td className="py-2 px-4 border-b text-sm text-center">${product.price.toFixed(2)}</td>
+                                    <td className="py-2 px-4 border-b text-sm text-center">{product.stock}</td>
+                                    <td className="py-2 px-4 border-b text-sm text-center">{product.status}</td>
                                     <td className="py-2 px-4 border-b text-sm text-center">
 
                                         {/* Edit Button */}
                                         <button
                                             onClick={() => setSelectedProduct(product)}
-                                            className="mr-3 text-blue-600 hover:underline"
+                                            className="mr-3 text-blue-600 hover:underline hover:text-blue-400 hover:cursor-pointer"
                                             title="Edit"
                                         >
                                             <PencilIcon className="h-5 w-5 inline" />
@@ -111,7 +111,7 @@ export default function InventoryManagement() {
                                         {/* Delete Button */}
                                         <button
                                             onClick={() => deleteProduct.mutate(product.id)}
-                                            className="text-red-600 hover:underline"
+                                            className="text-red-600 hover:underline hover:text-red-400 hover:cursor-pointer"
                                             title="Delete"
                                         >
                                             <TrashIcon className="h-5 w-5 inline" />
