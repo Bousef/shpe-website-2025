@@ -4,7 +4,7 @@ const members = [
     role: "President",
     img: "/board/hernan.jpg",
   },
-  // …add the remaining 21 here …
+  
 ];
 
 export default function TeamSection() {
@@ -18,12 +18,9 @@ export default function TeamSection() {
 
       <section className="bg-[#2A3342] text-white flex flex-col items-center pb-[6rem] py-[2rem]">
         <article className="w-[80%] flex flex-col lg:h-[12rem] 2xl:h-[16rem] justify-around py-6 pb-10">
-          <h2 className="font-bold text-[1.6rem] lg:text-4xl 2xl:text-7xl pb-4">
+          <h2 className="font-bold text-[1.6rem] lg:text-4xl 2xl:text-7xl pb-4 text-blue-800">
             Get to know our Team
           </h2>
-          <p className="font-medium text-xl 2xl:text-3xl text-slate-400">
-            Know the faces of SHPE UCF
-          </p>
         </article>
 
         <section className="flex flex-wrap justify-around gap-[3rem] w-[90%]">
@@ -42,7 +39,7 @@ export default function TeamSection() {
                 <h3 className="font-bold text-black text-lg 2xl:text-[1.6rem] mt-4 ml-4">
                   {name}
                 </h3>
-                <p className="font-medium text-neutral-700 text-base 2xl:text-xl ml-4">
+                <p className="font-medium text-blue-800 text-base 2xl:text-xl ml-4">
                   {role}
                 </p>
               </div>
