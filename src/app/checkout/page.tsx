@@ -1,23 +1,24 @@
 "use client";
 
-import { CreditCard, PaymentForm } from "react-square-web-payments-sdk"
+import { createPaymentLink } from "./actions/actions";
 
-export default async function Checkout() {
-  const squareApplicationId = process.env.SQUARE_SANDBOX_APPLICATION_ID ?? "";
-  const squareLocationId = process.env.SQUARE_LOCATION_ID ?? "";
+export default function CheckoutPage() {
+  const handleClick = async () => {
+    const url = await createPaymentLink();
+    if (url) window.location.href = url;
+    else alert("Failed to create payment link.");
+  };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <h1 className="text-2xl font-bold mb-4">Checkout</h1>
-      <PaymentForm
-        applicationId={squareApplicationId}
-        locationId={squareLocationId}
-        cardTokenizeResponseReceived={async (token) => {
-          console.log("Card Token:", token);
-        }}
+    <main className="p-10 text-center">
+      <h1 className="text-2xl font-bold mb-6">Nice SHPE shirt</h1>
+      <button
+        onClick={handleClick}
+        className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700"
       >
-        <CreditCard />
-      </PaymentForm>
-    </div>
+        Pay $29.99
+      </button>
+    </main>
   );
 }
+
