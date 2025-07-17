@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { api } from "~/trpc/react";
 
@@ -99,9 +100,11 @@ export default function CartItemsContainer({ items: initialItems }: { items: Car
             <p className="text-lg font-semibold">
               Subtotal: ${subtotal.toFixed(2)}
             </p>
-            <button className="mt-4 bg-yellow-500 text-black font-bold px-6 py-2 rounded hover:bg-yellow-600">
+            <Link
+            href ="/checkout"
+            className="mt-4 bg-yellow-500 text-black font-bold px-6 py-2 rounded hover:bg-yellow-600">
               Checkout
-            </button>
+            </Link>
           </div>
         </div>
       )}
