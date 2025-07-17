@@ -99,6 +99,18 @@ export const cart = createTable(
   ]
 );
 
+export const reset_codes = createTable(
+  "reset_codes",
+  (d) => ({
+    id: d.uuid().primaryKey().defaultRandom(),
+    email: d.varchar({ length: 100 }).notNull().unique(),
+    code: d.varchar({ length: 6 }).notNull(),
+    created_at: d.timestamp({ withTimezone: true }).defaultNow(),
+    expires_at: d.timestamp({ withTimezone: true }).notNull(),
+    used: d.boolean().default(false),
+  })
+);
+
 /*
 export type IdentityType =
   | "email"

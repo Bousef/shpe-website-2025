@@ -4,7 +4,10 @@ import { memberRouter } from "./routers/member";
 import { alumniRouter } from "./routers/alumni";
 import { userRouter } from "./routers/user";
 
+import { cartRouter } from "./routers/cart";
+import { resetCodeRouter } from "./routers/reset-code";
 import { squareTestRouter } from "./routers/squareTest";
+
 /**
  * This is the primary router for your server.
  *
@@ -16,7 +19,9 @@ export const appRouter = createTRPCRouter({
   member: memberRouter,
   alumni: alumniRouter,
   user: userRouter,
-  squareTest: squareTestRouter
+  cart: cartRouter,
+  squareTest: squareTestRouter,
+  resetCode: resetCodeRouter,
 });
 
 // export type definition of API
