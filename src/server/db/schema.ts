@@ -35,6 +35,7 @@ export type Position = typeof positionEnumValues[number];
 export const positionEnum = pgEnum('position', positionEnumValues);
 
 export type Alumni = InferSelectModel<typeof alumni>;
+export type Member = InferSelectModel<typeof members>;
 
 //--------------------  Tables --------------------
 
