@@ -1,29 +1,53 @@
 "use client";
 
 import { api } from '~/trpc/react'
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { supabase } from "~/supabase-client"
 
 export default function ProfileCard() {
-	// const session = useSession()
-	// grab the ucf id stashed in the user's metadata at signup
-  // const ucfId = session?.user?.user_metadata?.ucf_id
-  //   ? Number(session.user.user_metadata.ucf_id)
-  //   : undefined
+	const [sessionChecked, setSessionChecked] = useState(false)
+	const router = useRouter()
+
+	useEffect(() => {
+		const exchangeSession = async () => {
+			const url = new URL(window.location.href)
+			const code = url.searchParams.get("code")
+			const error = url.searchParams.get("error")
+
+			if (error) {
+				console.error("Login error:", url.searchParams.get("error_description"))
+				return
+			}
+
+			if (code) {
+				const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+				if (error) {
+					console.error("Failed to exchange session:", error.message)
+				} else {
+					console.log("Session restored:", data.session)
+					router.replace("/profile") // Clean URL
+				}
+			}
+
+			setSessionChecked(true)
+		}
+
+		exchangeSession()
+	}, [router])
 
 	// call existing getMember endpoint
-  const {
-    data: profile,
-    isLoading,
-    error,
-  } = api.user.getCurrentMember.useQuery();
-	// if not signed in
-	// if (!session) return <p>Please sign in</p>
+	const {
+		data: profile,
+		isLoading,
+		error,
+	} = api.user.getCurrentMember.useQuery(undefined, {
+		enabled: sessionChecked,
+	})
 
-	// if still loading
-  if (isLoading) return <p>Loading profile…</p>
+  	if (!sessionChecked || isLoading) return <p>Loading profile…</p>
 	if (!profile)  return <p>You are not logged in.</p>
-	// if query error
-  if (error) return <p>Error: {error.message}</p>
-	
+  	if (error) return <p>Error: {error.message}</p>
 
 	return (
 		<main id="profile" className="relative bg-white py-10 px-15 text-[var(--shpe-navy-blue)] max-w-4xl mx-auto h-150">
