@@ -11,16 +11,48 @@ import EducationFields from "./EducationFields";
 import ExperienceFields from "./ExperienceFields";
 import { useRef } from "react";
 
-const generalSchema = z.object({
-  memberStatus: z.enum(["new", "returning"]),
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Invalid email address"),
-  confirmEmail: z.string().email("Invalid email address"),
-  phoneNumber: z.string().min(10, "Phone number is required"),
-  dateOfBirth: z.string().min(1, "Date of birth is required"),
-  discord: z.string().min(1, "Discord username is required"),
-});
+function ucfEmailValidator() {
+  return z
+    .email("Invalid email address")
+    .refine((val) => val.endsWith("@ucf.edu"), {
+      message: "Email must be a UCF email address",
+    });
+}
+
+const generalSchema = z
+  .object({
+    memberStatus: z.enum(["new", "returning"]),
+    firstName: z.string().min(1, "First name is required"),
+    lastName: z.string().min(1, "Last name is required"),
+    email: ucfEmailValidator(),
+    confirmEmail: ucfEmailValidator(),
+    phoneNumber: z.string().min(10, "Phone number is required"),
+    dateOfBirth: z.preprocess(
+      (val) => {
+        if (typeof val === "string") {
+          const parsed = new Date(val);
+          if (!isNaN(parsed.getTime())) {
+            return parsed;
+          }
+        }
+        return val;
+      },
+      z.date().refine((val) => val.getTime() < Date.now(), {
+        message: "Invalid date of birth",
+      }),
+    ),
+    discord: z.string().min(1, "Discord username is required"),
+  })
+  .check((ctx) => {
+    if (ctx.value.email !== ctx.value.confirmEmail) {
+      ctx.issues.push({
+        code: "custom",
+        message: "Emails must match",
+        path: ["confirmEmail"],
+        input: ctx.value.confirmEmail,
+      });
+    }
+  });
 export type GeneralSchema = z.infer<typeof generalSchema>;
 
 const demographicSchema = z.object({
@@ -44,7 +76,10 @@ const educationSchema = z.object({
       }
       return val;
     },
-    z.number().min(1000000, "UCF ID must be at least 7 digits"),
+    z
+      .number()
+      .min(1000000, "UCF ID must be at least 7 digits")
+      .max(9999999, "UCF ID must be at most 7 digits"),
   ),
   academicYear: z.string().min(1, "Academic year is required"),
   major: z.string().min(1, "Major is required"),
@@ -58,7 +93,16 @@ const educationSchema = z.object({
       }
       return val;
     },
-    z.number().min(2025, "Projected graduation year must be valid"),
+    z
+      .number()
+      .min(
+        new Date().getFullYear(),
+        "Projected graduation year must not be in the past",
+      )
+      .max(
+        new Date().getFullYear() + 10,
+        "Projected graduation year must be within the next 10 years",
+      ),
   ),
   secondMajor: z.string().optional(),
   minor: z.string().optional(),
