@@ -9,6 +9,7 @@ import GeneralFields from "./GeneralFields";
 import DemographicFields from "./DemographicFields";
 import EducationFields from "./EducationFields";
 import ExperienceFields from "./ExperienceFields";
+import { useRef } from "react";
 
 const generalSchema = z.object({
   memberStatus: z.enum(["new", "returning"]),
@@ -64,7 +65,7 @@ const educationSchema = z.object({
 });
 export type EducationSchema = z.infer<typeof educationSchema>;
 
-const internshipSchema = z.object({
+export const internshipSchema = z.object({
   companyName: z.string().min(1, "Company name is required"),
   location: z.string().min(1, "Location is required"),
   position: z.string().min(1, "Position is required"),
@@ -85,6 +86,7 @@ const { useStepper, steps, utils } = defineStepper(
 );
 
 export default function MemberRegistrationPage() {
+  const internshipPortalRef = useRef<HTMLDivElement>(null);
   const stepper = useStepper();
   const form = useForm({
     mode: "onTouched",
@@ -128,6 +130,7 @@ export default function MemberRegistrationPage() {
           </p>
           <p>Welcome to SHPE UCF: En la Florida Central, ¡Juntos sin parar!</p>
         </div>
+        <div ref={internshipPortalRef}></div>
         <FormProvider {...form}>
           <form
             className="space-y-4"
