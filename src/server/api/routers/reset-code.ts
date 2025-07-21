@@ -6,7 +6,6 @@ import { randomInt } from "crypto";
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-console.log(process.env.RESEND_API_KEY);
 
 export const resetCodeRouter = createTRPCRouter({
 
@@ -39,9 +38,7 @@ export const resetCodeRouter = createTRPCRouter({
             // send the email with the code
             try {
                 await resend.emails.send({
-                    from: "onboarding@resend.dev",
-
-                    //from: "SHPE UCF <no-reply@shpeucf.onresend.com>", // or verified domain
+                    from: "Acme <onboarding@resend.dev>",
                     to: [input.email],
                     subject: "Your Password Reset Code",
                     html: `

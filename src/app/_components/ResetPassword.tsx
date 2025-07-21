@@ -9,6 +9,8 @@ export default function ResetPassword() {
 	const searchParams = useSearchParams();
 
 	const email = searchParams.get("email");
+	const access_token = searchParams.get("access_token");
+	const refresh_token = searchParams.get("refresh_token");
 	const verified = searchParams.get("verified") === "true";
 
 	const [password, setPassword] = useState('');
@@ -25,25 +27,37 @@ export default function ResetPassword() {
 		);
 	}
 
-	// useEffect(() => {
-	// 	const checkSession = async () => {
-	// 		const {
-	// 			data: { session },
-	// 		} = await supabase.auth.getSession()
+	useEffect(() => {
+		const trySession = async () => {
+			if (access_token && refresh_token) {
+				const { error } = await supabase.auth.setSession({
+					access_token,
+					refresh_token,
+				});
 
-	// 		if (!session || !verified) {
-	// 			// wait a little if token is present but session isnt ready yet
-	// 			if (accessToken) {
-	// 				// wait for supabase to pick up token from url and set session
-	// 				setTimeout(checkSession, 500) // retry after 500 ms
-	// 				return
-	// 			}
-	// 			// if no token, kick them back\
-	// 			router.replace('/forgot-password')
-	// 		}
-	// 	}
-	// 	checkSession()
-	// }, [accessToken, verified, router])
+				if (error) {
+					setError("Session could not be established. Please retry.");
+					return;
+				}
+			}
+
+			const {
+				data: { session },
+			} = await supabase.auth.getSession();
+
+			if (!session || !verified) {
+				// // wait a little if token is present but session isnt ready yet
+				// if (access_token) {
+				// 	// wait for supabase to pick up token from url and set session
+				// 	setTimeout(trySession, 500) // retry after 500 ms
+				// 	return
+				// }
+				router.replace('/forgot-password') // if no token, kick them back
+			}
+		};
+
+		trySession()
+	}, [access_token, refresh_token, verified, router])
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -105,7 +119,6 @@ export default function ResetPassword() {
 				/>
 				<button
 					type="submit"
-					onClick={handleSubmit}
 					disabled={loading}
 					className="w-full py-2 mt-8 bg-[var(--shpe-light-blue)] text-white text-xl hover:bg-[var(--shpe-blue)] disabled:opacity-50 cursor-pointer"
 				>
