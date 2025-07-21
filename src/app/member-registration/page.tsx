@@ -10,6 +10,7 @@ import DemographicFields from "./DemographicFields";
 import EducationFields from "./EducationFields";
 import ExperienceFields from "./ExperienceFields";
 import { useRef } from "react";
+import KnightConnectSection from "./KnightConnectSection";
 
 function ucfEmailValidator() {
   return z
@@ -127,6 +128,7 @@ const { useStepper, steps, utils } = defineStepper(
   { id: "demographic", title: "Demographic", schema: demographicSchema },
   { id: "education", title: "Education", schema: educationSchema },
   { id: "experience", title: "Experience", schema: experienceSchema },
+  { id: "knight-connect", title: "Knight Connect", schema: z.object({}) },
 );
 
 export default function MemberRegistrationPage() {
@@ -187,6 +189,7 @@ export default function MemberRegistrationPage() {
               demographic: () => <DemographicFields />,
               education: () => <EducationFields />,
               experience: () => <ExperienceFields />,
+              "knight-connect": () => <KnightConnectSection />,
             })}
             <div className="float-right flex items-center gap-2">
               <button
