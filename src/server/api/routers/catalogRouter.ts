@@ -1,7 +1,7 @@
 import { legacyClient } from "~/lib/square/client";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { z } from "zod";
-import { FileWrapper, type BatchDeleteCatalogObjectsRequest, type BatchRetrieveCatalogObjectsRequest, type BatchUpsertCatalogObjectsRequest, type CreateCatalogImageRequest, type UpdateCatalogImageRequest } from "square/legacy";
+import { object, z } from "zod";
+import { FileWrapper, type SearchCatalogObjectsRequest, type BatchDeleteCatalogObjectsRequest, type BatchRetrieveCatalogObjectsRequest, type BatchUpsertCatalogObjectsRequest, type CreateCatalogImageRequest, type UpdateCatalogImageRequest, type UpsertCatalogObjectRequest } from "square/legacy";
 
 export const catalogRouter = createTRPCRouter({
     batchDeleteCatalogObjects: publicProcedure.input(
@@ -60,4 +60,41 @@ export const catalogRouter = createTRPCRouter({
     ).query(async ({ input }) => {
         return await legacyClient.catalogApi.listCatalog(input.cursor, input.types, input.catalogVersion);
     }),
+
+    upsertCatalogObject: publicProcedure.input(
+        z.object({
+            body: z.custom<UpsertCatalogObjectRequest>(),
+            requestOptions: z.any().optional(),
+        })
+    ).mutation(async({input}) =>{
+        return await legacyClient.catalogApi.upsertCatalogObject(input.body, input.requestOptions);
+    }),
+
+    deleteCatalogObject: publicProcedure.input(
+        z.object({ objectId: z.string() })
+    ).mutation(async ({ input }) => {
+        return await legacyClient.catalogApi.deleteCatalogObject(input.objectId);
+    }),
+
+    RetrieveCatalogObject: publicProcedure.input(
+        z.object({
+            objectId: z.string(),   
+            includeRelatedObjects: z.boolean().optional(),
+            catalogVersion: z.bigint().optional(),
+            includeCaegoryPathToRoot: z.boolean().optional(),
+        })
+    ).query(async ({ input }) => {
+        return await legacyClient.catalogApi.retrieveCatalogObject(input.objectId, input.includeRelatedObjects, input.catalogVersion, input.includeCaegoryPathToRoot);
+    }),
+
+    searchCatalogObjects: publicProcedure.input(
+        z.object({
+            body: z.custom<SearchCatalogObjectsRequest>(),
+            requestOptions: z.any().optional(),
+        })
+    ).query(async ({ input }) => {
+        return await legacyClient.catalogApi.searchCatalogObjects(input.body, input.requestOptions);
+    }),
+ 
+
 });
