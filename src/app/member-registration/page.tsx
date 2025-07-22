@@ -11,6 +11,7 @@ import EducationFields from "./EducationFields";
 import ExperienceFields from "./ExperienceFields";
 import { useRef } from "react";
 import KnightConnectSection from "./KnightConnectSection";
+import NationalMemberFields from "./NationalMemberFields";
 
 function ucfEmailValidator() {
   return z
@@ -123,12 +124,51 @@ const experienceSchema = z.object({
 });
 export type ExperienceSchema = z.infer<typeof experienceSchema>;
 
+const nationalMemberSchema = z.object({
+  invoiceNumber: z.preprocess(
+    (val) => {
+      if (typeof val === "string") {
+        const parsed = parseInt(val, 10);
+        if (!isNaN(parsed)) {
+          return parsed;
+        }
+      }
+      return val;
+    },
+    z
+      .number()
+      .min(1000000, "Invoice number is 7 digits long")
+      .max(9999999, "Invoice number is 7 digits long"),
+  ),
+  memberId: z.preprocess(
+    (val) => {
+      if (typeof val === "string") {
+        const parsed = parseInt(val, 10);
+        if (!isNaN(parsed)) {
+          return parsed;
+        }
+      }
+      return val;
+    },
+    z
+      .number()
+      .min(1000000, "Member ID is 7 digits long")
+      .max(9999999, "Member ID is 7 digits long"),
+  ),
+});
+export type NationalMemberSchema = z.infer<typeof nationalMemberSchema>;
+
 const { useStepper, steps, utils } = defineStepper(
   { id: "general", title: "General", schema: generalSchema },
   { id: "demographic", title: "Demographic", schema: demographicSchema },
   { id: "education", title: "Education", schema: educationSchema },
   { id: "experience", title: "Experience", schema: experienceSchema },
   { id: "knight-connect", title: "Knight Connect", schema: z.object({}) },
+  {
+    id: "national-member",
+    title: "National Member",
+    schema: nationalMemberSchema,
+  },
 );
 
 export default function MemberRegistrationPage() {
@@ -190,6 +230,7 @@ export default function MemberRegistrationPage() {
               education: () => <EducationFields />,
               experience: () => <ExperienceFields />,
               "knight-connect": () => <KnightConnectSection />,
+              "national-member": () => <NationalMemberFields />,
             })}
             <div className="float-right flex items-center gap-2">
               <button
