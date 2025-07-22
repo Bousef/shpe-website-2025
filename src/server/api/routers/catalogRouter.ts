@@ -1,9 +1,33 @@
 import { legacyClient } from "~/lib/square/client";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { z } from "zod";
-import { FileWrapper, type CreateCatalogImageRequest, type UpdateCatalogImageRequest } from "square/legacy";
+import { FileWrapper, type BatchDeleteCatalogObjectsRequest, type BatchRetrieveCatalogObjectsRequest, type BatchUpsertCatalogObjectsRequest, type CreateCatalogImageRequest, type UpdateCatalogImageRequest } from "square/legacy";
 
 export const catalogRouter = createTRPCRouter({
+    batchDeleteCatalogObjects: publicProcedure.input(
+        z.object({
+            body: z.custom<BatchDeleteCatalogObjectsRequest>(),
+        })
+    ).query(async ({ input }) => {
+        return await legacyClient.catalogApi.batchDeleteCatalogObjects(input.body);
+    }),
+
+    batchRetrieveCatalogObjects: publicProcedure.input(
+        z.object({
+            body: z.custom<BatchRetrieveCatalogObjectsRequest>(),
+        })
+    ).query(async ({ input }) => {
+        return await legacyClient.catalogApi.batchRetrieveCatalogObjects(input.body);
+    }),
+
+    batchUpsertCatalogObjects: publicProcedure.input(
+        z.object({
+            body: z.custom<BatchUpsertCatalogObjectsRequest>(),
+        })
+    ).query(async ({ input }) => {
+        return await legacyClient.catalogApi.batchUpsertCatalogObjects(input.body);
+    }),
+
     createCatalogImage: publicProcedure.input(
         z.object({
             request: z.custom<CreateCatalogImageRequest>().optional(),
