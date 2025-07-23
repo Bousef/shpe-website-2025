@@ -1,7 +1,7 @@
 import { legacyClient } from "~/lib/square/client";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { z } from "zod";
-import { FileWrapper, type BatchDeleteCatalogObjectsRequest, type BatchRetrieveCatalogObjectsRequest, type BatchUpsertCatalogObjectsRequest, type CreateCatalogImageRequest, type UpdateCatalogImageRequest } from "square/legacy";
+import { FileWrapper, type SearchCatalogItemsRequest, type BatchDeleteCatalogObjectsRequest, type BatchRetrieveCatalogObjectsRequest, type BatchUpsertCatalogObjectsRequest, type CreateCatalogImageRequest, type UpdateCatalogImageRequest, type UpdateItemModifierListsRequest, type UpdateItemTaxesRequest } from "square/legacy";
 
 export const catalogRouter = createTRPCRouter({
     batchDeleteCatalogObjects: publicProcedure.input(
@@ -60,4 +60,34 @@ export const catalogRouter = createTRPCRouter({
     ).query(async ({ input }) => {
         return await legacyClient.catalogApi.listCatalog(input.cursor, input.types, input.catalogVersion);
     }),
+
+
+    //-- This endpoint is used to search for catalog items.
+    searchCatalogItems: publicProcedure.input(
+        z.object({
+            body: z.custom<SearchCatalogItemsRequest>(),
+        })
+    ).query(async ({ input }) => {
+        return await legacyClient.catalogApi.searchCatalogItems(input.body);
+    }),
+
+    //-- This endpoint is used to update item modifier lists in the catalog.
+    updateItemModifierLists: publicProcedure.input(
+        z.object({
+            body: z.custom<UpdateItemModifierListsRequest>(),
+        })
+    ).query(async ({ input }) => {
+        return await legacyClient.catalogApi.updateItemModifierLists(input.body);
+    }
+    ),
+
+    //-- This endpoint is used to update item modifier lists in the catalog.
+    updateItemTaxes: publicProcedure.input(
+        z.object({
+            body: z.custom<UpdateItemTaxesRequest>(),
+        })
+    ).query(async ({ input }) => {
+        return await legacyClient.catalogApi.updateItemTaxes(input.body);
+    }),
+
 });
