@@ -17,7 +17,7 @@ export default function SquareConnectionTester() {
     error: itemsError,
   } = api.catalog.listCatalog.useQuery({ types: "ITEM" });
 
-  if (isLoadingCategories || isLoadingItems) return <p>🔄 Loading catalog...</p>;
+  if (isLoadingCategories || isLoadingItems) return <p> Loading catalog...</p>;
 
   if (categoriesError || itemsError)
     return (
@@ -29,7 +29,7 @@ export default function SquareConnectionTester() {
   return (
     <div className="space-y-10 p-6 bg-gray-50 min-h-screen">
       <section>
-        <h2 className="text-2xl font-bold mb-2">📂 Categories</h2>
+        <h2 className="text-2xl font-bold mb-2"> Categories</h2>
         <p>Found {categoriesData?.result?.objects?.length ?? 0} categories</p>
 
         <div className="grid gap-3 mt-3">
@@ -43,7 +43,7 @@ export default function SquareConnectionTester() {
       </section>
 
       <section>
-        <h2 className="text-2xl font-bold mb-2">🛒 Items</h2>
+        <h2 className="text-2xl font-bold mb-2">Items</h2>
         <p>Found {itemsData?.result?.objects?.length ?? 0} items</p>
 
         <div className="grid gap-3 mt-3">
