@@ -1,24 +1,32 @@
 "use server";
-
 import { SquareClient, SquareEnvironment } from "square";
 
-export async function createPaymentLink() {
+type PaymentRequest = {
+  token: string;
+  amount: number;  // in cents
+  buyerEmail?: string;
+};
+
+export async function createPayment({ token, amount, buyerEmail }: PaymentRequest) {
   const client = new SquareClient({
     token: process.env.SQUARE_SANDBOX_ACCESS_TOKEN!,
     environment: SquareEnvironment.Sandbox,
+    version: "2025-07-16",
   });
 
-  const { paymentLink } = await client.checkout.paymentLinks.create({
+  const response = await client.payments.create({
+    sourceId: token,
     idempotencyKey: crypto.randomUUID(),
-    quickPay: {
-      name: "Actual Shirt",
-      priceMoney: {
-        amount: BigInt("2999"), // $29.99
-        currency: "USD",
-      },
-      locationId: process.env.SQUARE_LOCATION_ID!,
+    amountMoney: {
+      amount: BigInt(amount),  // amount in cents
+      currency: "USD",
     },
+    autocomplete: true,
+    locationId: process.env.SQUARE_LOCATION_ID!,
+    buyerEmailAddress: buyerEmail,  // for receipt link generation
   });
 
-  return paymentLink?.url;
+  const payment = response.payment;
+
+  return payment;
 }
