@@ -1,7 +1,7 @@
 import { legacyClient } from "~/lib/square/client";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { z } from "zod";
-import { FileWrapper, type SearchCatalogItemsRequest, type BatchDeleteCatalogObjectsRequest, type BatchRetrieveCatalogObjectsRequest, type BatchUpsertCatalogObjectsRequest, type CreateCatalogImageRequest, type UpdateCatalogImageRequest, type UpdateItemModifierListsRequest, type UpdateItemTaxesRequest } from "square/legacy";
+import { object, z } from "zod";
+import { FileWrapper, type SearchCatalogObjectsRequest, type BatchDeleteCatalogObjectsRequest, type BatchRetrieveCatalogObjectsRequest, type BatchUpsertCatalogObjectsRequest, type CreateCatalogImageRequest, type UpdateCatalogImageRequest, type UpsertCatalogObjectRequest, type SearchCatalogItemsRequest, type UpdateItemModifierListsRequest, type UpdateItemTaxesRequest } from "square/legacy";
 
 export const catalogRouter = createTRPCRouter({
     batchDeleteCatalogObjects: publicProcedure.input(
@@ -62,6 +62,43 @@ export const catalogRouter = createTRPCRouter({
     }),
 
 
+    upsertCatalogObject: publicProcedure.input(
+        z.object({
+            body: z.custom<UpsertCatalogObjectRequest>(),
+            requestOptions: z.any().optional(),
+        })
+    ).mutation(async({input}) =>{
+        return await legacyClient.catalogApi.upsertCatalogObject(input.body, input.requestOptions);
+    }),
+
+    deleteCatalogObject: publicProcedure.input(
+        z.object({ objectId: z.string() })
+    ).mutation(async ({ input }) => {
+        return await legacyClient.catalogApi.deleteCatalogObject(input.objectId);
+    }),
+
+    RetrieveCatalogObject: publicProcedure.input(
+        z.object({
+            objectId: z.string(),   
+            includeRelatedObjects: z.boolean().optional(),
+            catalogVersion: z.bigint().optional(),
+            includeCaegoryPathToRoot: z.boolean().optional(),
+        })
+    ).query(async ({ input }) => {
+        return await legacyClient.catalogApi.retrieveCatalogObject(input.objectId, input.includeRelatedObjects, input.catalogVersion, input.includeCaegoryPathToRoot);
+    }),
+
+    searchCatalogObjects: publicProcedure.input(
+        z.object({
+            body: z.custom<SearchCatalogObjectsRequest>(),
+            requestOptions: z.any().optional(),
+        })
+    ).query(async ({ input }) => {
+        return await legacyClient.catalogApi.searchCatalogObjects(input.body, input.requestOptions);
+    }),
+
+
+
     //-- This endpoint is used to search for catalog items.
     searchCatalogItems: publicProcedure.input(
         z.object({
@@ -74,7 +111,7 @@ export const catalogRouter = createTRPCRouter({
     //-- This endpoint is used to update item modifier lists in the catalog.
     updateItemModifierLists: publicProcedure.input(
         z.object({
-            body: z.custom<UpdateItemModifierListsRequest>(),
+            body: z.custom<UpdateItemModifierListsRequest>(), 
         })
     ).query(async ({ input }) => {
         return await legacyClient.catalogApi.updateItemModifierLists(input.body);
@@ -84,10 +121,11 @@ export const catalogRouter = createTRPCRouter({
     //-- This endpoint is used to update item modifier lists in the catalog.
     updateItemTaxes: publicProcedure.input(
         z.object({
-            body: z.custom<UpdateItemTaxesRequest>(),
+            body: z.custom<UpdateItemTaxesRequest>(),   
         })
     ).query(async ({ input }) => {
         return await legacyClient.catalogApi.updateItemTaxes(input.body);
     }),
+ 
 
 });
