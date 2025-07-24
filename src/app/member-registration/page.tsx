@@ -164,10 +164,10 @@ export type NationalMemberSchema = z.infer<typeof nationalMemberSchema>;
 
 const resumeUploadSchema = z.object({
   resume: z.preprocess(
-    (val) => {
-      if (val instanceof FileList && val.length > 0) {
-        return val[0];
-      }
+    (val: File | FileList) => {
+      if ("name" in val && "size" in val && "type" in val) {
+        return val;
+      } else return undefined;
     },
     z
       .file()
