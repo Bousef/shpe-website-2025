@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { squareClient } from "~/lib/square/client";
 import { SortOrder } from "node_modules/square/api";
+import { randomUUID } from "crypto";
 
 export const ordersRouter = createTRPCRouter ({
 
@@ -44,6 +45,7 @@ export const ordersRouter = createTRPCRouter ({
                     totalMoney: order.totalMoney,
                     customerId: order.customerId,
                     state: order.state,
+                    taxes: order.taxes,
                     lineItems: order.lineItems,
                     tenders: order.tenders?.map((tender) => ({
                         type: tender.type,
@@ -65,12 +67,12 @@ export const ordersRouter = createTRPCRouter ({
             }
         }),
 
-    // create test order
+    // TESTING PURPOSES: create test order
     createTestOrder: publicProcedure
-        .mutation(async ({ input }) => {
-            
+        .mutation(async ({ input }) => {      
             try {
                 // create a test customer
+<<<<<<< HEAD
                 const customerRes = await squareClient.customers.create({
                     givenName: "test",
                     familyName: "user",
@@ -79,26 +81,55 @@ export const ordersRouter = createTRPCRouter ({
                     referenceId: "test-ref-id",
                     note: "this is a test customer",
                 });
+=======
+                // const customerRes = await squareClient.customers.create({
+                //     givenName: "test",
+                //     familyName: "user",
+                //     emailAddress: `testuser@example.com`,
+                //     phoneNumber: "386-334-8553",
+                //     referenceId: "test-ref-id",
+                //     note: "this is a test customer",
+                // });
+                // const customerId = customerRes.customer?.id;
+                // if (!customerId) throw new Error("Failed to create test customer");
+>>>>>>> 98da73d (receipts display updated + able create multiple test orders w taxes for same customer)
 
-                const customerId = customerRes.customer?.id;
-                if (!customerId) throw new Error("Failed to create test customer");
+                const customerId = "RT43CR60R77BQ1T0N46SYCW65M";
 
                 // create a test order
                 const orderRes = await squareClient.orders.create({
-                    idempotencyKey: "8193148c-9586-11e6-99f9-28cfe92138cf",
+                    idempotencyKey: randomUUID(), // ensures new order everytime
                     order: {
-                        referenceId: "my-order-001",
+                        referenceId: "my-order-002",
                         locationId: process.env.SQUARE_LOCATION_ID!,
                         customerId,
-                        lineItems: [
-                        {
-                            name: "Test Product",
-                            quantity: "1",
-                            basePriceMoney: {
-                                amount: BigInt("1500"), // $15.00
-                                currency: "USD",
+                        taxes: [
+                            {
+                                type: "ADDITIVE",
+                                percentage: "6.5",
+                                scope: "ORDER",
+                                name: "State Tax",
                             },
-                        },
+                        ],
+                        lineItems: [
+                            {
+                                name: "Test Product",
+                                quantity: "1",
+                                basePriceMoney: {
+                                    amount: BigInt("1500"), // $15.00
+                                    currency: "USD",
+                                },
+                            },
+                            {
+                                name: "Coffee",
+                                quantity: "2",
+                                basePriceMoney: { amount: BigInt(350), currency: "USD" },
+                            },
+                            {
+                                name: "Bagel",
+                                quantity: "1",
+                                basePriceMoney: { amount: BigInt(250), currency: "USD" },
+                            },                           
                         ],
                     },
                 });
