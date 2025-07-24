@@ -20,7 +20,6 @@ export const appRouter = createTRPCRouter({
   alumni: alumniRouter, 
   squareTest: squareTestRouter,
   square: squareRouter,
-  catalog: catalogRouter
 });
 
 // export type definition of API
