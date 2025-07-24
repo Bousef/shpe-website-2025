@@ -4,6 +4,9 @@ import { memberRouter } from "./routers/member";
 import { alumniRouter } from "./routers/alumni";
 import { squareTestRouter } from "./routers/squareTest";
 import { catalogRouter } from "./routers/catalogRouter";
+import { paymentsRouter } from "./routers/payments";
+import { customersRouter } from "./routers/customers";
+import { ordersRouter } from "./routers/orders";
 /**
  * This is the primary router for your server.
  *
@@ -12,15 +15,18 @@ import { catalogRouter } from "./routers/catalogRouter";
 
 const squareRouter = createTRPCRouter({
   catalog: catalogRouter,
+  payments: paymentsRouter,
+  customers: customersRouter,
+  orders: ordersRouter,
 });
 
 export const appRouter = createTRPCRouter({
   post: postRouter,
   member: memberRouter,
-  alumni: alumniRouter, 
+  alumni: alumniRouter,
   squareTest: squareTestRouter,
   square: squareRouter,
-  catalog: catalogRouter
+  catalog: catalogRouter,
 });
 
 // export type definition of API

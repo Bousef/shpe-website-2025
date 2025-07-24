@@ -13,6 +13,7 @@ import { useRef } from "react";
 import KnightConnectSection from "./KnightConnectSection";
 import NationalMemberFields from "./NationalMemberFields";
 import ResumeUploadFields from "./ResumeUploadFields";
+import PaymentSection from "./PaymentSection";
 
 function ucfEmailValidator() {
   return z
@@ -196,7 +197,10 @@ const resumeUploadSchema = z.object({
 });
 export type ResumeUploadSchema = z.infer<typeof resumeUploadSchema>;
 
-const { useStepper, steps, utils } = defineStepper(
+const paymentSchema = z.object({ paymentId: z.string("Payment is required") });
+export type PaymentSchema = z.infer<typeof paymentSchema>;
+
+const { useStepper } = defineStepper(
   { id: "general", title: "General", schema: generalSchema },
   { id: "demographic", title: "Demographic", schema: demographicSchema },
   { id: "education", title: "Education", schema: educationSchema },
@@ -211,6 +215,11 @@ const { useStepper, steps, utils } = defineStepper(
     id: "resume-upload",
     title: "Resume Upload",
     schema: resumeUploadSchema,
+  },
+  {
+    id: "payment",
+    title: "Payment",
+    schema: paymentSchema,
   },
 );
 
@@ -278,6 +287,7 @@ export default function MemberRegistrationPage() {
               "knight-connect": () => <KnightConnectSection />,
               "national-member": () => <NationalMemberFields />,
               "resume-upload": () => <ResumeUploadFields />,
+              payment: () => <PaymentSection />,
             })}
             <div className="float-right flex items-center gap-2">
               <button

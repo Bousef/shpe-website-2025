@@ -12,26 +12,28 @@ export const env = createEnv({
         : z.string().optional(),
     SUPABASE_ANON_KEY:
       process.env.NODE_ENV === "production"
-      ? z.string()
-      : z.string().optional(),
+        ? z.string()
+        : z.string().optional(),
     DATABASE_URL: z.string().url(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
+    SQUARE_LOCATION_ID: z.string(),
   },
-
   /**
    * Specify your client-side environment variables schema here.
    */
   client: {
     NEXT_PUBLIC_SUPABASE_URL:
       process.env.NODE_ENV === "production"
-      ? z.string()
-      : z.string().optional(),
+        ? z.string()
+        : z.string().optional(),
     NEXT_PUBLIC_SUPABASE_ANON_KEY:
       process.env.NODE_ENV === "production"
-      ? z.string()
-      : z.string().optional(),
+        ? z.string()
+        : z.string().optional(),
+    NEXT_PUBLIC_SQUARE_APPLICATION_ID: z.string(),
+    NEXT_PUBLIC_SHPE_MEMBERSHIP_ITEM_ID: z.string(),
   },
 
   /**
@@ -44,6 +46,11 @@ export const env = createEnv({
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
+    NEXT_PUBLIC_SQUARE_APPLICATION_ID:
+      process.env.NEXT_PUBLIC_SQUARE_APPLICATION_ID,
+    SQUARE_LOCATION_ID: process.env.SQUARE_LOCATION_ID,
+    NEXT_PUBLIC_SHPE_MEMBERSHIP_ITEM_ID:
+      process.env.NEXT_PUBLIC_SHPE_MEMBERSHIP_ITEM_ID,
   },
 
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
