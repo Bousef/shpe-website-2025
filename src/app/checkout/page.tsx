@@ -1,251 +1,227 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
-import React, { useState } from "react";
-import Image from "next/image";
-//  
-import { SquareClient } from "square";
+import Navbar from "../_components/NavBar";
+import { createPayment } from "./actions/actions";
+import {
+  CreditCard,
+  GooglePay,
+  Afterpay,
+  CashAppPay,
+  ApplePay,
+  Divider,
+  PaymentForm,
+} from "react-square-web-payments-sdk";
+import { useState } from "react";
+import { api } from "~/trpc/react";
 
+export default function CheckoutPage() {
+  const { data: member } = api.user.getCurrentMember.useQuery();
 
-type CheckoutItem = {
-  id: string;
-  name: string;
-  image: string;
-  price: number;
-  quantity: number;
-};
+  // CART
+  const utils = api.useUtils();
+  const { data: items = [], isLoading } = api.user.cart.getItems.useQuery();
 
-type Address = {
-  fullName: string;
-  email: string;
-  phone: string;
-  line1: string;
-  line2: string;
-  city: string;
-  state: string;
-  postal: string;
-  country: string;
-};
-
-export default function Checkout() {
-  /* ----------------------- cart ----------------------- */
-  const [items, setItems] = useState<CheckoutItem[]>([
-    {
-      id: "1",
-      name: "Supreme Tee",
-      image: "/placeholder.jpg",
-      price: 25,
-      quantity: 2,
-    },
-    {
-      id: "2",
-      name: "Bucket Hat",
-      image: "/placeholder.jpg",
-      price: 18,
-      quantity: 1,
-    },
-  ]);
-
-  const total = items.reduce((sum, it) => sum + it.price * it.quantity, 0);
-
-  const increment = (id: string) =>
-    setItems((prev) =>
-      prev.map((it) =>
-        it.id === id ? { ...it, quantity: it.quantity + 1 } : it,
-      ),
-    );
-
-  const decrement = (id: string) =>
-    setItems((prev) =>
-      prev.flatMap((it) =>
-        it.id === id
-          ? it.quantity > 1
-            ? [{ ...it, quantity: it.quantity - 1 }]
-            : []
-          : [it],
-      ),
-    );
-
-  /* -------------------- address form ------------------ */
-  const [addr, setAddr] = useState<Address>({
-    fullName: "",
-    email: "",
-    phone: "",
-    line1: "",
-    line2: "",
-    city: "",
-    state: "",
-    postal: "",
-    country: "",
+  const updateItemQuantity = api.user.cart.updateItemQuantity.useMutation({
+    onSuccess: () => utils.user.cart.getItems.invalidate(),
+  });
+  const removeItem = api.user.cart.removeItem.useMutation({
+    onSuccess: () => utils.user.cart.getItems.invalidate(),
   });
 
-  const handleAddr = (key: keyof Address) => (e: React.ChangeEvent<HTMLInputElement>) =>
-    setAddr({ ...addr, [key]: e.target.value });
+  // SQUARE ENV
+  const appId = process.env.NEXT_PUBLIC_SQUARE_SANDBOX_APPLICATION_ID ?? "";
+  const locationId = process.env.NEXT_PUBLIC_SQUARE_LOCATION_ID ?? "";
+  if (!appId || !locationId) throw new Error("Square IDs missing.");
 
-  /* -------------------- payment stub ------------------ */
-  const handlePayNow = () => {
-    const required = [
-      "fullName",
-      "email",
-      "line1",
-      "city",
-      "state",
-      "postal",
-      "country",
-    ] as (keyof Address)[];
-    const missing = required.filter((k) => !addr[k].trim());
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-    if (items.length === 0) {
-      alert("Your cart is empty.");
-    } else if (missing.length) {
-      alert("Please fill in all required address fields.");
-    } else {
-      alert(
-        `Pretend we charge the card here.\n\nOrder total: $${total.toFixed(
-          2,
-        )}\nShipping to: ${addr.fullName}, ${addr.line1}, ${addr.city}`,
-      );
-      // TODO: Send to real payment gateway / backend.
-      
-    }
+  // Totals
+  const subtotal = items.reduce((a, i) => a + i.price * i.quantity, 0);
+  const amountCents = Math.round(subtotal * 100);
+  const amountStr = (amountCents / 100).toFixed(2);
+
+  const createPaymentRequest = () => ({
+    countryCode: "US",
+    currencyCode: "USD",
+    total: { amount: amountStr, label: "Total" },
+    requestBillingContact: true,
+    requestShippingContact: false,
+  });
+
+  const billingContact = {
+    givenName: member?.first_name ?? "",
+    familyName: member?.last_name ?? "",
+    email: member?.email ?? "",
+    countryCode: "US",
   };
-  
+
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10 space-y-10">
-      <h1 className="text-3xl font-bold">Checkout</h1>
+    <div className="min-h-screen flex flex-col bg-gradient-brand">
+      <Navbar />
 
-      {/* ---------- Cart ---------- */}
-      {items.length === 0 ? (
-        <p className="text-gray-600">Your cart is empty.</p>
-      ) : (
-        <>
-          <section>
-            <h2 className="mb-4 text-xl font-semibold">Your items</h2>
-            <ul className="space-y-6">
-              {items.map((it) => (
-                <li key={it.id} className="flex items-center gap-4">
-                  <Image
-                    src={it.image}
-                    alt={it.name}
-                    width={80}
-                    height={80}
-                    className="rounded object-cover"
-                  />
-                  <div className="flex-1">
-                    <p className="font-medium">{it.name}</p>
-                    <p className="text-sm text-gray-500">
-                      ${it.price.toFixed(2)}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => decrement(it.id)}
-                      className="h-8 w-8 rounded border"
-                    >
-                      −
-                    </button>
-                    <span className="w-8 text-center">{it.quantity}</span>
-                    <button
-                      onClick={() => increment(it.id)}
-                      className="h-8 w-8 rounded border"
-                    >
-                      +
-                    </button>
-                  </div>
-                  <p className="w-16 text-right font-medium">
-                    ${(it.price * it.quantity).toFixed(2)}
-                  </p>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-6 flex justify-between text-lg font-semibold">
-              <span>Total</span>
-              <span>${total.toFixed(2)}</span>
-            </div>
-          </section>
-
-          {/* ---------- Address ---------- */}
-          <section>
-            <h2 className="mb-4 text-xl font-semibold">Shipping address</h2>
-            <div className="space-y-4">
-              {/* contact */}
-              <input
-                className="w-full rounded border px-3 py-2"
-                placeholder="Full name *"
-                value={addr.fullName}
-                onChange={handleAddr("fullName")}
-              />
-              <div className="flex gap-4">
-                <input
-                  className="flex-1 rounded border px-3 py-2"
-                  placeholder="Email *"
-                  type="email"
-                  value={addr.email}
-                  onChange={handleAddr("email")}
-                />
-                <input
-                  className="flex-1 rounded border px-3 py-2"
-                  placeholder="Phone"
-                  type="tel"
-                  value={addr.phone}
-                  onChange={handleAddr("phone")}
-                />
-              </div>
-
-              {/* address lines */}
-              <input
-                className="w-full rounded border px-3 py-2"
-                placeholder="Address line 1 *"
-                value={addr.line1}
-                onChange={handleAddr("line1")}
-              />
-              <input
-                className="w-full rounded border px-3 py-2"
-                placeholder="Address line 2"
-                value={addr.line2}
-                onChange={handleAddr("line2")}
-              />
-
-              {/* city / state / postal */}
-              <div className="flex gap-4">
-                <input
-                  className="flex-1 rounded border px-3 py-2"
-                  placeholder="City *"
-                  value={addr.city}
-                  onChange={handleAddr("city")}
-                />
-                <input
-                  className="flex-1 rounded border px-3 py-2"
-                  placeholder="State / Province *"
-                  value={addr.state}
-                  onChange={handleAddr("state")}
-                />
-                <input
-                  className="flex-1 rounded border px-3 py-2"
-                  placeholder="Postal code *"
-                  value={addr.postal}
-                  onChange={handleAddr("postal")}
-                />
-              </div>
-
-              {/* country */}
-              <input
-                className="w-full rounded border px-3 py-2"
-                placeholder="Country *"
-                value={addr.country}
-                onChange={handleAddr("country")}
-              />
-            </div>
-          </section>
-
-          {/* ---------- Pay ---------- */}
+      <main className="flex-grow w-full px-4 py-8 lg:px-12">
+        <div className="mx-auto max-w-6xl">
           <button
-            onClick={handlePayNow}
-            className="w-full rounded bg-blue-900 py-3 font-medium text-white hover:bg-blue-800"
+            onClick={() => history.back()}
+            className="mb-6 flex items-center text-sm text-white/80 hover:text-white"
           >
-            Pay now
+            ← Back
           </button>
-        </>
-      )}
+
+          <h1 className="mb-8 text-3xl font-semibold text-white">Checkout</h1>
+
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
+            {/* LEFT */}
+            <section className="space-y-8">
+              {/* Contact */}
+              <div className="rounded-xl bg-white/90 border border-white/20 backdrop-blur-sm p-6">
+                <h2 className="mb-4 text-lg font-medium text-gray-900">Contact</h2>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <input
+                    className="rounded-md border border-gray-300 px-3 py-2 text-sm"
+                    placeholder="Phone number"
+                    defaultValue=""
+                  />
+                  <input
+                    className="rounded-md border border-gray-300 px-3 py-2 text-sm sm:col-span-2"
+                    placeholder="Email address for receipt"
+                    defaultValue={member?.email ?? ""}
+                  />
+                  <input
+                    className="rounded-md border border-gray-300 px-3 py-2 text-sm"
+                    placeholder="First name"
+                    defaultValue={member?.first_name ?? ""}
+                  />
+                  <input
+                    className="rounded-md border border-gray-300 px-3 py-2 text-sm"
+                    placeholder="Last name"
+                    defaultValue={member?.last_name ?? ""}
+                  />
+                </div>
+                <p className="mt-3 text-xs text-gray-500">
+                  By providing your contact info, you may receive updates from Square.
+                </p>
+              </div>
+
+              {/* Payment */}
+              <div className="rounded-xl bg-white/90 border border-white/20 backdrop-blur-sm p-6">
+                <h2 className="mb-4 text-lg font-medium text-gray-900">Payment</h2>
+                <p className="mb-4 text-xs text-gray-500">
+                  All transactions are secure and encrypted.
+                </p>
+
+                {amountCents > 0 ? (
+                  <PaymentForm
+                    key={amountCents}
+                    applicationId={appId}
+                    locationId={locationId}
+                    createPaymentRequest={createPaymentRequest}
+                    createVerificationDetails={() => ({
+                      amount: amountStr,
+                      currencyCode: "USD",
+                      intent: "CHARGE",
+                      billingContact,
+                    })}
+                    cardTokenizeResponseReceived={async (token, buyer) => {
+                      setIsSubmitting(true);
+                      try {
+                        await createPayment({
+                          token: token.token!,
+                          amount: amountCents,
+                          buyerEmail: member?.email,
+                        });
+                        alert("Payment successful! Check your email for the receipt.");
+                      } catch (err) {
+                        console.error(err);
+                        alert("Payment failed. Please try again.");
+                      } finally {
+                        setIsSubmitting(false);
+                      }
+                    }}
+                  >
+                    <div className="space-y-5 mt-6">
+                      {/* Credit Card */}
+                      <section className="card-glass rounded-xl p-5">
+                        <h3 className="mb-3 text-sm font-semibold text-gray-800">Credit card</h3>
+                        <CreditCard
+                          buttonProps={{
+                            className:
+                              "btn-gradient-brand w-full rounded-full py-3 text-white font-semibold shadow-md hover:opacity-90 disabled:opacity-50",
+                          }}
+                        />
+                      </section>
+
+                      {/* Digital Wallets row */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <CashAppPay />
+                        <Afterpay buttonType="checkout_with_afterpay" />
+                      </div>
+                      <Divider />
+
+                      {/* Wallets row */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <GooglePay buttonType="long" buttonSizeMode="fill" />
+                        <ApplePay /> 
+                      </div>
+                    </div>
+                  </PaymentForm>
+
+                ) : (
+                  <p className="text-sm text-gray-500">Add items to your cart to pay.</p>
+                )}
+              </div>
+            </section>
+
+            {/* RIGHT: Summary */}
+            <aside className="space-y-6">
+              <div className="rounded-xl bg-white/90 border border-white/20 backdrop-blur-sm p-6">
+                <h2 className="mb-4 text-lg font-medium text-gray-900">Order summary ({items.length})</h2>
+
+                <div className="mt-4 space-y-3">
+                  {isLoading ? (
+                    <p className="text-sm text-gray-500">Loading…</p>
+                  ) : (
+                    items.map((item) => (
+                      <div key={item.id} className="flex items-start gap-4">
+                        <img
+                          src={item.image ?? ""}
+                          alt={item.name ?? ""}
+                          className="h-12 w-12 rounded object-contain bg-gray-100"
+                        />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-800">{item.name}</p>
+                          <p className="text-xs text-gray-500">Qty {item.quantity}</p>
+                        </div>
+                        <p className="text-sm font-medium text-gray-800">
+                          ${(item.price * item.quantity).toFixed(2)}
+                        </p>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                <div className="mt-4 space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Subtotal</span>
+                    <span>${amountStr}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Taxes</span>
+                    <span>$0.00</span>
+                  </div>
+                  <hr className="my-2 border-gray-200" />
+                  <div className="flex justify-between font-semibold text-gray-900">
+                    <span>Order total</span>
+                    <span>${amountStr}</span>
+                  </div>
+                </div>
+
+              </div>
+            </aside>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }

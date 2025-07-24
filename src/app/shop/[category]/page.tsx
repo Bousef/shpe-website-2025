@@ -1,106 +1,81 @@
-"use client";
+import type { CatalogObject, CatalogItem } from "node_modules/square/api";
+import { getCatalog } from "../actions/actions";
 
-import React, { useState, useEffect, type Usable, use } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import Navbar from "../../_components/NavBar";
-import { supabase } from "../../../supabase-client";
-import { type Product } from "../../_components/AddProductForm";
-
-interface CategoryParams {
-  category: string;
-}
-interface CategoryPageProps {
-  params: Usable<CategoryParams>;
+//
+// ---- tiny helpers -----------------------------------------------
+//
+function isCategory(
+  obj: CatalogObject
+): obj is CatalogObject & { categoryData: { name: string } } {
+  return obj.type === "CATEGORY";
 }
 
-export default function CategoryPage({ params }: CategoryPageProps) {
-  const { category } = use(params);
-  // Local state
-  const [products, setProducts] = useState<Product[]>([]);
-  const [errorMsg, setErrorMsg] = useState("");
+function isItem(
+  obj: CatalogObject
+): obj is CatalogObject & { itemData: CatalogItem } {
+  return obj.type === "ITEM";
+}
 
-  // Fetch products when `category` changes
-  useEffect(() => {
-    (async () => {
-      const { data, error } = await supabase
-        .from("shpe-website-2025_products")
-        .select("id, name, description, image, price, stock, category, status")
-        .eq("category", category)
-        .order("name", { ascending: true });
+//
+// ---- page component ---------------------------------------------
+//
+export default async function CategoryPage({
+  params,
+}: {
+  params: { category: string }; // e.g. /shop/shirt → "shirt"
+}) {
+  /* 0️⃣  await params once */
+  const { category } = await Promise.resolve(params);   // 👈 unwrap the Promise
+  const slug = category.toLowerCase();                  // reuse later
 
-      if (error) {
-        setErrorMsg(error.message);
-        return;
-      }
+  /* 1️⃣  fetch catalog */
+  const catalog = await getCatalog();
 
-      // Each `image` field is "url1;url2;…", so take only the first URL
-      setProducts(
-        (data ?? []).map(p => ({
-          ...p,
-          image: p.image.split(";")[0] || "",
-        }))
-      );
-    })();
-  }, [category]);
+  /* 2️⃣  find category that matches slug */
+  const matchedCategory = catalog.find(
+    (o): o is CatalogObject & { categoryData: { name: string } } =>
+      isCategory(o) &&
+      o.categoryData.name.toLowerCase().replace(/\s+/g, "-") === slug
+  );
 
-  return (
-    <div className="min-h-screen bg-white">
-      {/* Top nav */}
-      <Navbar />
 
-      {/* Header row: Back link, title, cart */}
-      <div className="flex items-center justify-between px-4 lg:px-48 mt-4">
-        <Link href="/shop" className="text-blue-600 hover:underline">
-          ← Back to categories
-        </Link>
-        <h1 className="text-5xl font-bold uppercase text-yellow-500">
-          {category}
-        </h1>
-        <Link
-          href="/cart"
-          className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-2 px-4 rounded"
-        >
-          🛒 View Cart
-        </Link>
+  if (!matchedCategory) {
+    return (
+      <div className="p-4">
+        <h1 className="text-2xl font-bold capitalize">{params.category}</h1>
+        <p className="text-red-600">Category not found.</p>
       </div>
+    );
+  }
 
-      {/* Error message */}
-      {errorMsg && (
-        <p className="mt-4 text-center text-red-600">{errorMsg}</p>
-      )}
+  /* 3️⃣  collect items whose itemData.categoryId matches */
+  const items = catalog
+    .filter(isItem)
+    .filter(
+      (item) => item.itemData?.categoryId === matchedCategory.id
+    );
 
-      {/* Product grid */}
-      <main className="px-4 py-10 lg:px-96">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
-          {products.map((p) => (
-            <Link
-              key={p.id}
-              href={`/shop/${encodeURIComponent(category)}/${p.id}`}
-              className="block"
-            >
-              {/* Thumbnail */}
-              <div className="relative mb-2 aspect-[3/4] bg-gray-200">
-                <Image
-                  src={p.image}
-                  alt={p.name}
-                  fill
-                  className="object-cover"
-                />
-              </div>
+  /* 4️⃣  render */
+  return (
+    <div className="p-4">
+      {/* show the category NAME */}
+      <h1 className="text-2xl font-semibold capitalize">
+        {matchedCategory.categoryData.name}
+      </h1>
 
-              {/* Product info */}
-              <p className="text-lg font-semibold text-blue-900">
-                {p.name}
-              </p>
-              <p className="text-blue-900">{p.description}</p>
-              <p className="text-xl text-blue-900">
-                ${p.price.toFixed(2)}
-              </p>
-            </Link>
+      {items.length ? (
+        <ul className="mt-4 space-y-2">
+          {items.map((item) => (
+            <li key={item.id} className="p-2 border rounded">
+              {item.itemData?.name}
+            </li>
           ))}
-        </div>
-      </main>
+        </ul>
+      ) : (
+        <p className="text-gray-500 mt-4">
+          No items found in this category.
+        </p>
+      )}
     </div>
   );
 }

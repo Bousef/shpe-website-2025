@@ -9,7 +9,15 @@
   }
 }
 
-
+  .bg-gradient-brand {
+    @apply bg-gradient-to-r from-[#006FCE] via-[#6CB3C8] to-[#E6451B];
+  }
+  .btn-gradient-brand {
+    @apply bg-gradient-to-r from-[#006FCE] to-[#E6451B];
+  }
+  .card-glass {
+    @apply bg-white/90 border border-white/20 backdrop-blur-sm;
+  }
 
 .hero-title {
   font-size: 233px;

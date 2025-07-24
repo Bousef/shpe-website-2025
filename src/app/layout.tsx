@@ -50,6 +50,10 @@ export default function RootLayout({
         - min-h-screen: at least viewport height 
         - flex flex-col: stack header/main/footer vertically 
       */}
+      <head>
+  <script src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
+</head>
+
       <body className="min-h-screen flex flex-col">
         <TRPCReactProvider>
           {/*
@@ -61,6 +65,7 @@ export default function RootLayout({
 
           {/* always rendered at the bottom */}
           <FooterSection />
+          
         </TRPCReactProvider>
       </body>
     </html>
