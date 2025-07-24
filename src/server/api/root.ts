@@ -1,15 +1,26 @@
 import { postRouter } from "~/server/api/routers/post";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
-import { memberRouter } from "~/trpc/member";
-
+import { memberRouter } from "./routers/member";
+import { alumniRouter } from "./routers/alumni";
+import { squareTestRouter } from "./routers/squareTest";
+import { catalogRouter } from "./routers/catalogRouter";
 /**
  * This is the primary router for your server.
  *
  * All routers added in /api/routers should be manually added here.
  */
+
+const squareRouter = createTRPCRouter({
+  catalog: catalogRouter,
+});
+
 export const appRouter = createTRPCRouter({
   post: postRouter,
-  member: memberRouter
+  member: memberRouter,
+  alumni: alumniRouter, 
+  squareTest: squareTestRouter,
+  square: squareRouter,
+  catalog: catalogRouter
 });
 
 // export type definition of API

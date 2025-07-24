@@ -43,8 +43,8 @@ export default function AboutSection() {
     <section id="about" className="w-full bg-white py-12">
       {/* Section Header */}
       <div className="text-center mb-12 px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold font-helvetica text-yellow-500">
-          LEARN MORE ABOUT SHPEUCF
+      <h2 className="text-3xl sm:text-4xl lg:text-5xl font-helvetica text-blue-800">
+        ABOUT US
         </h2>
         <p className="mt-4 text-base sm:text-lg lg:text-xl text-[#001f5b] mx-auto font-helvetica ">
           WE BRING YOU THE BEST PROFESSIONAL DEVELOPMENT, ENGINEERING, AND SOCIAL EXPERIENCES WITH A HISPANIC TWIST.
@@ -52,8 +52,8 @@ export default function AboutSection() {
       </div>
 
       {/* Responsive Grid of Cards */}
-      <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-6 gap-10 px-8 sm:px-10 lg:px-30">
-        {aboutCards.map(({ img, title, text, bgColor }) => (
+      <div className="mx-auto max-w-6xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-6 px-4 sm:px-">
+      {aboutCards.map(({ img, title, text, bgColor }) => (
           <div
             key={title}
             className={`
@@ -61,7 +61,7 @@ export default function AboutSection() {
               flex flex-col items-center
               p-6 sm:p-8 lg:p-10
               text-white
-              min-h-[30rem] sm:min-h-[35rem] lg:min-h-[40rem]
+              min-h-[20rem] sm:min-h-[22rem] lg:min-h-[25rem]
               shadow-lg
               transition-transform hover:scale-105
             `}
@@ -79,7 +79,7 @@ export default function AboutSection() {
   {title}
 </h3>
 
-<p className="text-lg sm:text-xl md:text-2xl lg:text-3xl leading-snug text-center">
+<p className="text-sm sm:text-base md:text-lg lg:text-xl leading-snug text-center">
   {text}
 </p>
 

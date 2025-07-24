@@ -24,6 +24,13 @@ const events = [
     url: "https://shpe.org/shpexchange/",
     imgSrc: "/assets/yousefxd.jpeg",        // <-- replace with your actual image path
   },
+  {
+    title: "Hackathon",
+    text:
+      "36-hour event focusing on completing a prompt a company gives you ",
+    url: "https://shpe.org/shpexchange/",
+    imgSrc: "/assets/yousefxd.jpeg",        // <-- replace with your actual image path
+  },
 ];
 
 export default function EventsSection() {
@@ -34,7 +41,7 @@ export default function EventsSection() {
     >
       {/* Header */}
       <div className=" mx-auto text-center mb-12">
-        <h2 className="text-3xl lg:text-4xl 2xl:text-5xl font-semibold font-helvetica text-yellow-500">
+        <h2 className="text-3xl lg:text-4xl 2xl:text-5xl font-semibold font-helvetica text-blue-800">
           OUR MAIN EVENTS
         </h2>
         <p className="mt-4 text-base lg:text-lg 2xl:text-xl text-[#001f5b] mx-auto font-helvetica">
@@ -61,8 +68,6 @@ export default function EventsSection() {
                 className="w-10/11 h-10/11 object-cover object-center  "
               />
             </div>
-
-
 
             <div className="px-4 py-3">
               <h3 className="text-center text-slate-800 font-bold text-xl 2xl:text-2xl">
