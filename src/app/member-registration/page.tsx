@@ -163,37 +163,28 @@ const nationalMemberSchema = z.object({
 export type NationalMemberSchema = z.infer<typeof nationalMemberSchema>;
 
 const resumeUploadSchema = z.object({
-  resume: z
-    .instanceof(File)
-    .check((ctx) => {
-      const file = ctx.value;
-      if (!file) {
-        return;
+  resume: z.preprocess(
+    (val) => {
+      if (val instanceof FileList && val.length > 0) {
+        return val[0];
       }
-      const namePattern = /^[a-zA-Z]+_[a-zA-Z]+_Resume\.(pdf|doc|docx)$/;
-      if (!namePattern.test(file.name)) {
-        ctx.issues.push({
-          code: "custom",
-          input: file,
-          message:
-            "File name must be in the format LastName_FirstName_Resume and have a valid extension (pdf, doc, docx)",
-        });
-      }
-      if (
-        ![
-          "application/pdf",
-          "application/msword",
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        ].includes(file.type)
-      ) {
-        ctx.issues.push({
-          code: "custom",
-          input: file,
-          message: "File must be a PDF, DOC, or DOCX",
-        });
-      }
-    })
-    .optional(),
+    },
+    z
+      .file()
+      .mime([
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      ])
+      .optional()
+      .refine((file) => {
+        if (!file) {
+          return true;
+        }
+        const namePattern = /^[a-zA-Z]+_[a-zA-Z]+_Resume\.(pdf|doc|docx)$/;
+        return namePattern.test(file.name);
+      }, "Resume must be named in the format 'FirstName_LastName_Resume.pdf'"),
+  ),
 });
 export type ResumeUploadSchema = z.infer<typeof resumeUploadSchema>;
 
