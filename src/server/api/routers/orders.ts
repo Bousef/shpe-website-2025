@@ -118,7 +118,12 @@ export const ordersRouter = createTRPCRouter ({
                                 name: "Bagel",
                                 quantity: "1",
                                 basePriceMoney: { amount: BigInt(250), currency: "USD" },
-                            },                           
+                            },
+                            {
+                                name: "T-Shirt",
+                                quantity: "2",
+                                basePriceMoney: { amount: BigInt(2500), currency: "USD" },
+                            },                         
                         ],
                     },
                 });

@@ -74,6 +74,7 @@ import { useEffect, useState } from "react";
 export default function ProfileCard() {
 	const id = "fc3b4491-e919-406b-b29e-39c302cdb178";
 
+	const [showResume, setShowResume] = useState(false);
 	const [createdData, setCreatedData] = useState<{
 		customerId: string;
 		orderId: string;
@@ -177,7 +178,13 @@ export default function ProfileCard() {
 								<div className="flex">
 									<dt className="w-24 font-semibold">Phone:</dt>
 									<dd>HARDCODED ATM: 123-456-7890</dd>
-								</div>		
+								</div>
+								<button
+									onClick={() => setShowResume(true)}
+									className="mt-5 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+								>
+									View Resume
+								</button>
 							</dl>
 						</div>
 						{/* BECOME A MEMBER */}
@@ -205,76 +212,101 @@ export default function ProfileCard() {
 					</div>
 				</section>
 
+				{showResume && (
+					<div className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm flex items-center justify-center">
+						<div className="bg-white w-11/12 max-w-6xl rounded-lg shadow-lg overflow-hidden">
+							<div className="flex justify-between items-center p-4 border-b">
+								<h3 className="text-xl font-semibold">Resume</h3>
+								<button
+								onClick={() => setShowResume(false)}
+								className="text-gray-500 hover:text-gray-700"
+								>
+								✕
+								</button>
+							</div>
+							<div className="p-4 h-[70vh]">
+								<iframe
+								src={profile.resume ?? undefined}
+								className="w-full h-full"
+								title="Resume PDF"
+								/>
+							</div>
+						</div>
+					</div>
+				)}
+
 				{/* ORDER RECEIPTS */}
 				<section className="w-1/2 flex flex-col items-stretch p-6 bg-[var(--shpe-light-blue)] h-full shadow-sm">
 					<div className="p-6 bg-[#b3cad6]">
 						<h2 className="text-2xl font-bold mb-4 font-helios tracking-[0.1em]">ORDER RECEIPTS</h2>
-						{orders && orders.length > 0 ? (
-							<ul className="space-y-3 text-sm">
-								{orders.map((order, i) => (
-									<li key={i} className="bg-white rounded shadow p-4 text-black">
-										<p><strong>Order ID:</strong> {order.id}</p>
-										{order.createdAt && <p><strong>Date:</strong> {new Date(order.createdAt).toLocaleDateString()}</p>}
+						<div className="max-h-[400px] overflow-y-auto pr-2 space-y-3 text-sm">
+							{orders && orders.length > 0 ? (
+								<ul className="space-y-3 text-sm">
+									{orders.map((order, i) => (
+										<li key={i} className="bg-white rounded shadow p-4 text-black">
+											<p><strong>Order ID:</strong> {order.id}</p>
+											{order.createdAt && <p><strong>Date:</strong> {new Date(order.createdAt).toLocaleDateString()}</p>}
 
-										{Array.isArray(order.lineItems) && order.lineItems?.length > 0 && (
-											<div className='mt-2'>
-												<p className='font-semibold'>Items:</p>
-												<ul className='pl-4 space-y-1 text-sm'>
-													{order.lineItems?.map((item, idx) => (
-														<li key={idx} className='flex justify-between'>
-															<div>
-																<p>{item.name}</p>
-																<p className='text-gray-500 text-xs'>
-																	{item.quantity} x ${(Number(item.basePriceMoney?.amount ?? 0) / 100).toFixed(2)}
-																</p>
-															</div>
-															<p>${(Number(item.totalMoney?.amount ?? 0) / 100).toFixed(2)}</p>
-														</li>
-													))}
-												</ul>
-											</div>
-										)}
-										
-										{order.taxes?.length ? (
-											<div className="mb-2">
-												<p className="text-gray-700 font-semibold">Taxes:</p>
-												<ul className="text-sm text-gray-600">
-													{order.taxes.map((tax, idx) => (
-														<li key={idx}>
-															{tax.name ?? "Tax"}: {tax.percentage ?? "N/A"}%
-														</li>
-													))}
-												</ul>
-												<p className="mt-1 text-sm">
-													<strong>Total Taxes Applied:</strong> ${((order.taxes ?? []).reduce((sum, tax) => sum + Number(tax.appliedMoney?.amount ?? 0), 0) / 100).toFixed(2)}
+											{Array.isArray(order.lineItems) && order.lineItems?.length > 0 && (
+												<div className="mt-2">
+													<p className="font-semibold">Items:</p>
+													<ul className="pl-4 space-y-1 text-sm">
+														{order.lineItems?.map((item, idx) => (
+															<li key={idx} className="flex justify-between">
+																<div>
+																	<p>{item.name}</p>
+																	<p className="text-gray-500 text-xs">
+																		{item.quantity} x ${(Number(item.basePriceMoney?.amount ?? 0) / 100).toFixed(2)}
+																	</p>
+																</div>
+																<p>${(Number(item.totalMoney?.amount ?? 0) / 100).toFixed(2)}</p>
+															</li>
+														))}
+													</ul>
+												</div>
+											)}
+											
+											{order.taxes?.length ? (
+												<div className="mb-2">
+													<p className="text-gray-700 font-semibold">Taxes:</p>
+													<ul className="text-sm text-gray-600">
+														{order.taxes.map((tax, idx) => (
+															<li key={idx}>
+																{tax.name ?? "Tax"}: {tax.percentage ?? "N/A"}%
+															</li>
+														))}
+													</ul>
+													<p className="mt-1 text-sm">
+														<strong>Total Taxes Applied:</strong> ${((order.taxes ?? []).reduce((sum, tax) => sum + Number(tax.appliedMoney?.amount ?? 0), 0) / 100).toFixed(2)}
+													</p>
+												</div>
+											) : null}
+
+											<div className="mb-2">											
+												<p className="text-sm">
+													<strong>Total:</strong> ${(Number(order.totalMoney?.amount ?? 0) / 100).toFixed(2)}
 												</p>
 											</div>
-										) : null}
 
-										<div className="mb-2">											
-											<p className="text-sm">
-												<strong>Total:</strong> ${(Number(order.totalMoney?.amount ?? 0) / 100).toFixed(2)}
-											</p>
-										</div>
-
-										{order.tenders.length > 0 && ( 										
-											<div className="mt-2 text-sm">
-												<strong>Method(s):</strong>
-												<ul>
-													{order.tenders.map((tender, index) => (
-														<li key={index}>
-															{tender.type} - Payment ID: {tender.paymentId ?? "N/A"}
-														</li>
-													))}
-												</ul>
-											</div>
-										)}
-									</li>
-								))}
-							</ul>
-						) : (
-							<p>No payment orders found for this member.</p>
-						)}
+											{order.tenders.length > 0 && ( 										
+												<div className="mt-2 text-sm">
+													<strong>Method(s):</strong>
+													<ul>
+														{order.tenders.map((tender, index) => (
+															<li key={index}>
+																{tender.type} - Payment ID: {tender.paymentId ?? "N/A"}
+															</li>
+														))}
+													</ul>
+												</div>
+											)}
+										</li>
+									))}
+								</ul>
+							) : (
+								<p>No payment orders found for this member.</p>
+							)}
+						</div>
 					</div>
 					<div className="mb-4">
 						<button
