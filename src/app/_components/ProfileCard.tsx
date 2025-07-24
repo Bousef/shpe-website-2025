@@ -111,7 +111,6 @@ export default function ProfileCard() {
 		},
 	});
 
-
 	// fetch orders
 	const {
 		data: ordersData,
@@ -123,7 +122,6 @@ export default function ProfileCard() {
 		{ enabled: !!profile?.square_customer_id, } // avoids calling with undefined
 	); 
 	
-
 	const orders = ordersData && !Array.isArray(ordersData) && 'orders' in ordersData
 		? ordersData.orders
 		: [];
@@ -217,12 +215,53 @@ export default function ProfileCard() {
 									<li key={i} className="bg-white rounded shadow p-4 text-black">
 										<p><strong>Order ID:</strong> {order.id}</p>
 										{order.createdAt && <p><strong>Date:</strong> {new Date(order.createdAt).toLocaleDateString()}</p>}
-										{order.totalMoney && <p><strong>Amount:</strong> ${((Number(order.totalMoney?.amount ?? 0)) / 100).toFixed(2)}</p>}
+
+										{Array.isArray(order.lineItems) && order.lineItems?.length > 0 && (
+											<div className='mt-2'>
+												<p className='font-semibold'>Items:</p>
+												<ul className='pl-4 space-y-1 text-sm'>
+													{order.lineItems?.map((item, idx) => (
+														<li key={idx} className='flex justify-between'>
+															<div>
+																<p>{item.name}</p>
+																<p className='text-gray-500 text-xs'>
+																	{item.quantity} x ${(Number(item.basePriceMoney?.amount ?? 0) / 100).toFixed(2)}
+																</p>
+															</div>
+															<p>${(Number(item.totalMoney?.amount ?? 0) / 100).toFixed(2)}</p>
+														</li>
+													))}
+												</ul>
+											</div>
+										)}
+										
+										{order.taxes?.length ? (
+											<div className="mb-2">
+												<p className="text-gray-700 font-semibold">Taxes:</p>
+												<ul className="text-sm text-gray-600">
+													{order.taxes.map((tax, idx) => (
+														<li key={idx}>
+															{tax.name ?? "Tax"}: {tax.percentage ?? "N/A"}%
+														</li>
+													))}
+												</ul>
+												<p className="mt-1 text-sm">
+													<strong>Total Taxes Applied:</strong> ${((order.taxes ?? []).reduce((sum, tax) => sum + Number(tax.appliedMoney?.amount ?? 0), 0) / 100).toFixed(2)}
+												</p>
+											</div>
+										) : null}
+
+										<div className="mb-2">											
+											<p className="text-sm">
+												<strong>Total:</strong> ${(Number(order.totalMoney?.amount ?? 0) / 100).toFixed(2)}
+											</p>
+										</div>
+
 										{order.tenders.length > 0 && ( 										
-											<div>
+											<div className="mt-2 text-sm">
 												<strong>Method(s):</strong>
 												<ul>
-												{order.tenders.map((tender, index) => (
+													{order.tenders.map((tender, index) => (
 														<li key={index}>
 															{tender.type} - Payment ID: {tender.paymentId ?? "N/A"}
 														</li>
