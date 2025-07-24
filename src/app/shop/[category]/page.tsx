@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState, useEffect, use, type Usable } from "react";
+import React, { useState, useEffect, type Usable, use } from "react";
 import Link from "next/link";
-import Navbar from "../../_components/NavBar";
-import AddProductForm, { type Product } from "../../_components/AddProductForm";
-import { supabase } from "../../../supabase-client";
 import Image from "next/image";
+import Navbar from "../../_components/NavBar";
+import { supabase } from "../../../supabase-client";
+import { type Product } from "../../_components/AddProductForm";
 
 interface CategoryParams {
   category: string;
@@ -16,15 +16,16 @@ interface CategoryPageProps {
 
 export default function CategoryPage({ params }: CategoryPageProps) {
   const { category } = use(params);
+  // Local state
   const [products, setProducts] = useState<Product[]>([]);
-  const [errorMsg, setErrorMsg] = useState<string>("");
-  const [showForm, setShowForm] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
+  // Fetch products when `category` changes
   useEffect(() => {
-    async function loadProducts() {
+    (async () => {
       const { data, error } = await supabase
         .from("shpe-website-2025_products")
-        .select("id, name, description, image, price, stock, category")
+        .select("id, name, description, image, price, stock, category, status")
         .eq("category", category)
         .order("name", { ascending: true });
 
@@ -33,73 +34,69 @@ export default function CategoryPage({ params }: CategoryPageProps) {
         return;
       }
 
-      // map each product.image (semicolon-list) → public URL
-      const withUrls = (data ?? []).map((p) => {
-        const firstFile = p.image.split(";")[0] ?? "";
-        const { data: urlData } = supabase
-          .storage
-          .from("product-images")
-          .getPublicUrl(firstFile);
-        return { ...p, image: urlData.publicUrl };
-      });
-
-      setProducts(withUrls);
-    }
-
-    loadProducts();
+      // Each `image` field is "url1;url2;…", so take only the first URL
+      setProducts(
+        (data ?? []).map(p => ({
+          ...p,
+          image: p.image.split(";")[0] || "",
+        }))
+      );
+    })();
   }, [category]);
-
-  const handleAdd = (newProd: Product) => {
-    // convert its image too
-    const firstFile = newProd.image.split(";")[0] ?? "";
-    const { data: urlData } = supabase
-      .storage
-      .from("product-images")
-      .getPublicUrl(firstFile);
-
-    setProducts((prev) => [{ ...newProd, image: urlData.publicUrl }, ...prev]);
-    setShowForm(false);
-  };
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Top nav */}
       <Navbar />
 
+      {/* Header row: Back link, title, cart */}
+      <div className="flex items-center justify-between px-4 lg:px-48 mt-4">
+        <Link href="/shop" className="text-blue-600 hover:underline">
+          ← Back to categories
+        </Link>
+        <h1 className="text-5xl font-bold uppercase text-yellow-500">
+          {category}
+        </h1>
+        <Link
+          href="/cart"
+          className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-2 px-4 rounded"
+        >
+          🛒 View Cart
+        </Link>
+      </div>
+
+      {/* Error message */}
+      {errorMsg && (
+        <p className="mt-4 text-center text-red-600">{errorMsg}</p>
+      )}
+
+      {/* Product grid */}
       <main className="px-4 py-10 lg:px-96">
-        <div className="mb-8 flex flex-col items-center justify-between lg:flex-row lg:mb-20">
-          <Link href="/shop" className="text-blue-600 hover:text-blue-800">
-            ← Back to categories
-          </Link>
-          <h1 className="text-5xl font-medium text-yellow-500 uppercase lg:text-6xl">
-            {decodeURIComponent(category ?? "")}
-          </h1>
-          <div className="ml-4">
-            <AddProductForm onAdd={handleAdd} />
-          </div>
-        </div>
-
-        {errorMsg && <p className="mb-4 text-red-600">{errorMsg}</p>}
-
-        <div className="grid grid-cols-1 gap-16 sm:grid-cols-2 lg:grid-cols-3 lg:gap-32">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
           {products.map((p) => (
             <Link
               key={p.id}
               href={`/shop/${encodeURIComponent(category)}/${p.id}`}
-              className="block overflow-hidden"
+              className="block"
             >
-              <div className="relative mb-2 aspect-[3/4] bg-[#d9d9d9]">
+              {/* Thumbnail */}
+              <div className="relative mb-2 aspect-[3/4] bg-gray-200">
                 <Image
                   src={p.image}
                   alt={p.name}
                   fill
-                  className="object-fill"
+                  className="object-cover"
                 />
               </div>
-              <p className="mb-2 text-blue-900">{p.description}</p>
-              <p className="text-lg font-bold tracking-wider text-blue-900 uppercase">
+
+              {/* Product info */}
+              <p className="text-lg font-semibold text-blue-900">
                 {p.name}
               </p>
-              <p className="text-xl text-blue-900">${p.price.toFixed(2)}</p>
+              <p className="text-blue-900">{p.description}</p>
+              <p className="text-xl text-blue-900">
+                ${p.price.toFixed(2)}
+              </p>
             </Link>
           ))}
         </div>

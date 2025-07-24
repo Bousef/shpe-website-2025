@@ -19,6 +19,7 @@ export const memberRouter = createTRPCRouter({
   createMember: publicProcedure
   .input(
     z.object({
+      uuid: z.string().uuid(),
       ucf_id: z.number(),
       first_name: z.string(),
       last_name: z.string(),
@@ -59,12 +60,12 @@ export const memberRouter = createTRPCRouter({
 
   //get member
   getMember: publicProcedure
-  .input(z.object({ucf_id : z.number()}))
+  .input(z.object({uuid : z.string().uuid()}))
   .query(async ({input}) => {
     const member = await db
       .select()
       .from(members)
-      .where(eq(members.ucf_id, input.ucf_id));
+      .where(eq(members.uuid, input.uuid));
 
       if (member.length == 0){
         throw new Error("No member found!");
@@ -74,19 +75,19 @@ export const memberRouter = createTRPCRouter({
 
   //delete member - debugging
   deleteMember: publicProcedure
-  .input(z.object({id: z.number()}))
+  .input(z.object({uuid: z.string().uuid()}))
   .mutation(async ({input}) => {
     const delteMem = await db
       .select()
       .from(members)
-      .where(eq(members.id, input.id));
-    
+      .where(eq(members.uuid, input.uuid));
+
     if (delteMem.length == 0){
       throw new Error("No member with that Id");
     }
 
 
-    await db.delete(members).where(eq(members.id, input.id));
+    await db.delete(members).where(eq(members.uuid, input.uuid));
 
 
     return delteMem[0];

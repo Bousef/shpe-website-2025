@@ -2,8 +2,11 @@ import { postRouter } from "~/server/api/routers/post";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 import { memberRouter } from "./routers/member";
 import { alumniRouter } from "./routers/alumni";
-import { squareTestRouter } from "./routers/squareTest";
 import { catalogRouter } from "./routers/catalogRouter";
+import { userRouter } from "./routers/user";
+import { productRouter } from "./routers/product";
+import { clothingRouter } from "./routers/clothing";
+
 /**
  * This is the primary router for your server.
  *
@@ -18,8 +21,10 @@ export const appRouter = createTRPCRouter({
   post: postRouter,
   member: memberRouter,
   alumni: alumniRouter, 
-  squareTest: squareTestRouter,
   square: squareRouter,
+  user: userRouter,
+  product: productRouter,
+  clothing: clothingRouter,
 });
 
 // export type definition of API

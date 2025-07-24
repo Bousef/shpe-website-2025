@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { VscAccount } from "react-icons/vsc";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
+import { api } from "~/trpc/react";
+import router from "next/router";
 
 const navItems = [
   { href: "/board", label: "Board" },
@@ -16,6 +18,18 @@ const navItems = [
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Fetch current member; null if not signed in
+  const { data: member, isLoading } = api.user.getCurrentMember.useQuery();
+  const isLoggedIn = Boolean(member);
+  
+  // sign out and reload
+  const logout = api.user.logout.useMutation({
+    onSuccess: () => {
+      // after logging out, send them back to home or login
+      router.push("/");
+    },
+  });
 
   return (
   <nav className="w-full bg-gradient-to-t from-white to-[#afc1e3] p-4 sm:p-5 max-w-screen overlay-x-hidden">
@@ -63,9 +77,29 @@ export default function Navbar() {
           </Link>
         )
       )}
-      <Link href="/login">
-        <VscAccount className="text-3xl sm:text-4xl text-[#001f5b] cursor-pointer" />
-      </Link>
+ {/* account / login / logout */}
+          {!isLoading && (
+            isLoggedIn ? (
+              <div className="flex items-center space-x-4">
+                <Link href="/profile" title="Your Profile">
+                  <VscAccount className="text-3xl text-[#001f5b] cursor-pointer" />
+                </Link>
+                <button
+                   onClick={() => logout.mutate()}
+                  className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                >
+                  Log out
+                </button>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="px-3 py-1 text-[#001f5b] hover:text-[#001133] font-medium"
+              >
+                Log in
+              </Link>
+            )
+          )}
     </div>
   </div>
 
@@ -92,9 +126,29 @@ export default function Navbar() {
           </Link>
         )
       )}
-      <Link href="/login">
-        <VscAccount className="text-3xl text-[#001f5b] mt-2 cursor-pointer" />
-      </Link>
+           {!isLoading && (
+            isLoggedIn ? (
+              <div className="px-4 py-2 flex items-center space-x-4 bg-white/90 rounded-xl">
+                <Link href="/profile">
+                  <VscAccount className="text-2xl text-[#001f5b]" />
+                </Link>
+                <button
+                   onClick={() => logout.mutate()}
+                  className="text-red-600 font-medium"
+                >
+                  Log out
+                </button>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setMobileOpen(false)}
+                className="px-4 py-2 bg-white/90 rounded-xl"
+              >
+                Log in
+              </Link>
+            )
+          )}
     </div>
   )}
 </nav>

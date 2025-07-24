@@ -1,5 +1,5 @@
 {
-  "id": "4a07bef7-22d2-49cf-b102-469d96889582",
+  "id": "8944e812-41d3-47a6-8d26-f9e6e23618ac",
   "prevId": "4d59b358-9230-42a0-9518-6a45e8673995",
   "version": "7",
   "dialect": "postgresql",
@@ -72,8 +72,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.shpe-website-2025_members": {
-      "name": "shpe-website-2025_members",
+    "public.shpe-website-2025_cart": {
+      "name": "shpe-website-2025_cart",
       "schema": "",
       "columns": {
         "id": {
@@ -83,7 +83,7 @@
           "notNull": true,
           "identity": {
             "type": "byDefault",
-            "name": "shpe-website-2025_members_id_seq",
+            "name": "shpe-website-2025_cart_id_seq",
             "schema": "public",
             "increment": "1",
             "startWith": "1",
@@ -92,6 +92,94 @@
             "cache": "1",
             "cycle": false
           }
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "member_uuid": {
+          "name": "member_uuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "product_id": {
+          "name": "product_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "shpe-website-2025_cart_member_uuid_shpe-website-2025_members_uuid_fk": {
+          "name": "shpe-website-2025_cart_member_uuid_shpe-website-2025_members_uuid_fk",
+          "tableFrom": "shpe-website-2025_cart",
+          "tableTo": "shpe-website-2025_members",
+          "columnsFrom": [
+            "member_uuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "shpe-website-2025_cart_product_id_shpe-website-2025_products_id_fk": {
+          "name": "shpe-website-2025_cart_product_id_shpe-website-2025_products_id_fk",
+          "tableFrom": "shpe-website-2025_cart",
+          "tableTo": "shpe-website-2025_products",
+          "columnsFrom": [
+            "product_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "shpe-website-2025_cart_member_uuid_product_id_unique": {
+          "name": "shpe-website-2025_cart_member_uuid_product_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "member_uuid",
+            "product_id"
+          ]
+        },
+        "cart_member_product_unique": {
+          "name": "cart_member_product_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "member_uuid",
+            "created_at"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.shpe-website-2025_members": {
+      "name": "shpe-website-2025_members",
+      "schema": "",
+      "columns": {
+        "uuid": {
+          "name": "uuid",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
         },
         "ucf_id": {
           "name": "ucf_id",
@@ -217,7 +305,7 @@
           "name": "price",
           "type": "real",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "stock": {
           "name": "stock",
