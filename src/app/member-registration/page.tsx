@@ -22,6 +22,8 @@ function ucfEmailValidator() {
     });
 }
 
+const phoneRegex = new RegExp(/^\+[1-9]\d{1,14}$/);
+
 const generalSchema = z
   .object({
     memberStatus: z.enum(["new", "returning"]),
@@ -29,7 +31,7 @@ const generalSchema = z
     lastName: z.string().min(1, "Last name is required"),
     email: ucfEmailValidator(),
     confirmEmail: ucfEmailValidator(),
-    phoneNumber: z.string().min(10, "Phone number is required"),
+    phoneNumber: z.string().regex(phoneRegex, "Invalid phone number"),
     dateOfBirth: z.preprocess(
       (val) => {
         if (typeof val === "string") {
@@ -218,6 +220,9 @@ export default function MemberRegistrationPage() {
   const form = useForm({
     mode: "onTouched",
     resolver: zodResolver(stepper.current.schema),
+    defaultValues: {
+      phoneNumber: "",
+    },
   });
 
   return (

@@ -1,16 +1,23 @@
 "use client";
 
-import { useFormContext } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 import Input from "../_components/Input";
 import { type GeneralSchema } from "./page";
 import FieldError from "./FieldError";
 import ToggleButton from "./ToggleButton";
+import { usePhoneInput } from "react-international-phone";
 
 export default function GeneralFields() {
   const {
     register,
     formState: { errors },
+    control,
+    setValue,
   } = useFormContext<GeneralSchema>();
+  const { inputRef, inputValue, handlePhoneValueChange } = usePhoneInput({
+    defaultCountry: "us",
+    onChange: ({ phone: phoneNumber }) => setValue("phoneNumber", phoneNumber),
+  });
 
   return (
     <>
@@ -89,10 +96,24 @@ export default function GeneralFields() {
           What is your phone number?
         </p>
         <div className="mt-2 max-w-1/2">
-          <Input
-            type="tel"
-            {...register("phoneNumber", { required: true })}
-            placeholder="(123)-456-7890"
+          <Controller
+            name="phoneNumber"
+            control={control}
+            render={({
+              field: {
+                value: _value,
+                onChange: _onChange,
+                ref: _ref,
+                ...field
+              },
+            }) => (
+              <Input
+                ref={inputRef}
+                value={inputValue}
+                onChange={handlePhoneValueChange}
+                {...field}
+              />
+            )}
           />
           <FieldError error={errors.phoneNumber} />
         </div>
