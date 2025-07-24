@@ -3,6 +3,7 @@ import WeeklyEvents    from "./_components/WeeklyEvents";
 import Slideshow    from "./_components/MeetFam";
 import AboutSection    from "./_components/AboutSection";
 import HeroSection    from "./_components/HeroSection";
+import SquareConnectionTest from "./_components/SquareConnectionTester";
 
 export const metadata = {
   title: "SHPE UCF",
@@ -21,7 +22,8 @@ export default function HomePage() {
         <WeeklyEvents />
 
         <Slideshow />
-  
+        <SquareConnectionTest />
+        
       </div>
     </>
   );

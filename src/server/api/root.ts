@@ -2,6 +2,7 @@ import { postRouter } from "~/server/api/routers/post";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 import { memberRouter } from "./routers/member";
 import { alumniRouter } from "./routers/alumni";
+import { catalogRouter } from "./routers/catalogRouter";
 import { userRouter } from "./routers/user";
 import { productRouter } from "./routers/product";
 import { clothingRouter } from "./routers/clothing";
@@ -12,10 +13,15 @@ import { clothingRouter } from "./routers/clothing";
  * All routers added in /api/routers should be manually added here.
  */
 
+const squareRouter = createTRPCRouter({
+  catalog: catalogRouter,
+});
+
 export const appRouter = createTRPCRouter({
   post: postRouter,
   member: memberRouter,
-  alumni: alumniRouter,
+  alumni: alumniRouter, 
+  square: squareRouter,
   user: userRouter,
   product: productRouter,
   clothing: clothingRouter,
