@@ -12,6 +12,7 @@ import ExperienceFields from "./ExperienceFields";
 import { useRef } from "react";
 import KnightConnectSection from "./KnightConnectSection";
 import NationalMemberFields from "./NationalMemberFields";
+import ResumeUploadFields from "./ResumeUploadFields";
 
 function ucfEmailValidator() {
   return z
@@ -158,6 +159,41 @@ const nationalMemberSchema = z.object({
 });
 export type NationalMemberSchema = z.infer<typeof nationalMemberSchema>;
 
+const resumeUploadSchema = z.object({
+  resume: z
+    .instanceof(File)
+    .check((ctx) => {
+      const file = ctx.value;
+      if (!file) {
+        return;
+      }
+      const namePattern = /^[a-zA-Z]+_[a-zA-Z]+_Resume\.(pdf|doc|docx)$/;
+      if (!namePattern.test(file.name)) {
+        ctx.issues.push({
+          code: "custom",
+          input: file,
+          message:
+            "File name must be in the format LastName_FirstName_Resume and have a valid extension (pdf, doc, docx)",
+        });
+      }
+      if (
+        ![
+          "application/pdf",
+          "application/msword",
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ].includes(file.type)
+      ) {
+        ctx.issues.push({
+          code: "custom",
+          input: file,
+          message: "File must be a PDF, DOC, or DOCX",
+        });
+      }
+    })
+    .optional(),
+});
+export type ResumeUploadSchema = z.infer<typeof resumeUploadSchema>;
+
 const { useStepper, steps, utils } = defineStepper(
   { id: "general", title: "General", schema: generalSchema },
   { id: "demographic", title: "Demographic", schema: demographicSchema },
@@ -168,6 +204,11 @@ const { useStepper, steps, utils } = defineStepper(
     id: "national-member",
     title: "National Member",
     schema: nationalMemberSchema,
+  },
+  {
+    id: "resume-upload",
+    title: "Resume Upload",
+    schema: resumeUploadSchema,
   },
 );
 
@@ -231,6 +272,7 @@ export default function MemberRegistrationPage() {
               experience: () => <ExperienceFields />,
               "knight-connect": () => <KnightConnectSection />,
               "national-member": () => <NationalMemberFields />,
+              "resume-upload": () => <ResumeUploadFields />,
             })}
             <div className="float-right flex items-center gap-2">
               <button
