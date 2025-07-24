@@ -33,7 +33,7 @@ export default function InventoryManagement() {
                     <h1 className="text-3xl font-bold text-blue-900">Inventory Management</h1>
                     <button
                         onClick={() => setShowAdd(prev => !prev)}
-                        className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                        className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 cursor-pointer"
                     >
                         {showAdd ? (
                             <><XMarkIcon className="h-5 w-5" /> Cancel</>
