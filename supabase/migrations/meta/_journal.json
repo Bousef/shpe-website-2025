@@ -43,6 +43,13 @@
       "when": 1752775209598,
       "tag": "0005_married_blink",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1753213741059,
+      "tag": "0006_cheerful_starhawk",
+      "breakpoints": true
     }
   ]
 }

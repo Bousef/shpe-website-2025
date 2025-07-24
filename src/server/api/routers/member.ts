@@ -7,11 +7,12 @@ deleteMember [ID]
 
 */
 
-import { publicProcedure, createTRPCRouter } from "src/server/api/trpc";
+import { createTRPCRouter, publicProcedure } from "../trpc";
 import { db } from "src/server/db";
 import { members } from "src/server/db/schema";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
+import { squareClient } from "~/lib/square/client";
 
 export const memberRouter = createTRPCRouter({
 
@@ -37,12 +38,28 @@ export const memberRouter = createTRPCRouter({
       // We return null to tell the user that there the member already exists
       return null;
     }
+
+    // create square customer using the email and name
+    let squareCustomerId: string | null = null;
+    try {
+      const response = await squareClient.customers.create({
+        emailAddress: input.email,
+        givenName: input.first_name,
+        familyName: input.last_name,
+        referenceId: input.uuid,
+      });
+
+      squareCustomerId = response.customer?.id ?? null;
+    } catch (err) {
+      console.error("Error creating Square customer:", err); // feel free to throw or continue with null here
+    }
     
     //insert new member with the hashed password
     const [newMember] = await db
     .insert(members)
     .values({
       ...input,
+      square_customer_id: squareCustomerId ?? undefined,
     })
     .returning();
 

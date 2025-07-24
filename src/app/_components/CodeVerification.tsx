@@ -27,8 +27,6 @@ export default function CodeVerification() {
 		const access_token = params.get("access_token");
 		const refresh_token = params.get("refresh_token");
 
-		console.log("access:/n" + access_token + "/n/nrefresh/n" + refresh_token);
-
 		if (access_token && refresh_token) {
 			sessionStorage.setItem("access_token", access_token);
 			sessionStorage.setItem("refresh_token", refresh_token);
