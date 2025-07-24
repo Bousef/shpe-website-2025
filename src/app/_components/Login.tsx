@@ -19,7 +19,7 @@ export default function Login(){
 				<h2 className="text-5xl text-[var(--shpe-orange)]">LOG IN</h2>
 			</div>
 
-			<form className="w-full max-w-md space-y-1">
+			<form className="w-full max-w-md space-y-1" action={loginAction}>
 				<InputBox>
 				<InputField 
 					id="email"
@@ -63,7 +63,7 @@ export default function Login(){
 
 				{/* LOGIN / SIGNUP BUTTONS */}
 				<div className="mt-15 space-y-2 text-[var(--shpe-navy-blue)] font-bold">
-					<button formAction={loginAction} className="w-full p-2 bg-[var(--shpe-light-blue)] text-white hover:bg-[var(--shpe-blue)] cursor-pointer">
+					<button type='submit' className="w-full p-2 bg-[var(--shpe-light-blue)] text-white hover:bg-[var(--shpe-blue)] cursor-pointer">
 						LOG IN
 					</button>
 					<p className="text-center text-sm">
