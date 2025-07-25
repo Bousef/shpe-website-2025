@@ -47,7 +47,7 @@ export default async function CategoryPage({
       </div>
     );
   }
-
+  
   /* 3️⃣  collect items whose itemData.categoryId matches */
   const items = catalog
     .filter(isItem)
