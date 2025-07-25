@@ -34,10 +34,10 @@ export default function ProfileCard() {
 	})
 
 	const [showResume, setShowResume] = useState(false);
-	const [orderCursor, setOrderCursor] = useState<string | undefined>(undefined);
-	const hasCursor = (data: typeof ordersData): data is { orders: any[]; cursor: string | null } => {
-		return !!data && !Array.isArray(data) && 'cursor' in data;
-	};
+	const [cursorHistory, setCursorHistory] = useState<(string | undefined)[]>([undefined]); // for going back
+	const [cursorIndex, setCursorIndex] = useState(0);
+	const [page, setPage] = useState(1);
+	const orderCursor = cursorHistory[cursorIndex]; // for querying
 
 	// create orders
 	const [createdData, setCreatedData] = useState<{
@@ -80,6 +80,27 @@ export default function ProfileCard() {
 	const orders = ordersData && !Array.isArray(ordersData) && 'orders' in ordersData
 		? ordersData.orders
 		: [];
+
+	const hasNextPage = ordersData && !Array.isArray(ordersData) && ordersData.cursor;
+
+	const handleNextPage = () => {
+		if (hasNextPage) {
+			const newCursorStack = [
+				...cursorHistory.slice(0, cursorIndex + 1),
+				ordersData.cursor ?? undefined,
+			];			
+			setCursorHistory(newCursorStack);
+    		setCursorIndex(cursorIndex + 1);			
+			setPage((prev) => prev + 1);
+		}
+	};
+
+	const handlePrevPage = () => {
+		if (cursorIndex > 0) {
+			setCursorIndex(cursorIndex - 1);
+			setPage((prev) => prev - 1);
+		}
+	};
 	
 	if (!sessionChecked || isLoading) return <p>Loading profile…</p>
 	if (!profile) return <p>No profile found for this user.</p>;
@@ -261,6 +282,23 @@ export default function ProfileCard() {
 								<p>No payment orders found for this member.</p>
 							)}
 						</div>
+						<div className="flex justify-center gap-4 mt-4">
+							<button
+								onClick={handlePrevPage}
+								disabled={cursorIndex === 0}
+								className="px-4 py-2 bg-blue-600 text-white rounded disabled:bg-gray-400"
+							>
+								← Prev
+							</button>
+							<p className="text-sm mt-2 text-gray-700">Page {page}</p>
+							<button
+								onClick={handleNextPage}
+								disabled={!hasNextPage}
+								className="px-4 py-2 bg-blue-600 text-white rounded disabled:bg-gray-400"
+							>
+								Next →
+							</button>						
+						</div>
 					</div>
 					<div className="mb-4">
 						<button
@@ -276,16 +314,6 @@ export default function ProfileCard() {
 						>
 							{creatingTestOrder ? "Creating Test Order..." : "Create Test Customer + Order"}
 						</button>
-
-						{hasCursor(ordersData) && ordersData?.cursor && (
-							<button
-								onClick={() => setOrderCursor(ordersData.cursor ?? undefined)}
-								className="mt-4 px-3 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded"
-							>
-								Load More Orders
-							</button>
-						)}
-
 
 						{createdData && (
 							<div className="mt-2 text-sm text-black">
