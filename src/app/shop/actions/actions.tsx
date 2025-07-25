@@ -43,7 +43,7 @@ export async function getObjectURL(imageId: string) {
   const obj = result.object;
   if (obj?.type === "IMAGE")
     console.log("Image URL: " + obj.imageData?.url)
-  else 
+  else
     console.log("Not an IMAGE?")
 
   if (obj?.type === "IMAGE" && obj.imageData?.url) {
@@ -103,8 +103,8 @@ export async function insertItemWithImage(
   const itemData: any = {
     name: form.name,
     description: form.description,
-    categoryId: form.categoryId,     // ✅ camelCase for the SDK → becomes category_id on wire
-    variations,                       // built earlier
+    categoryId: form.categoryId,
+    variations,
   };
   /* ---------- 2. UPSERT THE ITEM ---------- */
   const upsertRes = await client.catalog.object.upsert({
@@ -112,8 +112,18 @@ export async function insertItemWithImage(
     object: {
       type: "ITEM",
       id: tempItemId,
-      itemData,
+      itemData: {
+        categories: [
+          {
+            id: form.categoryId,
+          },
+        ],
+        name: form.name,
+        description: form.description,
+        variations: variations,
+      }
     },
+
   });
 
   /* ---------- 3. GET THE REAL ITEM ID ---------- */
