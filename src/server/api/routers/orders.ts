@@ -33,7 +33,7 @@ export const ordersRouter = createTRPCRouter ({
                         },
                     },
                     cursor: input.cursor, // fetch next page if provided
-                    limit: 50,
+                    limit: 5,
                 });
                 
                 const orders =  response.orders ?? [];
@@ -69,32 +69,26 @@ export const ordersRouter = createTRPCRouter ({
 
     // TESTING PURPOSES: create test order
     createTestOrder: publicProcedure
+        .input(z.object({ 
+            customerId: z.string(),
+        }))
         .mutation(async ({ input }) => {      
             try {
                 // create a test customer
-<<<<<<< HEAD
-                const customerRes = await squareClient.customers.create({
-                    givenName: "test",
-                    familyName: "user",
-                    emailAddress: `testuser@example.com`,
-                    phoneNumber: "555-555-5555",
-                    referenceId: "test-ref-id",
-                    note: "this is a test customer",
-                });
-=======
                 // const customerRes = await squareClient.customers.create({
                 //     givenName: "test",
                 //     familyName: "user",
                 //     emailAddress: `testuser@example.com`,
-                //     phoneNumber: "386-334-8553",
+                //     phoneNumber: "555-555-5555",
                 //     referenceId: "test-ref-id",
                 //     note: "this is a test customer",
                 // });
                 // const customerId = customerRes.customer?.id;
                 // if (!customerId) throw new Error("Failed to create test customer");
->>>>>>> 98da73d (receipts display updated + able create multiple test orders w taxes for same customer)
 
-                const customerId = "RT43CR60R77BQ1T0N46SYCW65M";
+                if (!input.customerId) {
+                    throw new Error("Customer ID is required to create test order.");
+                }
 
                 // create a test order
                 const orderRes = await squareClient.orders.create({
@@ -102,7 +96,7 @@ export const ordersRouter = createTRPCRouter ({
                     order: {
                         referenceId: "my-order-002",
                         locationId: process.env.SQUARE_LOCATION_ID!,
-                        customerId,
+                        customerId: input.customerId,
                         taxes: [
                             {
                                 type: "ADDITIVE",
@@ -134,7 +128,7 @@ export const ordersRouter = createTRPCRouter ({
                                 name: "T-Shirt",
                                 quantity: "2",
                                 basePriceMoney: { amount: BigInt(2500), currency: "USD" },
-                            },                         
+                            },                           
                         ],
                     },
                 });
@@ -142,7 +136,7 @@ export const ordersRouter = createTRPCRouter ({
                 const order = orderRes.order;
 
                 return {
-                    customerId,
+                    customerId: order?.customerId,
                     orderId: order?.id,
                     createdAt: order?.createdAt,
                     totalMoney: order?.totalMoney,
@@ -153,5 +147,3 @@ export const ordersRouter = createTRPCRouter ({
             }
         }),
 });
-
-

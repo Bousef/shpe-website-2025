@@ -21,10 +21,8 @@ export default function ProfileCard() {
 	// )
 
 	useEffect(() => {
-
 		setSessionChecked(true);
-
-	}, [router])
+	}, [])
 
 	// call existing getMember endpoint
 	const {
@@ -36,6 +34,10 @@ export default function ProfileCard() {
 	})
 
 	const [showResume, setShowResume] = useState(false);
+	const [orderCursor, setOrderCursor] = useState<string | undefined>(undefined);
+	const hasCursor = (data: typeof ordersData): data is { orders: any[]; cursor: string | null } => {
+		return !!data && !Array.isArray(data) && 'cursor' in data;
+	};
 
 	// create orders
 	const [createdData, setCreatedData] = useState<{
@@ -46,7 +48,7 @@ export default function ProfileCard() {
 	const { mutate: createTestOrder, isPending: creatingTestOrder } = api.orders.createTestOrder.useMutation({
 		onSuccess: (data) => {
 			console.log("Test order created:", data);
-			if (data.orderId) {
+			if (data.customerId && data.orderId) {
 				setCreatedData({
 					customerId: data.customerId,
 					orderId: data.orderId,
@@ -71,7 +73,7 @@ export default function ProfileCard() {
 		error: ordersError,
 		refetch: refetchOrders,
 	} = api.orders.getOrdersForMember.useQuery(
-		{ customerId: profile?.square_customer_id ?? "" },
+		{ customerId: profile?.square_customer_id ?? "", cursor: orderCursor },
 		{ enabled: !!profile?.square_customer_id, } // avoids calling with undefined
 	); 
 	
@@ -103,7 +105,7 @@ export default function ProfileCard() {
 						<div className="text-center space-y-1">
 							{/* <p className="font-mono font-bold text-xl">{profile.uuid}</p> */}
 							<p className="text-xs">Member ID</p>
-							<p className="font-mono font-bold text-xl>">{profile.ucf_id}</p>
+							<p className="font-mono font-bold text-xl">{profile.ucf_id}</p>
 							<p className="text-xs">UCF ID</p>
 						</div>
 						<img src="/assets/round_logo.png" alt="SHPE UCF Logo" className="h-30 w-30 mt-2" />
@@ -262,12 +264,28 @@ export default function ProfileCard() {
 					</div>
 					<div className="mb-4">
 						<button
-							onClick={() => createTestOrder()}
-							disabled={creatingTestOrder}
+							onClick={() => {
+								if (!profile?.square_customer_id) {
+									console.error("Missing customer ID");
+									return;
+								}
+								createTestOrder({customerId: profile.square_customer_id})
+							}}
+							disabled={creatingTestOrder || !profile?.square_customer_id}
 							className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
 						>
 							{creatingTestOrder ? "Creating Test Order..." : "Create Test Customer + Order"}
 						</button>
+
+						{hasCursor(ordersData) && ordersData?.cursor && (
+							<button
+								onClick={() => setOrderCursor(ordersData.cursor ?? undefined)}
+								className="mt-4 px-3 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded"
+							>
+								Load More Orders
+							</button>
+						)}
+
 
 						{createdData && (
 							<div className="mt-2 text-sm text-black">
