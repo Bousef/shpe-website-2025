@@ -3,6 +3,7 @@
 import type { CatalogObject } from "node_modules/square/api";
 import { SquareClient, SquareEnvironment } from "square";
 
+
 export type FormCatalogObject = {
   name: string;
   description: string;
@@ -24,6 +25,14 @@ export async function getCatalog() {
 
     const result = await client.catalog.list({});
     return result.data; // <-- return the array of catalog objects
+}
+
+export async function getCatalogObject(id: string) {
+
+    const result = await client.catalog.object.get({
+        objectId: id,
+    });
+    return result;
 }
 
 export async function insertItemWithImage(
@@ -150,4 +159,8 @@ export async function insertCategoryWithImage(
   });
 
   return { id: realCategoryId };
+}
+
+function listCatalog(arg0: { includeRelatedObjects: boolean; }): { objects: any; } | PromiseLike<{ objects: any; }> {
+  throw new Error("Function not implemented.");
 }
