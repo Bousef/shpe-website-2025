@@ -21,34 +21,9 @@ export default function ProfileCard() {
 	// )
 
 	useEffect(() => {
-		const exchangeSession = async () => {
-			const url = new URL(window.location.href);
-			const code = url.searchParams.get("code");
-			const error = url.searchParams.get("error");
 
-			if (error) {
-				console.error("Login error:", url.searchParams.get("error_description"));
-				return;
-			}
+		setSessionChecked(true);
 
-			if (code) {
-				console.log("code form url: ", code);
-				const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-
-				if (error) {
-					console.error("Failed to exchange session:", error.message);
-				} else {
-					console.log("Session restored:", data.session);
-					const currentSession = await supabase.auth.getSession();
-				console.log("Current session:", currentSession.data.session);
-					router.replace("/profile"); // Clean URL
-				}
-			}
-
-			setSessionChecked(true);
-		}
-
-		exchangeSession();
 	}, [router])
 
 	// call existing getMember endpoint
