@@ -33,7 +33,7 @@ type CreateCatalogObjectFormProps = {
 };
 
 export default function CreateCatalogObjectForm({
-    onSave,                           // ➋ receive it
+    onSave,
 }: CreateCatalogObjectFormProps) {
 
     /* -------------- initial state ------------------ */
@@ -64,9 +64,33 @@ export default function CreateCatalogObjectForm({
         })();
     }, []);
 
+    /* -------------- validation --------------------- */
+    const validateForm = (): string | null => {
+        if (!file) return "Please choose an image.";
+        if (form.mode === "CATEGORY") {
+            if (!form.name.trim()) return "Category name is required.";
+        } else {
+            if (!form.name.trim()) return "Item name is required.";
+            if (!form.description.trim()) return "Description is required.";
+            if (!form.variationPrice.trim() || isNaN(Number(form.variationPrice))) {
+                return "A valid variation price is required.";
+            }
+            if (!form.categoryId) return "Please select a category.";
+            if (form.categoryId === clothesId) {
+                // ensure sizes are non-negative
+                for (const [sz, qty] of Object.entries(sizes)) {
+                    if (qty < 0) return `Stock for ${sz} cannot be negative.`;
+                }
+            }
+        }
+        return null;
+    };
+
     /* -------------- helpers ------------------------ */
     const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+        e: React.ChangeEvent<
+            HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+        >
     ) => {
         const { name, value } = e.target;
         setForm((prev) => ({ ...prev, [name]: value } as FormState));
@@ -81,7 +105,11 @@ export default function CreateCatalogObjectForm({
         e.preventDefault();
         setErrorMsg("");
 
-        if (!file) return alert("Please choose an image.");
+        const validationError = validateForm();
+        if (validationError) {
+            setErrorMsg(validationError);
+            return;
+        }
 
         try {
             setLoading(true);
@@ -90,7 +118,7 @@ export default function CreateCatalogObjectForm({
                 /* ------- create category -------- */
                 await insertCategoryWithImage(
                     { name: form.name },
-                    file
+                    file!
                 );
             } else {
                 /* ------- create item ------------ */
@@ -102,8 +130,6 @@ export default function CreateCatalogObjectForm({
                     categoryId,
                 } = form;
 
-                if (!categoryId) throw new Error("Choose a category for the item.");
-
                 await insertItemWithImage(
                     {
                         name,
@@ -113,13 +139,11 @@ export default function CreateCatalogObjectForm({
                         categoryId,
                         sizes,
                     },
-                    file
+                    file!
                 );
-
             }
 
             alert("Catalog object saved!");
-
             onSave?.();
 
             // reset simple fields
@@ -166,35 +190,26 @@ export default function CreateCatalogObjectForm({
                 </select>
             </div>
 
-            {/* ---------- CATEGORY fields ---------- */}
-
-
-            {/* fallback fields for non‑clothes items */}
-            {form.mode === "ITEM" && form.categoryId !== "Clothes" && (
+            {form.mode === "CATEGORY" ? (
                 <>
+                    {/* category-specific input fields */}
                     <input
-                        name="variationPrice"
-                        type="number"
-                        placeholder="Price (USD)"
-                        value={form.variationPrice}
+                        name="name"
+                        placeholder="Category Name"
+                        value={form.name}
                         onChange={handleChange}
                         className="w-full border rounded px-3 py-2"
-                        required
                     />
                 </>
-            )}
-
-
-            {/* ---------- ITEM fields ---------- */}
-            {form.mode === "ITEM" && (
+            ) : (
                 <>
+                    {/* item-specific fields */}
                     <input
                         name="name"
                         placeholder="Item Name"
                         value={form.name}
                         onChange={handleChange}
                         className="w-full border rounded px-3 py-2"
-                        required
                     />
 
                     <textarea
@@ -206,12 +221,19 @@ export default function CreateCatalogObjectForm({
                         rows={3}
                     />
 
+                    <input
+                        name="variationPrice"
+                        placeholder="Variation Price"
+                        value={form.variationPrice}
+                        onChange={handleChange}
+                        className="w-full border rounded px-3 py-2"
+                    />
+
                     <select
                         name="categoryId"
                         value={form.categoryId}
                         onChange={handleChange}
                         className="w-full border rounded px-3 py-2"
-                        required
                     >
                         <option value="">Choose category</option>
                         {categories.map((c) => (
@@ -222,26 +244,23 @@ export default function CreateCatalogObjectForm({
                     </select>
 
                     {/* size & price block (only for Clothes) */}
-                    {form.mode === "ITEM" && form.categoryId === clothesId && (
-                        <>
-                            <div className="grid grid-cols-3 gap-4">
-                                {Object.keys(sizes).map((sz) => (
-                                    <div key={sz}>
-                                        <label className="block mb-1">{sz} Stock</label>
-                                        <input
-                                            type="number"
-                                            min={0}
-                                            value={sizes[sz]}
-                                            onChange={(e) =>
-                                                setSizes((p) => ({ ...p, [sz]: parseInt(e.target.value, 10) || 0 }))
-                                            }
-                                            className="w-full border rounded px-3 py-2"
-                                            required
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-                        </>
+                    {form.categoryId === clothesId && (
+                        <div className="grid grid-cols-3 gap-4">
+                            {Object.keys(sizes).map((sz) => (
+                                <div key={sz}>
+                                    <label className="block mb-1">{sz} Stock</label>
+                                    <input
+                                        type="number"
+                                        min={0}
+                                        value={sizes[sz]}
+                                        onChange={(e) =>
+                                            setSizes((p) => ({ ...p, [sz]: parseInt(e.target.value, 10) || 0 }))
+                                        }
+                                        className="w-full border rounded px-3 py-2"
+                                    />
+                                </div>
+                            ))}
+                        </div>
                     )}
 
                 </>
@@ -255,7 +274,6 @@ export default function CreateCatalogObjectForm({
                     accept="image/*"
                     onChange={handleFileChange}
                     className="w-full"
-                    required
                 />
             </div>
 

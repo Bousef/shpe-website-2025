@@ -16,23 +16,53 @@ export type FormCatalogObject = {
 export type NewCategoryPayload = { name: string };
 
 const client = new SquareClient({
-    token: process.env.NEXT_PUBLIC_SQUARE_SANDBOX_ACCESS_TOKEN!,
-    environment: SquareEnvironment.Sandbox,
+  token: process.env.NEXT_PUBLIC_SQUARE_SANDBOX_ACCESS_TOKEN!,
+  environment: SquareEnvironment.Sandbox,
 });
 
 
 export async function getCatalog() {
 
-    const result = await client.catalog.list({});
-    return result.data; // <-- return the array of catalog objects
+  const result = await client.catalog.list({});
+  return result.data; // <-- return the array of catalog objects
 }
 
 export async function getCatalogObject(id: string) {
 
-    const result = await client.catalog.object.get({
-        objectId: id,
-    });
-    return result;
+  const result = await client.catalog.object.get({
+    objectId: id,
+  });
+
+  return result;
+}
+
+export async function getObjectURL(imageId: string) {
+  const result = await client.catalog.object.get({
+    objectId: imageId,
+  });
+  const obj = result.object;
+  if (obj?.type === "IMAGE")
+    console.log("Image URL: " + obj.imageData?.url)
+  else
+    console.log("Not an IMAGE?")
+
+  if (obj?.type === "IMAGE" && obj.imageData?.url) {
+    return obj.imageData.url;
+  }
+  return null;
+}
+
+export async function wipeCatalog() {
+
+  const list = await client.catalog.list({});
+
+  const ids = list.data.map(o => o.id).filter(Boolean) as string[];
+  if (ids.length > 0) {
+    const resp = await client.catalog.batchDelete({ objectIds: ids });
+    console.log("Deleted IDs:", resp.deletedObjectIds);
+  } else {
+    console.log("Catalog already empty.");
+  }
 }
 
 export async function insertItemWithImage(
@@ -40,13 +70,13 @@ export async function insertItemWithImage(
   file: File
 ) {
   /* ---------- 0. derive reusable bits ---------- */
-  const tempItemId   = `#${crypto.randomUUID()}`;
-  const priceCents   = BigInt(Math.round(parseFloat(form.variationPrice) * 100));
+  const tempItemId = `#${crypto.randomUUID()}`;
+  const priceCents = BigInt(Math.round(parseFloat(form.variationPrice) * 100));
 
-/* ---------- 1. BUILD VARIATIONS LIST ---------- */
-const variations: CatalogObject[] =
-  form.sizes && Object.keys(form.sizes).length > 0
-    ? Object.keys(form.sizes).map((sz) => ({
+  /* ---------- 1. BUILD VARIATIONS LIST ---------- */
+  const variations: CatalogObject[] =
+    form.sizes && Object.keys(form.sizes).length > 0
+      ? Object.keys(form.sizes).map((sz) => ({
         type: "ITEM_VARIATION" as const,   // keeps literal type
         id: `#${sz}`,
         itemVariationData: {
@@ -56,7 +86,7 @@ const variations: CatalogObject[] =
           priceMoney: { amount: priceCents, currency: "USD" },
         },
       }))
-    : [
+      : [
         {
           type: "ITEM_VARIATION" as const,
           id: "#default",
@@ -69,21 +99,31 @@ const variations: CatalogObject[] =
         },
       ];
 
-      /* ---------- 1. BUILD ITEM DATA ---------- */
-const itemData: any = {
-  name:        form.name,
-  description: form.description,
-  categoryId:  form.categoryId,     // ✅ camelCase for the SDK → becomes category_id on wire
-  variations,                       // built earlier
-};
+  /* ---------- 1. BUILD ITEM DATA ---------- */
+  const itemData: any = {
+    name: form.name,
+    description: form.description,
+    categoryId: form.categoryId,
+    variations,
+  };
   /* ---------- 2. UPSERT THE ITEM ---------- */
   const upsertRes = await client.catalog.object.upsert({
     idempotencyKey: crypto.randomUUID(),
     object: {
       type: "ITEM",
       id: tempItemId,
-      itemData,
+      itemData: {
+        categories: [
+          {
+            id: form.categoryId,
+          },
+        ],
+        name: form.name,
+        description: form.description,
+        variations: variations,
+      }
     },
+
   });
 
   /* ---------- 3. GET THE REAL ITEM ID ---------- */
@@ -159,8 +199,4 @@ export async function insertCategoryWithImage(
   });
 
   return { id: realCategoryId };
-}
-
-function listCatalog(arg0: { includeRelatedObjects: boolean; }): { objects: any; } | PromiseLike<{ objects: any; }> {
-  throw new Error("Function not implemented.");
 }
