@@ -1,8 +1,10 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { squareClient } from "~/lib/square/client";
+import { legacyClient, squareClient } from "~/lib/square/client";
 import { SortOrder } from "node_modules/square/api";
 import { randomUUID } from "crypto";
+import { type BatchRetrieveOrdersRequest, type CreateOrderRequest } from "square/legacy";
+import { request } from "http";
 
 export const ordersRouter = createTRPCRouter ({
 
@@ -141,4 +143,35 @@ export const ordersRouter = createTRPCRouter ({
                 throw new Error("Could not create test order.");
             }
         }),
+
+    createOrder: publicProcedure
+        .input(
+            z.object({
+                body: z.custom<CreateOrderRequest>(),
+                requestOptions: z.any().optional()
+            })
+        ).mutation(async({input})=>{
+            return await legacyClient.ordersApi.createOrder(
+                input.body,
+                input.requestOptions
+            );
+        }),
+    
+    batchRetrieveOrders: publicProcedure
+        .input(
+            z.object({
+                body: z.custom<BatchRetrieveOrdersRequest>(),
+                requestOptions: z.any().optional()
+            }))
+        .query(async ({input}) =>{
+            return await legacyClient.ordersApi.batchRetrieveOrders(
+                input.body,
+                input.requestOptions
+            );
+        }),
+    
+
+
+
+    
 });
