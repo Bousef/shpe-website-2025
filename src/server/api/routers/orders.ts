@@ -189,14 +189,27 @@ export const ordersRouter = createTRPCRouter ({
                 })).optional(),
             })
         ).query(async ({ input }) => {
-            await squareClient.orders.calculate({
+            const response = await squareClient.orders.calculate({
                 order: {
                     locationId: input.locationId, 
                     lineItems: input.lineItems as OrderLineItem[] | null, 
                     discounts: input.discounts as OrderLineItemDiscount[] | null,
                 }
             });
-            return;
+
+            // in case of an error, we accumulate all errors into one string and throw them
+            // this should probably be handled better...
+            if (response.errors && response.errors?.length > 0) {
+                throw Error(response.errors.reduce((acc, val) => 
+                    acc + val.detail + "\n"
+                , ""))
+            }
+
+            if (response.order === undefined) {
+                throw Error("caculateOrder returned an undefined order. This should not happen.");
+            }
+
+            return response.order;
         }),
 
         
