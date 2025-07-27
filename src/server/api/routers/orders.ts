@@ -212,6 +212,7 @@ export const ordersRouter = createTRPCRouter ({
             return response.order;
         }),
 
+    // I am assuming this call modifies the square db and thus requires a mutation
     cloneOrder: publicProcedure
         .input(
             z.object({
@@ -219,7 +220,7 @@ export const ordersRouter = createTRPCRouter ({
                 version: z.number(),
                 idempotencyKey: z.string(),
             })
-        ).query(async ({ input }) => {
+        ).mutation(async ({ input }) => {
             const response = await squareClient.orders.clone({
                 ...input
             });
@@ -246,7 +247,7 @@ export const ordersRouter = createTRPCRouter ({
                 idempotencyKey: z.string(),
                 paymentIds: z.array(z.string()),
             })
-        ).query(async ({ input }) => {
+        ).mutation(async ({ input }) => {
             const response = await squareClient.orders.pay({
                 ...input
             });
