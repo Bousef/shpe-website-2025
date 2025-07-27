@@ -3,7 +3,7 @@ import { createTRPCRouter, publicProcedure } from "../trpc";
 import { legacyClient, squareClient } from "~/lib/square/client";
 import { SortOrder } from "node_modules/square/api";
 import { randomUUID } from "crypto";
-import { type BatchRetrieveOrdersRequest, type CreateOrderRequest } from "square/legacy";
+import { type BatchRetrieveOrdersRequest, type CreateOrderRequest, type UpdateOrderRequest } from "square/legacy";
 import { request } from "http";
 
 export const ordersRouter = createTRPCRouter ({
@@ -169,9 +169,38 @@ export const ordersRouter = createTRPCRouter ({
                 input.requestOptions
             );
         }),
+
+        
+    updateOrders: publicProcedure
+        .input(
+            z.object({
+                orderId: z.string(),
+                body: z.custom<UpdateOrderRequest>(),
+                requestOptions: z.any().optional()
+            })
+        ).mutation(async ({input}) => {
+            const { orderId, body, requestOptions } = input;
+            return await legacyClient.ordersApi.updateOrder(
+                orderId,
+                body,
+                requestOptions
+            );
+        }),
+
+    retrieveOrder: publicProcedure
+        .input(
+            z.object({
+                orderId: z.string(),
+                requestOptions: z.any().optional()
+            })
+        ).query(async ({input}) => {
+            const { orderId, requestOptions } = input;
+            return await legacyClient.ordersApi.retrieveOrder(
+                orderId,
+                requestOptions
+            );
+        }),
     
-
-
 
     
 });
