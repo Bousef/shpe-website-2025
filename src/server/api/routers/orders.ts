@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { legacyClient, squareClient } from "~/lib/square/client";
-import { SortOrder } from "node_modules/square/api";
+import { SortOrder, type OrderLineItem, type OrderLineItemDiscount } from "node_modules/square/api";
 import { randomUUID } from "crypto";
 import { type BatchRetrieveOrdersRequest, type CreateOrderRequest, type UpdateOrderRequest } from "square/legacy";
 import { request } from "http";
@@ -168,6 +168,35 @@ export const ordersRouter = createTRPCRouter ({
                 input.body,
                 input.requestOptions
             );
+        }),
+
+    calculateOrder: publicProcedure
+        .input(
+            z.object({
+                locationId: z.string(),
+                lineItems: z.array(z.object({ 
+                    name: z.string(),
+                    quantity: z.string(),
+                    basePriceMoney: z.object({
+                        amount: z.bigint(),
+                        currency: z.string(),
+                    }).optional(),
+                })),
+                discounts: z.array(z.object({ 
+                    name: z.string(),
+                    percentage: z.string(),
+                    scope: z.string(),
+                })).optional(),
+            })
+        ).query(async ({ input }) => {
+            await squareClient.orders.calculate({
+                order: {
+                    locationId: input.locationId, 
+                    lineItems: input.lineItems as OrderLineItem[] | null, 
+                    discounts: input.discounts as OrderLineItemDiscount[] | null,
+                }
+            });
+            return;
         }),
 
         
