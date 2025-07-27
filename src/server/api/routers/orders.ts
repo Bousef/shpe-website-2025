@@ -239,6 +239,33 @@ export const ordersRouter = createTRPCRouter ({
             return response.order;
         }),
 
+    payOrder: publicProcedure
+        .input(
+            z.object({
+                orderId: z.string(),
+                idempotencyKey: z.string(),
+                paymentIds: z.array(z.string()),
+            })
+        ).query(async ({ input }) => {
+            const response = await squareClient.orders.pay({
+                ...input
+            });
+
+            // in case of an error, we accumulate all errors into one string and throw them
+            // this should probably be handled better...
+            if (response.errors && response.errors?.length > 0) {
+                throw Error(response.errors.reduce((acc, val) => 
+                    acc + val.detail + "\n"
+                , ""))
+            }
+
+            if (response.order === undefined) {
+                throw Error("payOrder returned an undefined order. This should not happen.");
+            }
+
+            return response.order;
+        }),
+
         
     updateOrders: publicProcedure
         .input(
