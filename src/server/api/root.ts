@@ -3,7 +3,7 @@ import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 import { memberRouter } from "./routers/member";
 import { alumniRouter } from "./routers/alumni";
 import { squareTestRouter } from "./routers/squareTest";
-import { catalogRouter } from "./routers/catalogRouter";
+import { catalogRouter } from "./routers/catalog";
 /**
  * This is the primary router for your server.
  *

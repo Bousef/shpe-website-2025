@@ -97,8 +97,6 @@ export const catalogRouter = createTRPCRouter({
         return await legacyClient.catalogApi.searchCatalogObjects(input.body, input.requestOptions);
     }),
 
-
-
     //-- This endpoint is used to search for catalog items.
     searchCatalogItems: publicProcedure.input(
         z.object({
