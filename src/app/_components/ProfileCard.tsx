@@ -1,94 +1,47 @@
-// "use client";
-
-// import { api } from '~/trpc/react';
-// import { useEffect, useState } from "react";
-// import { useRouter } from "next/navigation";
-// import { supabase } from "~/supabase-client";
-
-// export default function ProfileCard() {
-// 	const [sessionChecked, setSessionChecked] = useState(false);
-// 	const router = useRouter();
-
-// 	useEffect(() => {
-// 		const exchangeSession = async () => {
-// 			const url = new URL(window.location.href);
-// 			const code = url.searchParams.get("code");
-// 			const error = url.searchParams.get("error");
-
-// 			console.log("url:", url.href)
-// 			console.log("code param:", code)
-// 			console.log("error param:", error)
-
-// 			if (error) {
-// 				console.error("Login error:", url.searchParams.get("error_description"));
-// 				return;
-// 			}
-
-// 			if (code) {
-// 				console.log("code form url: ", code);
-// 				const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-				
-
-// 				if (error) {
-// 					console.error("Failed to exchange session:", error.message);
-// 				} else {
-// 					console.log("Session restored:", data.session);
-// 					const currentSession = await supabase.auth.getSession();
-// 				console.log("Current session:", currentSession.data.session);
-// 					router.replace("/profile"); // Clean URL
-// 				}
-// 			}
-
-// 			setSessionChecked(true);
-// 		}
-
-// 		exchangeSession();
-// 	}, [router])
-
-// 	// call existing getMember endpoint
-// 	const {
-// 		data: profile,
-// 		isLoading,
-// 		error,
-// 	} = api.user.getCurrentMember.useQuery(undefined, {
-// 		enabled: sessionChecked,
-// 	})
-
-//   	if (!sessionChecked || isLoading) return <p>Loading profile…</p>
-// 	if (!profile)  return <p>You are not logged in.</p>
-//   	if (error) return <p>Error: {error.message}</p>
-
-
-
-// ABOVE^: ISSUE W LOGIN THEN GOING DIRECTLY TO /PROFILE AND ITS NOT PICKING UP THE USER
-// INSTEAD DISPLAYING "YOU ARE NOT LOGGED IN." WILL LOOK MORE INTO LATER
-
-
-// BELOW: HARDCODED USER FOR TESTING PURPOSES.
-
 "use client";
 
-import { api } from '~/trpc/react'
+import { api } from '~/trpc/react';
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "~/supabase-client";
 
 export default function ProfileCard() {
-	const id = "fc3b4491-e919-406b-b29e-39c302cdb178";
+	const [sessionChecked, setSessionChecked] = useState(false);
+	const router = useRouter();
 
-	const [showResume, setShowResume] = useState(false);
-	const [createdData, setCreatedData] = useState<{
-		customerId: string;
-		orderId: string;
-	} | null>(null);
+	// HARDCODED USER FOR TESTING PURPOSES:
+	// const id = "93a534ac-85a2-4019-84a9-d28af45730f5";
+	// const {
+	// 	data: profile,
+	// 	isLoading,
+	// 	error,
+	// } = api.member.getMember.useQuery(
+	// 	{ uuid: id },
+	// 	{ enabled: true }
+	// )
+
+	useEffect(() => {
+
+		setSessionChecked(true);
+
+	}, [router])
 
 	// call existing getMember endpoint
 	const {
 		data: profile,
 		isLoading,
 		error,
-	} = api.member.getMember.useQuery(
-		{ uuid: id },
-		{ enabled: true }
-	)
+	} = api.user.getCurrentMember.useQuery(undefined, {
+		enabled: sessionChecked,
+	})
+
+	const [showResume, setShowResume] = useState(false);
+
+	// create orders
+	const [createdData, setCreatedData] = useState<{
+		customerId: string;
+		orderId: string;
+	} | null>(null);
 
 	const { mutate: createTestOrder, isPending: creatingTestOrder } = api.orders.createTestOrder.useMutation({
 		onSuccess: (data) => {
@@ -99,9 +52,8 @@ export default function ProfileCard() {
 					orderId: data.orderId,
 				});
 
-				// Optionally refetch orders if a real customerId is returned
+				// optionally refetch orders if a real customerId is returned
 				if (data.customerId === profile?.square_customer_id) {
-					console.log("yerrrr");
 					refetchOrders(); // only works if refetch function is available from useQuery
 				}
 			}
@@ -126,10 +78,10 @@ export default function ProfileCard() {
 	const orders = ordersData && !Array.isArray(ordersData) && 'orders' in ordersData
 		? ordersData.orders
 		: [];
-
-  	if (isLoading) return <p>Loading profile…</p>
-	if (!profile)  return <p>No member found for UCF ID {id}</p>
-  	if (error) return <p>Error: {error.message}</p>
+	
+	if (!sessionChecked || isLoading) return <p>Loading profile…</p>
+	if (!profile) return <p>No profile found for this user.</p>;
+	if (error) return <p>Error: {error.message}</p>;
 
 	return (
 		<main id="profile" className="relative bg-white py-15 px-15 text-[var(--shpe-navy-blue)] min-w-6xl mx-auto min-h-[80vh]">

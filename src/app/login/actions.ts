@@ -2,7 +2,6 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-
 import { createClient } from '~/server/auth/server'
 
 export async function login(prevState: unknown, formData: FormData): Promise<{error: string, formData?: {email?: string}}> {
