@@ -7,6 +7,7 @@ import { HiMenuAlt3, HiX } from "react-icons/hi";
 import { api } from "~/trpc/react";
 import router from "next/router";
 
+
 const navItems = [
   { href: "/board", label: "Board" },
   { href: "/dev-team", label: "Dev team" },
@@ -30,6 +31,7 @@ export default function Navbar() {
       router.push("/");
     },
   });
+
 
   return (
   <nav className="w-full bg-gradient-to-t from-white to-[#afc1e3] p-4 sm:p-5 max-w-screen overlay-x-hidden">
@@ -103,6 +105,7 @@ export default function Navbar() {
     </div>
   </div>
 
+
   {/* Mobile Nav */}
   {mobileOpen && (
     <div className="md:hidden mt-4 space-y-3 flex flex-col items-start text-lg sm:text-xl">
@@ -149,6 +152,7 @@ export default function Navbar() {
               </Link>
             )
           )}
+
     </div>
   )}
 </nav>

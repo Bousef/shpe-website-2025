@@ -14,6 +14,7 @@ import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { squareClient } from "~/lib/square/client";
 
+
 export const memberRouter = createTRPCRouter({
 
   //create member ->looks longer than it actually is
@@ -38,7 +39,6 @@ export const memberRouter = createTRPCRouter({
       // We return null to tell the user that there the member already exists
       return null;
     }
-
     // create square customer using the email and name
     let squareCustomerId: string | null = null;
     try {
@@ -53,6 +53,7 @@ export const memberRouter = createTRPCRouter({
     } catch (err) {
       console.error("Error creating Square customer:", err); // feel free to throw or continue with null here
     }
+
     
     //insert new member with the hashed password
     const [newMember] = await db
@@ -60,6 +61,7 @@ export const memberRouter = createTRPCRouter({
     .values({
       ...input,
       square_customer_id: squareCustomerId ?? undefined,
+
     })
     .returning();
 
@@ -83,7 +85,6 @@ export const memberRouter = createTRPCRouter({
       .select()
       .from(members)
       .where(eq(members.uuid, input.uuid));
-
       if (member.length == 0){
         throw new Error("No member found!");
       }
@@ -98,7 +99,6 @@ export const memberRouter = createTRPCRouter({
       .select()
       .from(members)
       .where(eq(members.uuid, input.uuid));
-
     if (delteMem.length == 0){
       throw new Error("No member with that Id");
     }

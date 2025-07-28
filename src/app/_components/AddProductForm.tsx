@@ -116,7 +116,6 @@ export default function AddProductForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
-
     const files = imageFiles.filter((f): f is File => !!f);
     let storedUrls: string[] = [];
 

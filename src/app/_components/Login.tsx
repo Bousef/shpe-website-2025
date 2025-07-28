@@ -11,6 +11,7 @@ export default function Login(){
 	const currentError = loginState.error;
 	const formData = loginState.formData;
 
+
 	return (
 		<section className="flex flex-col items-center pb-[6rem] py-[2rem] px-4 min-w-[280px]">
 

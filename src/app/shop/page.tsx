@@ -8,6 +8,7 @@ import { supabase } from "../../supabase-client";
 import Image from "next/image";
 import { api } from '~/trpc/react'
 
+
 export type CategoryImage = {
   category: string;
   image: string; // semicolon-separated filenames
@@ -58,14 +59,12 @@ export default function Shop() {
           map[category] = firstUrl;
         }
       });
-
       const list = Object.entries(map)
         .map(([category, image]) => ({ category, image }))
         .sort((a, b) => a.category.localeCompare(b.category));
 
       setCategories(list);
     }
-
     loadCategories();
   }, []);
 
@@ -126,7 +125,6 @@ export default function Shop() {
             </Link>
           ))}
         </div>
-
       </main>
     </div>
   );

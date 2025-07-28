@@ -7,6 +7,7 @@ import Navbar from "../../_components/NavBar";
 import { supabase } from "../../../supabase-client";
 import { type Product } from "../../_components/AddProductForm";
 
+
 interface CategoryParams {
   category: string;
 }

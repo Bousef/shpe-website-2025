@@ -66,7 +66,6 @@ useEffect(() => {
   loadProduct();
 }, [itemId]);
 
-
   const showSizes = (category === "Clothes");
 
   if (showSizes) {

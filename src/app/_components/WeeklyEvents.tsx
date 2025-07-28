@@ -34,7 +34,6 @@ useEffect(() => {
 
   loadEvents();
 }, []);
-
   return (
     <section
       id="events"
@@ -64,6 +63,7 @@ useEffect(() => {
               <img
                 src={imgSrc}
                 alt={name}
+
                 className="w-10/11 h-10/11 object-cover object-center"
               />
             </div>
@@ -71,6 +71,7 @@ useEffect(() => {
               <h3 className="text-center text-slate-800 font-bold text-xl 2xl:text-2xl">
                 {name.toUpperCase()}
               </h3>
+
             </div>
           </a>
         ))}

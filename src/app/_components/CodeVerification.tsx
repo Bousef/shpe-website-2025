@@ -149,6 +149,7 @@ export default function CodeVerification() {
 						Back
 					</a>
 				</div>
+
 			</form>
 		</section>
 	)

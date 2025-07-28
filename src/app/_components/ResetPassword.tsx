@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation"
 import { supabase } from "~/supabase-client";
 
+
 export default function ResetPassword() {
 	const router = useRouter()
 	const searchParams = useSearchParams();
@@ -95,6 +96,7 @@ export default function ResetPassword() {
 			
 			<form onSubmit={handleSubmit} className="w-full max-w-md bg-white item-center p-6 rounded-lg shadow text-[var(--shpe-navy-blue)]">
 				{/* ENTER NEW PASSWORD */}
+
 				<h2 className="text-lg font-semibold">Enter New Password</h2>
 				<input 
 					type="password"
@@ -103,6 +105,7 @@ export default function ResetPassword() {
 					value={password}
 					onChange={e => setPassword(e.target.value)}
 					placeholder="At least 8 characters"
+
 					className="w-full px-3 py-2 mb-1 border rounded"
 				/>
 
@@ -117,6 +120,8 @@ export default function ResetPassword() {
 					placeholder="At least 8 digits"
 					className="w-full px-3 py-2 mb-1 border rounded"
 				/>
+
+				{error && <p className="text-red-600 text-sm mb-2">{error}</p>}
 				<button
 					type="submit"
 					disabled={loading}
@@ -126,6 +131,7 @@ export default function ResetPassword() {
 				</button>
 				{error && <p className="text-red-600 text-sm mb-2">{error}</p>}
 				{success && <p className="text-green-600 mb-2 text-center">{success}</p>}
+
 			</form>
 		</section>
 	)
