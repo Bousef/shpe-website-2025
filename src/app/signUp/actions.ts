@@ -30,10 +30,10 @@ export async function signup(prevState: unknown, formData: FormData): Promise<{e
 
   const inputErrors = [];
 
-  if (!/^[\w.-]+@ucf\.edu$/.test(email)) {
-    inputErrors.push("Email must be a valid @ucf.edu address.");
+  if (!/^[\w.-]+@(ucf\.edu|shpeucf\.com)$/.test(email)) {
+      inputErrors.push("Email must be a valid @ucf.edu or @shpeucf.com address.");
   }
-
+  
   if (!/^\d{7}$/.test(ucfId)) {
     inputErrors.push("UCF ID must be exactly 7 digits.");
   }
