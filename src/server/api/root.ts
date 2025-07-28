@@ -4,6 +4,7 @@ import { memberRouter } from "./routers/member";
 import { alumniRouter } from "./routers/alumni";
 import { squareTestRouter } from "./routers/squareTest";
 import { catalogRouter } from "./routers/catalogRouter";
+import { jotformRouter } from "./routers/jotform";
 /**
  * This is the primary router for your server.
  *
@@ -20,7 +21,8 @@ export const appRouter = createTRPCRouter({
   alumni: alumniRouter, 
   squareTest: squareTestRouter,
   square: squareRouter,
-  catalog: catalogRouter
+  catalog: catalogRouter,
+  jotform: jotformRouter
 });
 
 // export type definition of API
