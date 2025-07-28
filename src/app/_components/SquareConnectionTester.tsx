@@ -1,3 +1,4 @@
+
 /* Testing Purposes Only! Delete Later :P */
 
 "use client";
@@ -66,3 +67,4 @@ export default function SquareConnectionTester() {
     </div>
   );
 }
+

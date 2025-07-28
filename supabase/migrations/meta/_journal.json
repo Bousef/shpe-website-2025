@@ -12,8 +12,43 @@
     {
       "idx": 1,
       "version": "7",
+      "when": 1752008988591,
+      "tag": "0001_stormy_tana_nile",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
       "when": 1751043323391,
-      "tag": "0001_green_raider",
+      "tag": "0002_green_raider",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1752023155892,
+      "tag": "0003_glossy_shadowcat",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1752023155893,
+      "tag": "0004_glossy_shadowcat",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1752775209598,
+      "tag": "0005_married_blink",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1753213741059,
+      "tag": "0006_cheerful_starhawk",
       "breakpoints": true
     }
   ]

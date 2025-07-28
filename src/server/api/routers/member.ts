@@ -7,11 +7,13 @@ deleteMember [ID]
 
 */
 
-import { publicProcedure, createTRPCRouter } from "src/server/api/trpc";
+import { createTRPCRouter, publicProcedure } from "../trpc";
 import { db } from "src/server/db";
 import { members } from "src/server/db/schema";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
+import { squareClient } from "~/lib/square/client";
+
 
 export const memberRouter = createTRPCRouter({
 
@@ -19,6 +21,7 @@ export const memberRouter = createTRPCRouter({
   createMember: publicProcedure
   .input(
     z.object({
+      uuid: z.string().uuid(),
       ucf_id: z.number(),
       first_name: z.string(),
       last_name: z.string(),
@@ -36,12 +39,29 @@ export const memberRouter = createTRPCRouter({
       // We return null to tell the user that there the member already exists
       return null;
     }
+    // create square customer using the email and name
+    let squareCustomerId: string | null = null;
+    try {
+      const response = await squareClient.customers.create({
+        emailAddress: input.email,
+        givenName: input.first_name,
+        familyName: input.last_name,
+        referenceId: input.uuid,
+      });
+
+      squareCustomerId = response.customer?.id ?? null;
+    } catch (err) {
+      console.error("Error creating Square customer:", err); // feel free to throw or continue with null here
+    }
+
     
     //insert new member with the hashed password
     const [newMember] = await db
     .insert(members)
     .values({
       ...input,
+      square_customer_id: squareCustomerId ?? undefined,
+
     })
     .returning();
 
@@ -59,13 +79,12 @@ export const memberRouter = createTRPCRouter({
 
   //get member
   getMember: publicProcedure
-  .input(z.object({ucf_id : z.number()}))
+  .input(z.object({uuid : z.string().uuid()}))
   .query(async ({input}) => {
     const member = await db
       .select()
       .from(members)
-      .where(eq(members.ucf_id, input.ucf_id));
-
+      .where(eq(members.uuid, input.uuid));
       if (member.length == 0){
         throw new Error("No member found!");
       }
@@ -74,19 +93,18 @@ export const memberRouter = createTRPCRouter({
 
   //delete member - debugging
   deleteMember: publicProcedure
-  .input(z.object({id: z.number()}))
+  .input(z.object({uuid: z.string().uuid()}))
   .mutation(async ({input}) => {
     const delteMem = await db
       .select()
       .from(members)
-      .where(eq(members.id, input.id));
-    
+      .where(eq(members.uuid, input.uuid));
     if (delteMem.length == 0){
       throw new Error("No member with that Id");
     }
 
 
-    await db.delete(members).where(eq(members.id, input.id));
+    await db.delete(members).where(eq(members.uuid, input.uuid));
 
 
     return delteMem[0];
