@@ -14,6 +14,9 @@ import KnightConnectSection from "./KnightConnectSection";
 import NationalMemberFields from "./NationalMemberFields";
 import ResumeUploadFields from "./ResumeUploadFields";
 import PaymentSection from "./PaymentSection";
+import { mapToJotFormFields } from "~/utils/jotformMapper";
+import axios from "axios";
+const allDataRef = useRef<Record<string, any>>({});
 
 function ucfEmailValidator() {
   return z
@@ -225,6 +228,39 @@ export default function MemberRegistrationPage() {
     },
   });
 
+  async function handleFinalSubmit(mergedData: Record<string, any>) {
+    const payload = mapToJotFormFields(mergedData);
+    const formData = new FormData();
+
+    for (const key in payload) {
+      const value = payload[key];
+      if (value !== undefined && value !== null) {
+        formData.append(key, value);
+      }
+    }
+
+    if (mergedData.resume instanceof File) {
+      formData.append("resumeUpload", mergedData.resume);
+    }
+
+    try {
+      await axios.post(
+        `https://api.jotform.com/form/${process.env.JOTFORM_FORM_ID}/submissions?apiKey=${process.env.JOTFORM_API_KEY}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+      alert("Form submitted successfully!");
+      stepper.reset();
+    } catch (err) {
+      console.error("JotForm submission failed!", err);
+      alert("Something went wrong. Please try again.");
+    }
+  }
+
   return (
     <>
       <Navbar />
@@ -266,9 +302,15 @@ export default function MemberRegistrationPage() {
         <FormProvider {...form}>
           <form
             className="space-y-4"
-            onSubmit={form.handleSubmit(
-              stepper.isLast ? stepper.reset : stepper.next,
-            )}
+            onSubmit={form.handleSubmit(async (currentStepData) => {
+              Object.assign(allDataRef.current, currentStepData);
+
+              if (stepper.isLast) {
+                await handleFinalSubmit(allDataRef.current);
+              } else {
+                stepper.next();
+              }
+            })}
           >
             {stepper.switch({
               general: () => <GeneralFields />,
