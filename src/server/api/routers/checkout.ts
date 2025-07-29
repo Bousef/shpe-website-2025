@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { squareClient } from "~/lib/square/client";
-import type { CheckoutOptions, Order, PaymentLink, PrePopulatedData, QuickPay } from "node_modules/square/api";
+import type { CheckoutOptions, Currency, Order, PaymentLink, PrePopulatedData, QuickPay } from "node_modules/square/api";
 
 export const checkoutRouter = createTRPCRouter({
         retrieveLocationSettings: publicProcedure
@@ -48,15 +48,15 @@ export const checkoutRouter = createTRPCRouter({
                         }),
                         tipping: z.object({
                             percentages: z.array(z.number().min(3)).optional(),
-                            smart_tipping_enabled: z.boolean().optional(),
-                            default_percentage: z.number().optional(),
-                            smart_tips: z.array(z.object({
-                                amount: z.number().optional(),
-                                currency: z.string().optional(),
+                            smartTippingEnabled: z.boolean().optional(),
+                            defaultPercentage: z.number().optional(),
+                            smartTips: z.array(z.object({
+                                amount: z.bigint().optional(),
+                                currency: z.custom<Currency>().optional(),
                             })).optional(),
-                            default_smart_tip: z.object({
-                                amount: z.number().optional(),
-                                currency: z.string().optional(),
+                            defaultSmartTip: z.object({
+                                amount: z.bigint().optional(),
+                                currency: z.custom<Currency>().optional(),
                             }).optional(),
                         }).optional(),
                         coupons: z.object({
@@ -108,34 +108,34 @@ export const checkoutRouter = createTRPCRouter({
             .input(z.object({
                 merchant_settings: z.object({
                     payment_methods: z.object({
-                        apple_pay: z.object({
+                        applePay: z.object({
                             enabled: z.boolean().optional(),
                         }),
-                        google_pay: z.object({
+                        googlePay: z.object({
                             enabled: z.boolean().optional(),
                         }),
-                        cash_app: z.object({
+                        cashApp: z.object({
                             enabled: z.boolean().optional(),
                         }),
-                        afterpay_clearpay: z.object({
-                            order_eligibility_range: z.object({
+                        afterpayClearpay: z.object({
+                            orderEligibilityRange: z.object({
                                 min: z.object({
-                                    amount: z.number().min(0).optional(),
-                                    currency: z.string().optional(),
+                                    amount: z.bigint().min(0n).optional(),
+                                    currency: z.custom<Currency>().optional(),
                                 }),
                                 max: z.object({
-                                    amount: z.number().min(0).optional(),
-                                    currency: z.string().optional(),
+                                    amount: z.bigint().min(0n).optional(),
+                                    currency: z.custom<Currency>().optional(),
                                 }),
                             }).optional(),
-                            item_eligibility_range: z.object({
+                            itemEligibilityRange: z.object({
                                 min: z.object({
-                                    amount: z.number().min(0).optional(),
-                                    currency: z.string().optional(),
+                                    amount: z.bigint().min(0n).optional(),
+                                    currency: z.custom<Currency>().optional(),
                                 }),
                                 max: z.object({
-                                    amount: z.number().min(0).optional(),
-                                    currency: z.string().optional(),
+                                    amount: z.bigint().min(0n).optional(),
+                                    currency: z.custom<Currency>().optional(),
                                 }),
                             }).optional(),
                             enabled: z.boolean().optional(),
@@ -146,7 +146,10 @@ export const checkoutRouter = createTRPCRouter({
             
             })).mutation(async ({ input }) => {
                 const response = await squareClient.checkout.updateMerchantSettings({
-                    merchantSettings: input.merchant_settings
+                    merchantSettings: {
+                        paymentMethods: input.merchant_settings.payment_methods,
+                        updatedAt: input.merchant_settings.updatedAt,
+                    }
                 });
 
                 // in case of an error, we accumulate all errors into one string and throw them
@@ -172,7 +175,8 @@ export const checkoutRouter = createTRPCRouter({
                 })
             ).query(async ({ input }) => {
                 const response = await squareClient.checkout.paymentLinks.list({
-                    ...input
+                    cursor: input.cursor,
+                    limit: input.limit,
                 });
 
                 return response;
@@ -185,13 +189,19 @@ export const checkoutRouter = createTRPCRouter({
                     description: z.string().max(4096).optional(),
                     quickPay: z.custom<QuickPay>().optional(),
                     order: z.custom<Order>().optional(),
-                    checkoutOption: z.custom<CheckoutOptions>().optional(),
+                    checkoutOptions: z.custom<CheckoutOptions>().optional(),
                     prePopulatedData: z.custom<PrePopulatedData>().optional(),
                     paymentNote: z.string().max(500).optional(),
                 })
             ).mutation(async ({ input }) => {
                 const response = await squareClient.checkout.paymentLinks.create({
-                    ...input
+                    idempotencyKey: input.idempotencyKey,
+                    description: input.description,
+                    quickPay: input.quickPay,
+                    order: input.order,
+                    checkoutOptions: input.checkoutOptions,
+                    prePopulatedData: input.prePopulatedData,
+                    paymentNote: input.paymentNote,
                 });
 
                 // in case of an error, we accumulate all errors into one string and throw them
@@ -216,7 +226,7 @@ export const checkoutRouter = createTRPCRouter({
                 })
             ).mutation(async ({ input }) => {
                 const response = await squareClient.checkout.paymentLinks.delete({
-                    ...input
+                    id: input.id,
                 });
 
                 // in case of an error, we accumulate all errors into one string and throw them
@@ -241,7 +251,7 @@ export const checkoutRouter = createTRPCRouter({
                 })
             ).query(async ({ input }) => {
                 const response = await squareClient.checkout.paymentLinks.get({
-                    ...input
+                    id: input.id
                 });
 
                 // in case of an error, we accumulate all errors into one string and throw them
@@ -263,11 +273,12 @@ export const checkoutRouter = createTRPCRouter({
             .input(
                 z.object({
                     id: z.string(),
-                    paymentLink: z.custom<PaymentLink>().optional(),
+                    paymentLink: z.custom<PaymentLink>(),
                 })
             ).mutation(async ({ input }) => {
-                const response = await squareClient.checkout.paymentLinks.get({
-                    ...input
+                const response = await squareClient.checkout.paymentLinks.update({
+                    id: input.id,
+                    paymentLink: input.paymentLink,
                 });
 
                 // in case of an error, we accumulate all errors into one string and throw them
