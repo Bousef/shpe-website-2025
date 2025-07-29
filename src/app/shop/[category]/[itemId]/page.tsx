@@ -9,6 +9,7 @@ import Navbar from "../../../_components/NavBar";
 import { supabase } from "../../../../supabase-client";
 import type { Product } from "../../../_components/AddProductForm";
 import { boolean } from "drizzle-orm/gel-core";
+import { api } from "~/trpc/react";
 
 /**
  * ItemPage component
@@ -31,39 +32,39 @@ export default function ItemPage() {
   const sizes = ["S", "M", "L", "XL", "XXL", "XXXL"];
   const [sizeStock, setSizeStock] = useState<Record<string, number>>({});
 
-  useEffect(() => {
-    async function loadProduct() {
-      const { data, error } = await supabase
-        .from("shpe-website-2025_products")
-        .select("id, name, description, category, image, price, stock")
-        .eq("id", Number(itemId))
-        .single();
+  const addProduct = api.user.cart.addProduct.useMutation({
+    onSuccess: () => {
+      return; // Handle successful addition to cart
+    },
+  });
 
-      if (error) {
-        setErrorMsg(error.message);
-        return;
-      }
-      setProduct(data);
+useEffect(() => {
+  async function loadProduct() {
+    const { data, error } = await supabase
+      .from("shpe-website-2025_products")
+      .select("id, name, description, category, image, price, stock, status")
+      .eq("id", Number(itemId))
+      .single();
 
-      // Convert filenames into public URLs
-      const rawFiles = data!.image
-        .split(";")
-        .map((f: string) => f.trim())
-        .filter(Boolean); // filter out empty strings
-
-      const publicUrls = rawFiles.map((fileName: string) => {
-        const { data: urlData } = supabase
-          .storage
-          .from("product-images")
-          .getPublicUrl(fileName);
-        return urlData.publicUrl;
-      });
-
-      setThumbs(publicUrls);
-      setGalleryImage(publicUrls[0] || "");
+    if (error) {
+      setErrorMsg(error.message);
+      return;
     }
-    loadProduct();
-  }, [itemId]);
+
+    setProduct(data);
+
+    // image is already "https://...;https://...;…"
+    const rawUrls = data!.image
+      .split(";")
+      .map((s: string) => s.trim())
+      .filter(Boolean);
+
+    setThumbs(rawUrls);
+    setGalleryImage(rawUrls[0] || "");
+  }
+
+  loadProduct();
+}, [itemId]);
 
   const showSizes = (category === "Clothes");
 
@@ -106,6 +107,15 @@ export default function ItemPage() {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
+      <div className="flex justify-end px-4 lg:px-48 mt-4">
+  <Link
+    href="/cart"
+    className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-2 px-4 rounded shadow"
+  >
+    🛒 View Cart
+  </Link>
+</div>
+
       <main className="max-w-6xl mx-auto py-10 px-4 lg:px-0 flex flex-col lg:flex-row lg:space-x-8">
         <div className="hidden lg:flex flex-col gap-4 flex-shrink-0 w-24">
           {thumbs.map((src, idx) => (
@@ -191,7 +201,14 @@ export default function ItemPage() {
 
           <button
             onClick={() =>
-              alert(`Added ${product.name} (size ${selectedSize} x${quantity}) to cart!`)
+              {
+                addProduct.mutate({
+                  product_id: product.id,
+                  quantity,
+                });
+                
+                alert(`Added ${product.name} (size ${selectedSize} x${quantity}) to cart!`)
+              }
             }
             disabled={maxQty < 1}
             className="bg-yellow-500 text-black font-semibold py-3 hover:bg-yellow-600 disabled:opacity-50"
