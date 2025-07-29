@@ -9,6 +9,7 @@ import { clothingRouter } from "./routers/clothing";
 import { cartRouter } from "./routers/cart";
 import { resetCodeRouter } from "./routers/reset-code";
 import { ordersRouter } from "./routers/orders";
+import { checkoutRouter } from "./routers/checkout";
 
 /**
  * This is the primary router for your server.
@@ -18,6 +19,7 @@ import { ordersRouter } from "./routers/orders";
 
 const squareRouter = createTRPCRouter({
   catalog: catalogRouter,
+  checkout: checkoutRouter,
 });
 
 export const appRouter = createTRPCRouter({
