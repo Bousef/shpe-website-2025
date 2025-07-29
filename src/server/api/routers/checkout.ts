@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { squareClient } from "~/lib/square/client";
+import { min } from "drizzle-orm";
 
 export const checkoutRouter = createTRPCRouter({
         retrieveLocationSettings: publicProcedure
@@ -34,16 +35,16 @@ export const checkoutRouter = createTRPCRouter({
                     locationId: z.string(),
                     locationSettings: z.object({
                         locationId: z.string().optional(),
-                        customer_nodes_enabled: z.boolean().optional(),
-                        policies: z.object({
+                        customerNodesEnabled: z.boolean().optional(),
+                        policies: z.array(z.object({
                             uid: z.string().optional(),
-                            title: z.string().optional(),
-                            description: z.string().optional(),
-                        }).optional(),
+                            title: z.string().max(50).optional(),
+                            description: z.string().max(4096).optional(),
+                        })).max(2).optional(),
                         branding: z.object({
-                            header_text: z.string().optional(),
-                            button_color: z.string().min(7).max(7).optional(),
-                            button_shape: z.enum(["SQUARE", "ROUNDED", "PILL"]).optional(),
+                            headerType: z.enum(["BUSINESS_NAME", "FRAMED_LOGO", "FULL_WIDTH_LOGO"]).optional(),
+                            buttonColor: z.string().min(7).max(7).optional(),
+                            buttonShape: z.enum(["SQUARED", "ROUNDED", "PILL"]).optional(),
                         }),
                         tipping: z.object({
                             percentages: z.array(z.number().min(3)).optional(),
@@ -61,13 +62,13 @@ export const checkoutRouter = createTRPCRouter({
                         coupons: z.object({
                             enabled: z.boolean().optional(),
                         }).optional(),
-                        updated_at: z.string().optional(),
+                        updatedAt: z.string().optional(),
                     })
                 })
             ).mutation(async ({ input }) => {
                 const response = await squareClient.checkout.updateLocationSettings({
                     locationId: input.locationId,
-                    locationSettings: {}
+                    locationSettings: input.locationSettings
                 });
     
                 // in case of an error, we accumulate all errors into one string and throw them
@@ -85,4 +86,81 @@ export const checkoutRouter = createTRPCRouter({
                 return response.locationSettings;
             }),
 
+        retrieveMerchantSettings: publicProcedure.query(async () => {
+                const response = await squareClient.checkout.retrieveMerchantSettings();
+    
+                // in case of an error, we accumulate all errors into one string and throw them
+                // this should probably be handled better...
+                if (response.errors && response.errors?.length > 0) {
+                    throw Error(response.errors.reduce((acc, val) => 
+                        acc + val.detail + "\n"
+                    , ""))
+                }
+    
+                if (response.merchantSettings === undefined) {
+                    throw Error("retrieveMerchantSettings returned an undefined merchantSettings. This should not happen.");
+                }
+
+                return response.merchantSettings;
+            }),
+        
+        updateMerchantSettings: publicProcedure
+            .input(z.object({
+                merchant_settings: z.object({
+                    payment_methods: z.object({
+                        apple_pay: z.object({
+                            enabled: z.boolean().optional(),
+                        }),
+                        google_pay: z.object({
+                            enabled: z.boolean().optional(),
+                        }),
+                        cash_app: z.object({
+                            enabled: z.boolean().optional(),
+                        }),
+                        afterpay_clearpay: z.object({
+                            order_eligibility_range: z.object({
+                                min: z.object({
+                                    amount: z.number().min(0).optional(),
+                                    currency: z.string().optional(),
+                                }),
+                                max: z.object({
+                                    amount: z.number().min(0).optional(),
+                                    currency: z.string().optional(),
+                                }),
+                            }).optional(),
+                            item_eligibility_range: z.object({
+                                min: z.object({
+                                    amount: z.number().min(0).optional(),
+                                    currency: z.string().optional(),
+                                }),
+                                max: z.object({
+                                    amount: z.number().min(0).optional(),
+                                    currency: z.string().optional(),
+                                }),
+                            }).optional(),
+                            enabled: z.boolean().optional(),
+                        }),
+                    }).optional(),
+                    updatedAt: z.string().optional(),
+                })
+            
+            })).query(async ({ input }) => {
+                const response = await squareClient.checkout.updateMerchantSettings({
+                    merchantSettings: input.merchant_settings
+                });
+
+                // in case of an error, we accumulate all errors into one string and throw them
+                // this should probably be handled better...
+                if (response.errors && response.errors?.length > 0) {
+                    throw Error(response.errors.reduce((acc, val) => 
+                        acc + val.detail + "\n"
+                    , ""))
+                }
+    
+                if (response.merchantSettings === undefined) {
+                    throw Error("retrieveMerchantSettings returned an undefined merchantSettings. This should not happen.");
+                }
+
+                return response.merchantSettings;
+            }),
 });
