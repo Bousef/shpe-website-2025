@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { squareClient } from "~/lib/square/client";
-import { min } from "drizzle-orm";
+import type { CheckoutOptions, Order, PrePopulatedData, QuickPay } from "node_modules/square/api";
 
 export const checkoutRouter = createTRPCRouter({
         retrieveLocationSettings: publicProcedure
@@ -144,7 +144,7 @@ export const checkoutRouter = createTRPCRouter({
                     updatedAt: z.string().optional(),
                 })
             
-            })).query(async ({ input }) => {
+            })).mutation(async ({ input }) => {
                 const response = await squareClient.checkout.updateMerchantSettings({
                     merchantSettings: input.merchant_settings
                 });
@@ -162,5 +162,50 @@ export const checkoutRouter = createTRPCRouter({
                 }
 
                 return response.merchantSettings;
+            }),
+
+        listPaymentLinks: publicProcedure
+            .input(
+                z.object({
+                    cursor: z.string().optional(),
+                    limit: z.number().max(100).default(100).optional(),
+                })
+            ).query(async ({ input }) => {
+                const response = await squareClient.checkout.paymentLinks.list({
+                    ...input
+                });
+
+                return response;
+            }),
+
+        createPaymentLinks: publicProcedure
+            .input(
+                z.object({
+                    idempotencyKey: z.string().max(192).optional(),
+                    description: z.string().max(4096).optional(),
+                    quickPay: z.custom<QuickPay>().optional(),
+                    order: z.custom<Order>().optional(),
+                    checkoutOption: z.custom<CheckoutOptions>().optional(),
+                    prePopulatedData: z.custom<PrePopulatedData>().optional(),
+                    paymentNote: z.string().max(500).optional(),
+                })
+            ).mutation(async ({ input }) => {
+                const response = await squareClient.checkout.paymentLinks.create({
+                    ...input
+                });
+
+                // in case of an error, we accumulate all errors into one string and throw them
+                // this should probably be handled better...
+                if (response.errors && response.errors?.length > 0) {
+                    throw Error(response.errors.reduce((acc, val) => 
+                        acc + val.detail + "\n"
+                    , ""))
+                }
+    
+                if (response.paymentLink === undefined) {
+                    throw Error("createPaymentLinks returned an undefined paymentLink. This should not happen.");
+                }
+
+                return response.paymentLink;
             }),
 });
