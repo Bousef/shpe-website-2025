@@ -65,6 +65,7 @@ export default function RootLayout({
 
           {/* always rendered at the bottom */}
           <FooterSection />
+          
         </TRPCReactProvider>
       </body>
     </html>

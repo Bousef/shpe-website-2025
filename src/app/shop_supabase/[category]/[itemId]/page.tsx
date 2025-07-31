@@ -94,15 +94,20 @@ useEffect(() => {
       }
       loadSizeStock();
     }, [product, itemId]);
-  }
+  } 
+    const stock = product?.stock ?? 0;
+  
 
   if (errorMsg)
     return <p className="text-red-600 text-center mt-10">{errorMsg}</p>;
   if (!product)
     return <p className="text-center mt-10">Loading…</p>;
 
-  const maxQty = sizeStock[selectedSize] || 0;
-  const qtyOptions = Array.from({ length: Math.max(maxQty, 1) }, (_, i) => i + 1);
+const productStock = product?.stock ?? 0;
+const availableQty = showSizes ? (sizeStock[selectedSize] ?? 0) : productStock;
+
+const qtyOptions = Array.from({ length: Math.max(availableQty, 1) }, (_, i) => i + 1);
+
 
   return (
     <div className="min-h-screen bg-white">
@@ -188,7 +193,7 @@ useEffect(() => {
               id="qty"
               value={quantity}
               onChange={(e) => setQuantity(Number(e.target.value))}
-              disabled={maxQty < 1}
+              disabled={availableQty < 1}
               className="border px-3 py-2"
             >
               {qtyOptions.map((num) => (
@@ -210,10 +215,10 @@ useEffect(() => {
                 alert(`Added ${product.name} (size ${selectedSize} x${quantity}) to cart!`)
               }
             }
-            disabled={maxQty < 1}
+            disabled={availableQty < 1}
             className="bg-yellow-500 text-black font-semibold py-3 hover:bg-yellow-600 disabled:opacity-50"
           >
-            {maxQty > 0 ? "Add to Cart" : "Out of Stock"}
+            {showSizes ? (availableQty > 0 ? "Add to Cart" : "Out of Stock") : (stock > 0 ? "Add to Cart" : "Out of Stock")}
           </button>
         </div>
       </main>

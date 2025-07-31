@@ -1,8 +1,10 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { squareClient } from "~/lib/square/client";
-import { SortOrder } from "node_modules/square/api";
+import { legacyClient, squareClient } from "~/lib/square/client";
+import { SortOrder, type OrderLineItem, type OrderLineItemDiscount } from "node_modules/square/api";
 import { randomUUID } from "crypto";
+import { type BatchRetrieveOrdersRequest, type CreateOrderRequest, type UpdateOrderRequest } from "square/legacy";
+import { request } from "http";
 
 export const ordersRouter = createTRPCRouter ({
 
@@ -146,4 +148,161 @@ export const ordersRouter = createTRPCRouter ({
                 throw new Error("Could not create test order.");
             }
         }),
+
+    createOrder: publicProcedure
+        .input(
+            z.object({
+                body: z.custom<CreateOrderRequest>(),
+                requestOptions: z.any().optional()
+            })
+        ).mutation(async({input})=>{
+            return await legacyClient.ordersApi.createOrder(
+                input.body,
+                input.requestOptions
+            );
+        }),
+    
+    batchRetrieveOrders: publicProcedure
+        .input(
+            z.object({
+                body: z.custom<BatchRetrieveOrdersRequest>(),
+                requestOptions: z.any().optional()
+            }))
+        .query(async ({input}) =>{
+            return await legacyClient.ordersApi.batchRetrieveOrders(
+                input.body,
+                input.requestOptions
+            );
+        }),
+
+    calculateOrder: publicProcedure
+        .input(
+            z.object({
+                locationId: z.string(),
+                lineItems: z.array(z.object({ 
+                    name: z.string(),
+                    quantity: z.string(),
+                    basePriceMoney: z.object({
+                        amount: z.bigint(),
+                        currency: z.string(),
+                    }).optional(),
+                })),
+                discounts: z.array(z.object({ 
+                    name: z.string(),
+                    percentage: z.string(),
+                    scope: z.string(),
+                })).optional(),
+            })
+        ).query(async ({ input }) => {
+            const response = await squareClient.orders.calculate({
+                order: {
+                    locationId: input.locationId, 
+                    lineItems: input.lineItems as OrderLineItem[] | null, 
+                    discounts: input.discounts as OrderLineItemDiscount[] | null,
+                }
+            });
+
+            // in case of an error, we accumulate all errors into one string and throw them
+            // this should probably be handled better...
+            if (response.errors && response.errors?.length > 0) {
+                throw Error(response.errors.reduce((acc, val) => 
+                    acc + val.detail + "\n"
+                , ""))
+            }
+
+            if (response.order === undefined) {
+                throw Error("caculateOrder returned an undefined order. This should not happen.");
+            }
+
+            return response.order;
+        }),
+
+    // I am assuming this call modifies the square db and thus requires a mutation
+    cloneOrder: publicProcedure
+        .input(
+            z.object({
+                orderId: z.string(),
+                version: z.number(),
+                idempotencyKey: z.string(),
+            })
+        ).mutation(async ({ input }) => {
+            const response = await squareClient.orders.clone({
+                ...input
+            });
+
+            // in case of an error, we accumulate all errors into one string and throw them
+            // this should probably be handled better...
+            if (response.errors && response.errors?.length > 0) {
+                throw Error(response.errors.reduce((acc, val) => 
+                    acc + val.detail + "\n"
+                , ""))
+            }
+
+            if (response.order === undefined) {
+                throw Error("cloneOrder returned an undefined order. This should not happen.");
+            }
+
+            return response.order;
+        }),
+
+    payOrder: publicProcedure
+        .input(
+            z.object({
+                orderId: z.string(),
+                idempotencyKey: z.string(),
+                paymentIds: z.array(z.string()),
+            })
+        ).mutation(async ({ input }) => {
+            const response = await squareClient.orders.pay({
+                ...input
+            });
+
+            // in case of an error, we accumulate all errors into one string and throw them
+            // this should probably be handled better...
+            if (response.errors && response.errors?.length > 0) {
+                throw Error(response.errors.reduce((acc, val) => 
+                    acc + val.detail + "\n"
+                , ""))
+            }
+
+            if (response.order === undefined) {
+                throw Error("payOrder returned an undefined order. This should not happen.");
+            }
+
+            return response.order;
+        }),
+
+        
+    updateOrders: publicProcedure
+        .input(
+            z.object({
+                orderId: z.string(),
+                body: z.custom<UpdateOrderRequest>(),
+                requestOptions: z.any().optional()
+            })
+        ).mutation(async ({input}) => {
+            const { orderId, body, requestOptions } = input;
+            return await legacyClient.ordersApi.updateOrder(
+                orderId,
+                body,
+                requestOptions
+            );
+        }),
+
+    retrieveOrder: publicProcedure
+        .input(
+            z.object({
+                orderId: z.string(),
+                requestOptions: z.any().optional()
+            })
+        ).query(async ({input}) => {
+            const { orderId, requestOptions } = input;
+            return await legacyClient.ordersApi.retrieveOrder(
+                orderId,
+                requestOptions
+            );
+        }),
+    
+
+    
 });

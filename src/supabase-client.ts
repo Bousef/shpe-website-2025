@@ -9,5 +9,4 @@ export const supabase = createClient(
 export const supabaseMobile = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_MOBILE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_MOBILE_ANON_KEY!,
-
 );

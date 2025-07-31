@@ -2,16 +2,16 @@ import { postRouter } from "~/server/api/routers/post";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 import { memberRouter } from "./routers/member";
 import { alumniRouter } from "./routers/alumni";
+import { catalogRouter } from "./routers/catalog";
 import { userRouter } from "./routers/user";
 import { productRouter } from "./routers/product";
 import { clothingRouter } from "./routers/clothing";
-
 import { cartRouter } from "./routers/cart";
 import { resetCodeRouter } from "./routers/reset-code";
-import { squareTestRouter } from "./routers/squareTest";
 import { ordersRouter } from "./routers/orders";
-import { catalogRouter } from "./routers/catalog";
-import { Square } from "square";
+import { checkoutRouter } from "./routers/checkout";
+import { paymentsRouter } from "./routers/payments";
+import { squareTestRouter } from "./routers/squareTest";
 
 /**
  * This is the primary router for your server.
@@ -21,6 +21,8 @@ import { Square } from "square";
 
 const squareRouter = createTRPCRouter({
   catalog: catalogRouter,
+  checkout: checkoutRouter,
+  payments: paymentsRouter,
 });
 
 export const appRouter = createTRPCRouter({

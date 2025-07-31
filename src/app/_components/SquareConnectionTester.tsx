@@ -10,13 +10,13 @@ export default function SquareConnectionTester() {
     data: categoriesData,
     isLoading: isLoadingCategories,
     error: categoriesError,
-  } = api.catalog.listCatalog.useQuery({ types: "CATEGORY" });
+  } = api.square.catalog.listCatalog.useQuery({ types: "CATEGORY" });
 
   const {
     data: itemsData,
     isLoading: isLoadingItems,
     error: itemsError,
-  } = api.catalog.listCatalog.useQuery({ types: "ITEM" });
+  } = api.square.catalog.listCatalog.useQuery({ types: "ITEM" });
 
   if (isLoadingCategories || isLoadingItems) return <p> Loading catalog...</p>;
 

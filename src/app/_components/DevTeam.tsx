@@ -143,7 +143,6 @@ const members: Member[] = [
       industryFocus: "Full‐stack Development, UI/UX Design",
       biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
       hobbies: "Painting, Photography, Martial Arts (Jiu-Jitsu), Pickleball.",
-
       linkedin: "https://www.linkedin.com/in/mary-bauta-a76753292/",
     },
   },

@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation"
 import { api } from "~/trpc/react"; // our tRPC hook
 import { supabase } from "~/supabase-client"
 
-
 export default function ForgotPassword() {
 	const router = useRouter()
 	const [email, setEmail] = useState('')
@@ -32,7 +31,6 @@ export default function ForgotPassword() {
 
     	setSuccess("Check your email for a password reset link.");
     	setLoading(false);
-
 	}
 
 	return (
@@ -42,7 +40,6 @@ export default function ForgotPassword() {
 				<h2 className="text-2xl font-bold mb-2 text-center">Forgot Password</h2>
 				<p className="text-center mb-4 text-sm">Please enter your email address, and we’ll send you instructions to reset your password.</p>
 				{/* ENTER EMAIL */}
-
 				<input 
 					type="email"
 					required
@@ -51,7 +48,6 @@ export default function ForgotPassword() {
 					onChange={e => setEmail(e.target.value)}
 					className="w-full px-3 py-2 mb-4 border rounded"
 				/>
-
 				<button
 					type="submit"
 					disabled={loading}
@@ -63,7 +59,6 @@ export default function ForgotPassword() {
 				{success && <p className="text-green-600 mt-2 text-center">{success}</p>}
 
 				{/* BACK TO LOGIN */}
-
 				<div className="flex justify-center mt-4">
 					<a
 						href="/login"
@@ -76,5 +71,3 @@ export default function ForgotPassword() {
 		</section>
 	)
 }
-
-
