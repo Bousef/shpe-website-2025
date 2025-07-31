@@ -10,12 +10,18 @@ import { cartRouter } from "./routers/cart";
 import { resetCodeRouter } from "./routers/reset-code";
 import { squareTestRouter } from "./routers/squareTest";
 import { ordersRouter } from "./routers/orders";
+import { catalogRouter } from "./routers/catalog";
+import { Square } from "square";
 
 /**
  * This is the primary router for your server.
  *
  * All routers added in /api/routers should be manually added here.
  */
+
+const squareRouter = createTRPCRouter({
+  catalog: catalogRouter,
+});
 
 export const appRouter = createTRPCRouter({
   post: postRouter,
@@ -27,7 +33,9 @@ export const appRouter = createTRPCRouter({
   cart: cartRouter,
   resetCode: resetCodeRouter,
   squareTest: squareTestRouter,
+  square: squareRouter,
   orders: ordersRouter,
+  catalog: catalogRouter,
 });
 
 // export type definition of API

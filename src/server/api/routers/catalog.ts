@@ -77,7 +77,7 @@ export const catalogRouter = createTRPCRouter({
         return await legacyClient.catalogApi.deleteCatalogObject(input.objectId);
     }),
 
-    RetrieveCatalogObject: publicProcedure.input(
+    retrieveCatalogObject: publicProcedure.input(
         z.object({
             objectId: z.string(),   
             includeRelatedObjects: z.boolean().optional(),
