@@ -45,7 +45,7 @@ export default function ProfileCard() {
 		orderId: string;
 	} | null>(null);
 
-	const { mutate: createTestOrder, isPending: creatingTestOrder } = api.orders.createTestOrder.useMutation({
+	const { mutate: createTestOrder, isPending: creatingTestOrder } = api.square.orders.createTestOrder.useMutation({
 		onSuccess: (data) => {
 			console.log("Test order created:", data);
 			if (data.customerId && data.orderId) {
@@ -72,7 +72,7 @@ export default function ProfileCard() {
 		isLoading: ordersLoading,
 		error: ordersError,
 		refetch: refetchOrders,
-	} = api.orders.getOrdersForMember.useQuery(
+	} = api.square.orders.getOrdersForMember.useQuery(
 		{ customerId: profile?.square_customer_id ?? "", cursor: orderCursor },
 		{ enabled: !!profile?.square_customer_id, } // avoids calling with undefined
 	); 

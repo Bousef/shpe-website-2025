@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ArrowRightCircle } from "lucide-react";
 import { api } from "~/trpc/react";
 import Navbar from "~/app/_components/NavBar";
+import SquareCheckoutPopup from "~/app/_components/SquareCheckout";
 
 const ITEM_ID = "LE4E2BKJKFFN5Q57V66FNWKN";
 
@@ -11,12 +12,13 @@ export default function SponsorPage() {
     const [customAmount, setCustomAmount] = useState("");
     const [variationMap, setVariationMap] = useState<Record<string, string>>({});
     const [selectedVariationId, setSelectedVariationId] = useState<string | null>(null);
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
 
     const {
         data: itemObject,
         isLoading: isLoadingItem,
         error: itemError,
-    } = api.catalog.retrieveCatalogObject.useQuery({
+    } = api.square.catalog.retrieveCatalogObject.useQuery({
         objectId: ITEM_ID,
         includeRelatedObjects: true,
     });
@@ -38,7 +40,6 @@ export default function SponsorPage() {
                 map[name] = id;
             }
         });
-        console.log("Variation Map:", map);
         setVariationMap(map);
     }, [itemObject]);
 
@@ -59,11 +60,8 @@ export default function SponsorPage() {
             return;
         } 
 
-        console.log("Submitting donation:");
-        console.log("Amount:", customAmount);
-        console.log("Variation ID:", variationId);
-
-        // api call to backend or redirect to Square Checkout
+        setSelectedVariationId(variationId);
+        setShowPaymentModal(true);
     };
 
     return (
@@ -72,7 +70,7 @@ export default function SponsorPage() {
             <main className="min-h-screen bg-white py-12 px-4 flex justify-center">
                 <div className="max-w-3xl w-full rounded-3xl shadow-xl p-15">
                     <h1 className="text-4xl sm:text-5xl font-semibold text-center text-[var(--shpe-yellow)] mb-6 drop-shadow-md">
-                        {itemObject?.result.object?.itemData?.name || ""}
+                        {itemObject?.result.object?.itemData?.name || "SHPE UCF Sponsorship"}
                     </h1>
 
                     <p className="text-md leading-normal mb-8">
@@ -112,7 +110,7 @@ export default function SponsorPage() {
                             className={`px-6 py-3 rounded-full font-semibold shadow-md border transition cursor-pointer col-span-3 sm:col-span-1
                                 ${!["500", "750", "1000", "1500", "2000"].includes(customAmount)
                                     ? "bg-black text-white border-black"
-                                    : "bg-white text-black border-black hover:bg-black hover:text-white"}
+                                    : "bg-white text-black border-black hover:bg-gray-800 hover:text-white"}
                             `}
                             onClick={() => {
                                 setCustomAmount("");
@@ -157,6 +155,15 @@ export default function SponsorPage() {
                     </div>
                 </div>
             </main>
+
+            {showPaymentModal && selectedVariationId && (
+                <SquareCheckoutPopup
+                    itemName={itemObject?.result.object?.itemData?.name ?? "SHPE UCF Sponsorship"}
+                    amount={Math.round(Number(customAmount) * 100)} // convert to cents
+                    variationId={selectedVariationId}
+                    onClose={() => setShowPaymentModal(false)}
+                />
+            )}
         </div>
     );
 }

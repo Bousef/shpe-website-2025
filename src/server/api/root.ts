@@ -20,6 +20,7 @@ import { squareTestRouter } from "./routers/squareTest";
  */
 
 const squareRouter = createTRPCRouter({
+  orders: ordersRouter,
   catalog: catalogRouter,
   checkout: checkoutRouter,
   payments: paymentsRouter,
@@ -36,8 +37,6 @@ export const appRouter = createTRPCRouter({
   resetCode: resetCodeRouter,
   squareTest: squareTestRouter,
   square: squareRouter,
-  orders: ordersRouter,
-  catalog: catalogRouter,
 });
 
 // export type definition of API

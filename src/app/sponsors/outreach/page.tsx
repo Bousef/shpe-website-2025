@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ArrowRightCircle } from "lucide-react";
 import { api } from "~/trpc/react";
 import Navbar from "~/app/_components/NavBar";
+import SquareCheckoutPopup from "~/app/_components/SquareCheckout";
 
 const ITEM_ID = "2VJ3PNTMTHIVOROECMOCNO2X"; // outreach item ID 
 
@@ -11,12 +12,13 @@ export default function OutreachPage() {
     const [customAmount, setCustomAmount] = useState("");
     const [variationMap, setVariationMap] = useState<Record<string, string>>({});
     const [selectedVariationId, setSelectedVariationId] = useState<string | null>(null);
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
 
     const {
         data: itemObject,
         isLoading: isLoadingItem,
         error: itemError,
-    } = api.catalog.retrieveCatalogObject.useQuery({
+    } = api.square.catalog.retrieveCatalogObject.useQuery({
         objectId: ITEM_ID,
         includeRelatedObjects: true,
     });
@@ -38,7 +40,6 @@ export default function OutreachPage() {
                 map[name] = id;
             }
         });
-        console.log("Variation Map:", map);
         setVariationMap(map);
     }, [itemObject]);
 
@@ -48,8 +49,8 @@ export default function OutreachPage() {
             return;
         }
 
-        const variationName = ["500", "750", "1000", "1500", "2000"].includes(customAmount)
-            ? `$${Number(customAmount).toFixed(2)}`
+        const variationName = ["5", "10", "25"].includes(customAmount)
+            ? `$${Number(customAmount).toFixed(2)} donation`
             : "Custom Amount";
 
         const variationId = variationMap[variationName];
@@ -59,11 +60,8 @@ export default function OutreachPage() {
             return;
         } 
 
-        console.log("Submitting donation:");
-        console.log("Amount:", customAmount);
-        console.log("Variation ID:", variationId);
-
-        // api call to backend or redirect to Square Checkout
+        setSelectedVariationId(variationId);
+        setShowPaymentModal(true);
     };
   
     return (
@@ -161,6 +159,15 @@ export default function OutreachPage() {
                     </div>
                 </div>
             </main>
+
+            {showPaymentModal && selectedVariationId && (
+                <SquareCheckoutPopup
+                    itemName={itemObject?.result.object?.itemData?.name ?? "SHPE UCF Sponsorship"}
+                    amount={Math.round(Number(customAmount) * 100)} // convert to cents
+                    variationId={selectedVariationId}
+                    onClose={() => setShowPaymentModal(false)}
+                />
+            )}
         </div>
     );
 }
