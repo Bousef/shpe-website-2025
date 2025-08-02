@@ -22,10 +22,16 @@ export default function SquareCheckoutPopup({ itemName, amount, variationId, onC
         email: "",
         phone: "",
     });
+    const [formErrors, setFormErrors] = useState({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+    });
 
     const createPayment = api.square.payments.createPayment.useMutation();
-    const appId = process.env.NEXT_PUBLIC_SQUARE_APP_ID!;
-    const locationId = process.env.NEXT_PUBLIC_SQUARE_LOCATION_ID!;
+    const appId = process.env.NEXT_PUBLIC_SANDBOX_SQUARE_APP_ID!;
+    const locationId = process.env.NEXT_PUBLIC_SANDBOX_SQUARE_LOCATION_ID!;
 
     const initCard = async () => {
         if (!(window as any).Square) {
@@ -43,12 +49,67 @@ export default function SquareCheckoutPopup({ itemName, amount, variationId, onC
         }
     };
 
+    function formatPhoneNumber(value: string): string {
+        const digits = value.replace(/\D/g, "").substring(0, 10); // remove non-digits, max 10
+        const parts = [];
+
+        if (digits.length > 0) parts.push("(" + digits.slice(0, 3));
+        if (digits.length >= 4) parts.push(") " + digits.slice(3, 6));
+        if (digits.length >= 7) parts.push("-" + digits.slice(6));
+
+        return parts.join("");
+    }
+
+    const validateField = (name: string, value: string): string => {
+        switch (name) {
+            case "firstName":
+                return value.trim() === "" ? "First name is required." : "";
+            case "lastName":
+                return value.trim() === "" ? "Last name is required." : "";
+            case "email":
+                return value.trim() === ""
+                    ? "Email is required."
+                    : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+                    ? ""
+                    : "Invalid email format.";
+            case "phone":
+                const phoneDigits = value.replace(/\D/g, "");
+                return phoneDigits.length === 0
+                    ? "Phone number is required."
+                    : phoneDigits.length !== 10
+                    ? "Phone number must be exactly 10 digits."
+                    : "";
+            default:
+                return "";
+        }
+    }
+
     const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+
+        let newValue = value;
+        if (name === "phone") {
+            newValue = formatPhoneNumber(value);
+        }
+
+        const updatedForm = { ...form, [name]: newValue };
+        const updatedErrors = { ...formErrors, [name]: validateField(name, newValue) };
+
+        setForm(updatedForm);
+        setFormErrors(updatedErrors);
     };
 
     const handlePayment = async () => {
-        if (!card) return;
+        const errors = {
+            firstName: validateField("firstName", form.firstName),
+            lastName: validateField("lastName", form.lastName),
+            email: validateField("email", form.email),
+            phone: validateField("phone", form.phone),
+        };
+        setFormErrors(errors);
+
+        const isValid = Object.values(errors).every((e) => e === "");
+        if (!isValid || !card) return;
 
         const result = await card.tokenize();
         if (result.status === "OK") {
@@ -59,7 +120,7 @@ export default function SquareCheckoutPopup({ itemName, amount, variationId, onC
                 sourceId,
                 idempotencyKey: uuidv4(),
                 amountMoney: {
-                    amount: BigInt(amount), // $50.00
+                    amount: BigInt(amount),
                     currency: "USD",
                 },
                 note: `Order from ${form.firstName} ${form.lastName}`,
@@ -77,7 +138,7 @@ export default function SquareCheckoutPopup({ itemName, amount, variationId, onC
     return (
         <div className="fixed inset-0 z-50 backdrop-blur-sm flex justify-center items-center">
             <Script
-                src="https://web.squarecdn.com/v1/square.js"
+                src="https://sandbox.web.squarecdn.com/v1/square.js"
                 strategy="afterInteractive"
                 onLoad={initCard}
             />
@@ -91,25 +152,76 @@ export default function SquareCheckoutPopup({ itemName, amount, variationId, onC
                 </button>
 
                 {/* Left - Form */}
-                <div className="flex-1">
-                    <h2 className="text-xl font-bold mb-4">Your Details</h2>
-                    <div className="flex gap-4 mb-2">
-                        <input type="text" placeholder="First Name" className="flex-1 p-2 border border-gray-300 bg-gray-100 rounded"/>
-                        <input type="text" placeholder="Last Name" className="flex-1 p-2 border border-gray-300 bg-gray-100 rounded"/>
+                <div className="flex-1 p-2">
+                    <h2 className="text-xl font-bold mb-2">Your Details</h2>
+
+                    <div className="flex gap-4 mb-3">
+                        <div className="flex-1">
+                            <input
+                                name="firstName"
+                                type="text" 
+                                placeholder="First Name" 
+                                required
+                                className={`w-full p-2 border rounded ${
+                                    formErrors.firstName ? "border-red-500" : "border-gray-300"
+                                } bg-gray-100`}
+                                value={form.firstName}
+                                onChange={handleFormChange}
+                            />
+                            {formErrors.firstName && <p className="text-red-500 text-sm mt-1">{formErrors.firstName}</p>}
+                        </div>
+                        <div className="flex-1">
+                            <input
+                                name="lastName"
+                                type="text" 
+                                placeholder="Last Name" 
+                                required
+                                className={`w-full p-2 border rounded ${
+                                    formErrors.lastName ? "border-red-500" : "border-gray-300"
+                                } bg-gray-100`}
+                                value={form.lastName}
+                                onChange={handleFormChange}
+                            />
+                            {formErrors.lastName && <p className="text-red-500 text-sm mt-1">{formErrors.lastName}</p>}
+                        </div>
                     </div>
 
-                    <div className="flex gap-4">
-                        <input type="email" placeholder="Email" className="flex-1 p-2 border border-gray-300 bg-gray-100 rounded"/>
-                        <input type="tel" placeholder="Phone Number" className="flex-1 p-2 border border-gray-300 bg-gray-100 rounded"/>
+                    <div className="mb-3">
+                        <input 
+                            name="email"
+                            type="email" 
+                            placeholder="Email" 
+                            required
+                            className={`w-full p-2 border rounded ${
+                                formErrors.email ? "border-red-500" : "border-gray-300"
+                            } bg-gray-100`}
+                            value={form.email}
+                            onChange={handleFormChange}
+                        />
+                        {formErrors.email && <p className="text-red-500 text-sm mt-1">{formErrors.email}</p>}
+                    </div>
+                    <div className="mb-3">
+                        <input 
+                            name="phone" 
+                            type="text"
+                            placeholder="Phone Number" 
+                            required
+                            className={`w-full p-2 border rounded ${
+                                formErrors.phone ? "border-red-500" : "border-gray-300"
+                            } bg-gray-100`}
+                            value={form.phone}
+                            onChange={handleFormChange}
+                        />
+                        {formErrors.phone && <p className="text-red-500 text-sm mt-1">{formErrors.phone}</p>}
                     </div>
 
-                    <h2 className="text-xl font-bold mt-8 mb-4">Card Details</h2>
-                    <div ref={cardRef} className="card-input border border-gray-300 bg-gray-100 rounded-md min-h-[120px] p-2" />
+                    <h2 className="text-xl font-bold mt-6 mb-2">Card Details</h2>
+                    <div ref={cardRef} className="card-input border border-gray-300 bg-gray-100 rounded-md min-h-[120px] p-1" />
 
                     <button
                         onClick={handlePayment}
                         disabled={!card || createPayment.isPending}
-                        className="mt-6 w-full bg-[var(--shpe-yellow)] hover:bg-black text-white py-3 rounded-md font-semibold cursor-pointer"
+                        className="mt-6 w-full bg-[var(--shpe-yellow)] hover:bg-black text-lg text-white py-3 rounded-md font-semibold cursor-pointer"
                     >
                         {createPayment.isPending ? "Processing..." : "Place Order"}
                     </button>
@@ -117,8 +229,8 @@ export default function SquareCheckoutPopup({ itemName, amount, variationId, onC
 
                 {/* Right - Order Summary */}
                 <div className="w-full md:w-1/3 py-4 text-sm">
-                    <div className="px-4 py-8 bg-gray-50 rounded-md">
-                        <h3 className="summary font-semibold text-xl mb-3">Order Summary</h3>
+                    <div className="p-6 bg-gray-50 rounded-md">
+                        <h3 className="font-bold text-xl mb-3">Order Summary</h3>
                         <p className="mb-3"><strong>Item: </strong>{itemName}</p>
                         <div className="flex justify-between mb-1">
                             <span>Amount:</span>
