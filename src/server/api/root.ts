@@ -10,6 +10,7 @@ import { cartRouter } from "./routers/cart";
 import { resetCodeRouter } from "./routers/reset-code";
 import { ordersRouter } from "./routers/orders";
 import { checkoutRouter } from "./routers/checkout";
+import { paymentsRouter } from "./routers/payments";
 
 /**
  * This is the primary router for your server.
@@ -20,6 +21,7 @@ import { checkoutRouter } from "./routers/checkout";
 const squareRouter = createTRPCRouter({
   catalog: catalogRouter,
   checkout: checkoutRouter,
+  payments: paymentsRouter,
 });
 
 export const appRouter = createTRPCRouter({
