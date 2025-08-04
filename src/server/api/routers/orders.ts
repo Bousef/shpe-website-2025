@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { legacyClient, squareClient } from "~/lib/square/client";
-import { SortOrder, type OrderLineItem, type OrderLineItemDiscount } from "node_modules/square/api";
+import { SortOrder, type Order, type OrderLineItem, type OrderLineItemDiscount } from "node_modules/square/api";
 import { randomUUID } from "crypto";
 import { type BatchRetrieveOrdersRequest, type CreateOrderRequest, type UpdateOrderRequest } from "square/legacy";
 import { request } from "http";
@@ -145,30 +145,44 @@ export const ordersRouter = createTRPCRouter ({
         }),
 
     createOrder: publicProcedure
-        .input(
-            z.object({
-                body: z.custom<CreateOrderRequest>(),
-                requestOptions: z.any().optional()
-            })
-        ).mutation(async({input})=>{
-            return await legacyClient.ordersApi.createOrder(
-                input.body,
-                input.requestOptions
-            );
-        }),
+        .input(z.object({
+            idempotency_Key: z.string().max(192),
+            order: z.custom<Order>().optional()
+            })).mutation(async({input})=>{
+                const response = await squareClient.orders.create({
+                    ...input
+                });
+                if(response.errors && response.errors.length > 0){
+                    throw Error(response.errors.reduce((acc,val)=>
+                    acc + val.detail + "\n" , " "))
+
+                }
+
+                if(response.order == undefined){
+                    throw Error("Error in creating a order.");
+                }
+                return response.order;
+            }),
     
-    batchRetrieveOrders: publicProcedure
-        .input(
-            z.object({
-                body: z.custom<BatchRetrieveOrdersRequest>(),
-                requestOptions: z.any().optional()
-            }))
-        .query(async ({input}) =>{
-            return await legacyClient.ordersApi.batchRetrieveOrders(
-                input.body,
-                input.requestOptions
-            );
-        }),
+     batchRetrieveOrders: publicProcedure
+            .input(z.object({
+                location_id: z.string().optional(),
+                order_ids: z.array(z.string()),
+            })).query(async({input})=>{
+                const response = await squareClient.orders.batchGet({
+                    locationId: input.location_id,
+                    orderIds: input.order_ids,
+                });
+                if(response.errors && response.errors.length > 0){
+                    throw Error(response.errors.reduce((acc, val) => 
+                        acc + val.detail + "\n"
+                    , ""))
+                }
+                if(response.orders === undefined){
+                    throw Error("batchRetrieveOrders returned an undefined order. This should not happen.");
+                }
+                return response.orders;
+            }),
 
     calculateOrder: publicProcedure
         .input(
