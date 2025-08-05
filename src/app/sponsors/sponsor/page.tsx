@@ -6,8 +6,7 @@ import { api } from "~/trpc/react";
 import Navbar from "~/app/_components/NavBar";
 import SquareCheckoutPopup from "~/app/_components/SquareCheckout";
 
-//const ITEM_ID = "LE4E2BKJKFFN5Q57V66FNWKN";
-const ITEM_ID = "SPYTFDTARIS4PLPSHMQWUMKO";
+const ITEM_ID = "LE4E2BKJKFFN5Q57V66FNWKN";
 
 export default function SponsorPage() {
     const [customAmount, setCustomAmount] = useState("");
