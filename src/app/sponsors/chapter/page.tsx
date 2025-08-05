@@ -159,7 +159,7 @@ export default function ChapterPage() {
 
             {showPaymentModal && selectedVariationId && (
                 <SquareCheckoutPopup
-                    itemName={itemObject?.result.object?.itemData?.name ?? "SHPE UCF Sponsorship"}
+                    itemName={itemObject?.result.object?.itemData?.name ?? "SHPE CHAPTER CONTRIBUTION"}
                     amount={Math.round(Number(customAmount) * 100)} // convert to cents
                     variationId={selectedVariationId}
                     onClose={() => setShowPaymentModal(false)}

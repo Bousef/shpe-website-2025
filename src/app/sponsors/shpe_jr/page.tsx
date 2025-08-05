@@ -6,9 +6,10 @@ import { api } from "~/trpc/react";
 import Navbar from "~/app/_components/NavBar";
 import SquareCheckoutPopup from "~/app/_components/SquareCheckout";
 
-const ITEM_ID = "2VJ3PNTMTHIVOROECMOCNO2X"; // outreach item ID 
+const ITEM_ID = "XNFOLLXF3MRGNWLAMN5JRVQQ";
 
-export default function OutreachPage() {
+
+export default function SHPEJrPage() {
     const [customAmount, setCustomAmount] = useState("");
     const [variationMap, setVariationMap] = useState<Record<string, string>>({});
     const [selectedVariationId, setSelectedVariationId] = useState<string | null>(null);
@@ -49,9 +50,9 @@ export default function OutreachPage() {
             return;
         }
 
-        const variationName = ["5", "10", "25"].includes(customAmount)
-            ? `$${Number(customAmount).toFixed(2)} donation`
-            : "Custom Amount";
+        const variationName = ["5", "10", "15", "20"].includes(customAmount)
+            ? `$${Number(customAmount).toFixed(2)}`
+            : "";
 
         const variationId = variationMap[variationName];
 
@@ -73,15 +74,6 @@ export default function OutreachPage() {
                         {itemObject?.result.object?.itemData?.name  || ""}
                     </h1>
 
-                    <p className="text-md leading-normal mb-8">
-                        The Society of Hispanic Professional Engineers at UCF is involved directly with our local community with our outreach program - the SHPE Jr. Program. 
-                        It is a STEM based initiative set forward to inspire local high school students to achieve their highest potential and pursue post-secondary education. 
-                        Members from SHPE UCF volunteer their time to meet with these students and offer their experience, put on technical workshops, and mentoring. 
-                        Parents and students benefit from college prep workshops designed to educate them on the process of applying to college and looking for financial aid. 
-                        Through UCF SHPE Jr, students receive the benefits of working first hand with UCF students and receiving valuable insight in learning how to better 
-                        prepare themselves to take on new challenges and optimizing their own college experience. Your donation will assist us with materials that will further 
-                        our reach and involvement with our community. Thank you for your donation!
-                    </p>
 
                     <div className="text-sm text-gray-600 mt-4 mb-8">
                         <h2 className="font-semibold">Variation IDs:</h2>
@@ -93,7 +85,7 @@ export default function OutreachPage() {
                     </div>
 
                     <div className="flex justify-center gap-4 mb-8">
-                        {[5, 10, 25].map((amount) => (
+                        {[5, 10, 15, 20].map((amount) => (
                             <button
                                 key={amount}
                                 className={`px-6 py-3 rounded-full font-semibold shadow-md border transition cursor-pointer
@@ -109,20 +101,6 @@ export default function OutreachPage() {
                                 ${amount.toFixed(2)}
                             </button>
                         ))}
-                        {/* CUSTOM AMOUNT BUTTON */}
-                        <button
-                            className={`px-6 py-3 rounded-full font-semibold shadow-md border transition cursor-pointer col-span-3 sm:col-span-1
-                                ${!["5", "10", "25"].includes(customAmount)
-                                    ? "bg-black text-white border-black"
-                                    : "bg-white text-black border-black hover:bg-gray-800 hover:text-white"}
-                            `}
-                            onClick={() => {
-                                setCustomAmount("");
-                                setSelectedVariationId(variationMap["Custom Amount"] ?? null);
-                            }}
-                        >
-                            Custom
-                        </button>
                     </div>
                         
                     <div className="relative w-full mb-4">
@@ -162,7 +140,7 @@ export default function OutreachPage() {
 
             {showPaymentModal && selectedVariationId && (
                 <SquareCheckoutPopup
-                    itemName={itemObject?.result.object?.itemData?.name ?? "SHPE JR. OUTREACH PROGRAM"}
+                    itemName={itemObject?.result.object?.itemData?.name ?? "SHPE JR. DONATION"}
                     amount={Math.round(Number(customAmount) * 100)} // convert to cents
                     variationId={selectedVariationId}
                     onClose={() => setShowPaymentModal(false)}
