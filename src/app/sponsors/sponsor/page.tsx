@@ -6,7 +6,8 @@ import { api } from "~/trpc/react";
 import Navbar from "~/app/_components/NavBar";
 import SquareCheckoutPopup from "~/app/_components/SquareCheckout";
 
-const ITEM_ID = "LE4E2BKJKFFN5Q57V66FNWKN";
+//const ITEM_ID = "LE4E2BKJKFFN5Q57V66FNWKN";
+const ITEM_ID = "SPYTFDTARIS4PLPSHMQWUMKO";
 
 export default function SponsorPage() {
     const [customAmount, setCustomAmount] = useState("");
@@ -147,7 +148,7 @@ export default function SponsorPage() {
                     <div className="flex justify-center">
                         <button
                             type="submit"
-                            className="bg-[var(--shpe-yellow)] text-white font-bold px-20 py-4 rounded-full shadow-lg hover:bg-black hover:text-white transition text-xl flex items-center gap-2"
+                            className="bg-[var(--shpe-yellow)] text-white font-bold px-20 py-4 rounded-full shadow-lg hover:bg-black hover:text-white transition text-xl flex items-center gap-2 cursor-pointer"
                             onClick={handleSubmit}
                         >
                             Sponsor <ArrowRightCircle className="w-5 h-5" />

@@ -151,7 +151,7 @@ export default function OutreachPage() {
                     <div className="flex justify-center">
                         <button
                             type="submit"
-                            className="bg-[var(--shpe-yellow)] text-white font-bold px-20 py-4 rounded-full shadow-lg hover:bg-black hover:text-white transition text-xl flex items-center gap-2"
+                            className="bg-[var(--shpe-yellow)] text-white font-bold px-20 py-4 rounded-full shadow-lg hover:bg-black hover:text-white transition text-xl flex items-center gap-2 cursor-pointer"
                             onClick={handleSubmit}
                         >
                             Donate <ArrowRightCircle className="w-5 h-5" />
