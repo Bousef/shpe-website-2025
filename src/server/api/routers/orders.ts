@@ -286,31 +286,54 @@ export const ordersRouter = createTRPCRouter ({
         .input(
             z.object({
                 orderId: z.string(),
-                body: z.custom<UpdateOrderRequest>(),
-                requestOptions: z.any().optional()
+                order: z.custom<Order>(),       //the order object to update
+                idempotencyKey: z.string(),
+                fieldsToClear: z.array(z.string()).optional(), 
             })
         ).mutation(async ({input}) => {
-            const { orderId, body, requestOptions } = input;
-            return await legacyClient.ordersApi.updateOrder(
+            const { orderId, order, idempotencyKey, fieldsToClear } = input;
+
+            const response = await squareClient.orders.update({
                 orderId,
-                body,
-                requestOptions
-            );
+                idempotencyKey,
+                order,
+                fieldsToClear,
+            });
+
+            if (response.errors && response.errors.length > 0) {
+                throw Error(response.errors.reduce((acc, val) => acc + val.detail + "\n", ""));
+            }
+
+            if (!response.order) {
+                throw Error("updateOrders returned an undefined order.");
+            }
+
+            return response.order;
         }),
+            
 
     retrieveOrder: publicProcedure
         .input(
             z.object({
-                orderId: z.string(),
-                requestOptions: z.any().optional()
+                orderId: z.string()
             })
         ).query(async ({input}) => {
-            const { orderId, requestOptions } = input;
-            return await legacyClient.ordersApi.retrieveOrder(
-                orderId,
-                requestOptions
-            );
+            const response = await squareClient.orders.get({
+                orderId: input.orderId,
+            });
+
+            if (response.errors && response.errors.length > 0) {
+                throw Error(response.errors.reduce((acc, val) => acc + val.detail + "\n", ""));
+            }
+
+            if (!response.order) {
+                throw Error("retrieveOrder returned an undefined order.");
+            }
+
+            return response.order;
         }),
+            
+        
     
 
     
