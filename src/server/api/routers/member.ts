@@ -70,7 +70,6 @@ export const memberRouter = createTRPCRouter({
     }
 
     return newMember;
-
   }),
 
 
@@ -82,10 +81,11 @@ export const memberRouter = createTRPCRouter({
       .select()
       .from(members)
       .where(eq(members.uuid, input.uuid));
-      if (member.length == 0){
-        throw new Error("No member found!");
-      }
-      return member[0];
+
+    if (member.length == 0){
+      throw new Error("No member found!");
+    }
+    return member[0];
   }),
 
   //delete member - debugging
@@ -100,10 +100,7 @@ export const memberRouter = createTRPCRouter({
       throw new Error("No member with that Id");
     }
 
-
     await db.delete(members).where(eq(members.uuid, input.uuid));
-
-
     return delteMem[0];
   }),
 
@@ -119,6 +116,8 @@ export const memberRouter = createTRPCRouter({
       bio: z.string().optional(),
       resume: z.string().optional(),
       is_member: z.boolean().optional(),
+      phone_number: z.string().optional(),
+      major: z.string().optional(),
   }))
   .mutation(async ({ input, ctx }) => {
     const { ucf_id, ...updateData } = input;

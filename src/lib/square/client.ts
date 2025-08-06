@@ -16,15 +16,15 @@ export const squareClient = new SquareClient({
 });
 
 // Legacy SDK client — needed for Catalog API
-export const legacyClient = new LegacyClient({
-  bearerAuthCredentials: { accessToken: process.env.SQUARE_ACCESS_TOKEN! },
-});
+// export const legacyClient = new LegacyClient({
+//   bearerAuthCredentials: { accessToken: process.env.SQUARE_ACCESS_TOKEN! },
+// });
 
 // for testing purposes: legacy sdk client working for sandbox token
-// export const legacyClient = new LegacyClient({
-//   accessToken: process.env.SQUARE_ACCESS_TOKEN!,
-//   environment: process.env.NODE_ENV === "production" ? Environment.Production : Environment.Sandbox,
-// });
+export const legacyClient = new LegacyClient({
+  accessToken: process.env.SQUARE_ACCESS_TOKEN!,
+  environment: process.env.NODE_ENV === "production" ? Environment.Production : Environment.Sandbox,
+});
 
 // Export the exact client.handle for catalog:
 export const catalogApi = legacyClient.catalogApi;
