@@ -78,7 +78,7 @@ export const checkoutRouter = createTRPCRouter({
                         acc + val.detail + "\n"
                     , ""))
                 }
-    
+                
                 if (response.locationSettings === undefined) {
                     throw Error("retrieveLocationSettings returned an undefined locationSettings. This should not happen.");
                 }
@@ -151,7 +151,7 @@ export const checkoutRouter = createTRPCRouter({
                         updatedAt: input.merchant_settings.updatedAt,
                     }
                 });
-
+                
                 // in case of an error, we accumulate all errors into one string and throw them
                 // this should probably be handled better...
                 if (response.errors && response.errors?.length > 0) {

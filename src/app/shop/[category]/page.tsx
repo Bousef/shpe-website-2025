@@ -5,8 +5,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Navbar from "../../_components/NavBar";
-import { getCatalog, getObjectURL } from "../../shop/actions/actions";
-import type { Square } from "square";
+import { api } from "~/trpc/react";
 
 interface ItemWithUrl {
   id: string;
@@ -26,6 +25,8 @@ export default function CategoryPage({ params }: { params: Promise<{ category: s
   const { category } = React.use(params);
   const [state, setState] = useState<LoadState>({ loading: true, error: null, items: [] });
   const slug = category.toLowerCase();
+
+  
 
   useEffect(() => {
     let cancelled = false;
@@ -75,6 +76,7 @@ export default function CategoryPage({ params }: { params: Promise<{ category: s
 
   if (state.loading) {
     // Skeleton loader rows
+
     return (
       <div className="p-4">
         <p className="animate-pulse text-center">Loading products…</p>
