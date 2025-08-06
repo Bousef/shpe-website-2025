@@ -103,15 +103,6 @@ export default function PartnersSection() {
                                     >
                                         SHPE Jr. Outreach Program
                                     </button>
-                                      <button
-                                        onClick={() => {
-                                            router.push("../sponsors/shpe_jr");
-                                            setShowDropdown(false);
-                                        }}
-                                        className="block w-full px-4 py-2 text-left text-gray-800 hover:bg-gray-100"
-                                    >
-                                        SHPE Jr. Donation
-                                      </button>
                                 </div>
                             )}
                         </div>

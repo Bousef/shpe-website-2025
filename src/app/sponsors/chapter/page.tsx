@@ -70,7 +70,7 @@ export default function ChapterPage() {
              <main className="min-h-screen bg-white py-12 px-4 flex justify-center">
                 <div className="max-w-3xl w-full rounded-3xl shadow-xl p-15">
                     <h1 className="text-4xl sm:text-5xl font-semibold text-center text-[var(--shpe-yellow)] mb-6 drop-shadow-md">
-                        {itemObject?.result.object?.itemData?.name || ""}
+                        {itemObject?.result.object?.itemData?.name || "Chapter Contribution"}
                     </h1>
 
                     <p className="text-md leading-normal mb-8">
@@ -159,7 +159,7 @@ export default function ChapterPage() {
 
             {showPaymentModal && selectedVariationId && (
                 <SquareCheckoutPopup
-                    itemName={itemObject?.result.object?.itemData?.name ?? "SHPE CHAPTER CONTRIBUTION"}
+                    itemName={itemObject?.result.object?.itemData?.name ?? "Chapter Contribution"}
                     amount={Math.round(Number(customAmount) * 100)} // convert to cents
                     variationId={selectedVariationId}
                     onClose={() => setShowPaymentModal(false)}

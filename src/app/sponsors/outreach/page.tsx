@@ -70,7 +70,7 @@ export default function OutreachPage() {
             <main className="min-h-screen bg-white py-12 px-4 flex justify-center">
                 <div className="max-w-3xl w-full rounded-3xl shadow-xl p-15">
                     <h1 className="text-4xl sm:text-5xl font-semibold text-center text-[var(--shpe-yellow)] mb-6 drop-shadow-md">
-                        {itemObject?.result.object?.itemData?.name  || ""}
+                        {itemObject?.result.object?.itemData?.name || "SHPE Jr. Outreach Program"}
                     </h1>
 
                     <p className="text-md leading-normal mb-8">
@@ -162,7 +162,7 @@ export default function OutreachPage() {
 
             {showPaymentModal && selectedVariationId && (
                 <SquareCheckoutPopup
-                    itemName={itemObject?.result.object?.itemData?.name ?? "SHPE JR. OUTREACH PROGRAM"}
+                    itemName={itemObject?.result.object?.itemData?.name ?? "SHPE Jr. Outreach Program"}
                     amount={Math.round(Number(customAmount) * 100)} // convert to cents
                     variationId={selectedVariationId}
                     onClose={() => setShowPaymentModal(false)}
