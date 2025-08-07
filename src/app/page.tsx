@@ -4,6 +4,8 @@ import Slideshow    from "./_components/MeetFam";
 import AboutSection    from "./_components/AboutSection";
 import HeroSection    from "./_components/HeroSection";
 import SquareConnectionTest from "./_components/SquareConnectionTester";
+import JotFormSubmitter from "./_components/JotformTester";
+import JotformTester from "./_components/JotformTester";
 
 export const metadata = {
   title: "SHPE UCF",
@@ -23,6 +25,7 @@ export default function HomePage() {
 
         <Slideshow />
         <SquareConnectionTest />
+        <JotformTester />
         
       </div>
     </>
