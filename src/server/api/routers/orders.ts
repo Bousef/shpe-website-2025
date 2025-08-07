@@ -158,7 +158,7 @@ export const ordersRouter = createTRPCRouter ({
 
                 }
 
-                if(response.order == undefined){
+                if(response.order === undefined){
                     throw Error("Error in creating a order.");
                 }
                 return response.order;
