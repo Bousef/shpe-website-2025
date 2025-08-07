@@ -68,9 +68,15 @@ export default function ProfileCard() {
 	const orders = ordersData && !Array.isArray(ordersData) && 'orders' in ordersData
 		? ordersData.orders
 		: [];
+	
+	// sum all order totals (square stores amounts in cents, so divide by 100)
+	const totalSpent = orders.reduce(
+		(sum, order) => sum + Number(order.totalMoney?.amount ?? 0),
+		0
+	) / 100;
 
+	// pagination of order receipts
 	const hasNextPage = ordersData && !Array.isArray(ordersData) && ordersData.cursor;
-
 	const handleNextPage = () => {
 		if (hasNextPage) {
 			const newCursorStack = [
@@ -82,7 +88,6 @@ export default function ProfileCard() {
 			setPage((prev) => prev + 1);
 		}
 	};
-
 	const handlePrevPage = () => {
 		if (cursorIndex > 0) {
 			setCursorIndex(cursorIndex - 1);
@@ -95,9 +100,9 @@ export default function ProfileCard() {
 	if (error) return <p>Error: {error.message}</p>;
 
 	return (
-		<main id="profile" className="relative bg-white py-15 px-15 text-[var(--shpe-navy-blue)] min-w-6xl mx-auto min-h-[80vh]">
+		<main id="profile" className="relative bg-white py-10 px-15 text-[var(--shpe-navy-blue)] min-w-6xl mx-auto min-h-[80vh]">
 			<div className='flex flex-row gap-5 h-full'>
-				<section className="w-1/2 flex items-stretch space-x-5 p-6 bg-[var(--shpe-light-blue)] shadow-sm">
+				<section className="w-1/2 flex items-stretch space-x-5 p-5 bg-[var(--shpe-light-blue)] shadow-sm">
 					{/* LEFT */}
 					<div className="w-1/3 bg-[#b3cad6] rounded flex flex-col items-center">
 						{profile.image &&
@@ -268,25 +273,32 @@ export default function ProfileCard() {
 				)}
 
 				{/* ORDER RECEIPTS */}
-				<section className="w-1/2 flex flex-col gap-6 h-full">
-					<div className="flex gap-6">
-						<div className="flex-1 p-6 bg-[var(--shpe-light-blue)] shadow-sm">
-							<div className="bg-[#b3cad6] p-6 rounded shadow">
-								<h3 className="font-bold mb-2">Section 1</h3>
-								<p>Content for the first section.</p>
+				<section className="w-1/2 flex flex-col gap-5 h-full">
+					<div className="flex gap-5">
+						{/* events attended TO BE IMPLEMENT LATER */}
+						<div className="flex-1 p-5 bg-[var(--shpe-light-blue)] shadow-sm">
+							<div className="bg-[#b3cad6] p-5 rounded shadow">
+								<h3 className="font-bold text-2xl mb-2 tracking-[0.1em]">INCOMING!</h3>
+								<p>New feature coming soon!!</p>
 							</div>
 						</div>
-						<div className="flex-1 p-6 bg-[var(--shpe-light-blue)] shadow-sm">
-							<div className="bg-[#b3cad6] p-6 rounded shadow">
-								<h3 className="font-bold mb-2">Section 2</h3>
-								<p>Content for the second section.</p>
+						{/* total spent */}
+						<div className="flex-1 p-5 bg-[var(--shpe-light-blue)] shadow-sm">
+							<div className="bg-[#b3cad6] p-5 rounded shadow flex flex-col items-start">
+								<h3 className="font-bold text-2xl mb-2 tracking-[0.1em]">PURCHASES</h3>
+
+								<div className="w-full flex justify-center">
+									<div className="w-42 h-42 rounded-full bg-[var(--shpe-yellow)] flex items-center justify-center shadow-inner">
+										<p className="text-4xl font-bold">${totalSpent.toFixed(2)}</p>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
-					<div className="p-6 bg-[var(--shpe-light-blue)] shadow-sm">
-						<div className="bg-[#b3cad6] p-6 rounded shadow">
-							<h2 className="text-2xl font-bold mb-4 font-helios tracking-[0.1em]">ORDER RECEIPTS</h2>
-							<div className="max-h-[400px] overflow-y-auto pr-2 space-y-3 text-sm">
+					<div className="p-5 bg-[var(--shpe-light-blue)] shadow-sm">
+						<div className="bg-[#b3cad6] p-5 rounded shadow">
+							<h2 className="text-2xl font-bold mb-2 font-helios tracking-[0.1em]">ORDER RECEIPTS</h2>
+							<div className="max-h-[150px] overflow-y-auto pr-2 space-y-3 text-sm">
 								{orders && orders.length > 0 ? (
 									<ul className="space-y-3 text-sm">
 										{orders.map((order, i) => (
@@ -358,7 +370,7 @@ export default function ProfileCard() {
 								<button
 									onClick={handlePrevPage}
 									disabled={cursorIndex === 0}
-									className="px-4 py-2 bg-blue-600 text-white rounded disabled:bg-gray-400"
+									className="px-4 py-1 bg-blue-600 text-white rounded disabled:bg-gray-400"
 								>
 									← Prev
 								</button>
@@ -366,7 +378,7 @@ export default function ProfileCard() {
 								<button
 									onClick={handleNextPage}
 									disabled={!hasNextPage}
-									className="px-4 py-2 bg-blue-600 text-white rounded disabled:bg-gray-400"
+									className="px-4 py-1 bg-blue-600 text-white rounded disabled:bg-gray-400"
 								>
 									Next →
 								</button>						
