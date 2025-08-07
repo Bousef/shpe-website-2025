@@ -280,6 +280,7 @@ export default function ProfileCard() {
 							<div className="bg-[#b3cad6] p-5 rounded shadow">
 								<h3 className="font-bold text-2xl mb-2 tracking-[0.1em]">INCOMING!</h3>
 								<p>New feature coming soon!!</p>
+								<img src="/assets/shpe-white-horizontal-logo.png" alt="→" className="my-5 h-30" />
 							</div>
 						</div>
 						{/* total spent */}
@@ -288,7 +289,7 @@ export default function ProfileCard() {
 								<h3 className="font-bold text-2xl mb-2 tracking-[0.1em]">PURCHASES</h3>
 
 								<div className="w-full flex justify-center">
-									<div className="w-42 h-42 rounded-full bg-[var(--shpe-yellow)] flex items-center justify-center shadow-inner">
+									<div className="w-45 h-45 rounded-full bg-[var(--shpe-yellow)] flex items-center justify-center shadow-inner">
 										<p className="text-4xl font-bold">${totalSpent.toFixed(2)}</p>
 									</div>
 								</div>
