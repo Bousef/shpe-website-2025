@@ -5,12 +5,14 @@ import Link from "next/link";
 import { useState, useEffect, useMemo } from "react";
 import Navbar from "../../../_components/NavBar";
 import { api } from "~/trpc/react";
+import Image from "next/image";
+import NextImage from "next/image";
 
 export default function ItemPage() {
   // 1. Route params
   const params = useParams<{ category: string; itemId: string }>();
-  const category = params.category!;
-  const itemId = params.itemId!;
+  const category = params.category;
+  const itemId = params.itemId;
 
   // 2. UI state
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
@@ -21,22 +23,14 @@ export default function ItemPage() {
   const { data: member } = api.user.getCurrentMember.useQuery();
 
   // 4. Fetch item + related objects
-const {
-  data: itemRes,
-  isLoading: itemLoading,
-  error: itemError,
-} = api.square.catalog.RetrieveCatalogObject.useQuery({
-  objectId: itemId,
-  includeRelatedObjects: true,
-});
-
-// — log as soon as itemRes becomes defined —
-useEffect(() => {
-  if (itemRes) {
-    console.log("✅ fetched itemRes:", itemRes);
-    console.log("📦 catalog object:", itemRes.result.object);
-  }
-}, [itemRes]);
+  const {
+    data: itemRes,
+    isLoading: itemLoading,
+    error: itemError,
+  } = api.square.catalog.RetrieveCatalogObject.useQuery({
+    objectId: itemId,
+    includeRelatedObjects: true,
+  });
 
   // 5. Extract ITEM object & variations
   const obj = itemRes?.result.object;
@@ -54,7 +48,24 @@ useEffect(() => {
     body: { catalogObjectIds: variationIds },
   });
 
-  // 7. Build image gallery data (memoized)
+  // Log the full inventory response once it’s fetched
+useEffect(() => {
+  if (invRes) {
+    console.log("✅ Inventory counts fetched:", invRes);
+    console.log("🔢 Counts array:", invRes.result.counts);
+  }
+}, [invRes]);
+
+  // 7. Build size/stock arrays
+  const stocks: number[] =
+    invRes?.result.counts?.map((c) => Number(c.quantity) || 0) ?? [];
+  const sizes = ["S", "M", "L", "XL", "XXL", "XXXL"];
+  const sizeStockPairs = sizes.map((size, idx) => ({
+    size,
+    stock: stocks[idx] ?? 0,
+  }));
+
+  // 8. Build image gallery data (memoized)
   const relatedObjs = useMemo(
     () => itemRes?.result.relatedObjects ?? [],
     [itemRes]
@@ -69,14 +80,6 @@ useEffect(() => {
   );
   const firstImage = allImages[0] ?? "";
 
-  // 8. Build size/stock arrays
-  const stocks: number[] =
-    invRes?.result.counts?.map((c) => Number(c.quantity) || 0) ?? [];
-  const sizes = ["S", "M", "L", "XL", "XXL", "XXXL"];
-  const sizeStockPairs = sizes.map((size, idx) => ({
-    size,
-    stock: stocks[idx] ?? 0,
-  }));
 
   // 9. Derived hooks & helpers (all unconditionally here)
   const stockBySize = useMemo(
@@ -145,28 +148,37 @@ useEffect(() => {
 
       <main className="max-w-6xl mx-auto py-10 px-4 lg:px-0 flex flex-col lg:flex-row lg:space-x-8">
         {/* Thumbnails */}
-        <div className="hidden lg:flex flex-col gap-4 flex-shrink-0 w-24">
-          {allImages.map((url, idx) => (
-            <img
-              key={idx}
-              src={url}
-              alt={`${itemData?.name} thumbnail ${idx + 1}`}
-              className={`w-20 h-20 object-cover border cursor-pointer ${
-                galleryImage === url ? "ring-2 ring-blue-600" : ""
-              }`}
-              onClick={() => setGalleryImage(url)}
-            />
-          ))}
-        </div>
+<div className="hidden lg:flex flex-col gap-4 flex-shrink-0 w-24">
+  {allImages.map((url, idx) => (
+    <div
+      key={idx}
+      className={`relative w-20 h-20 border cursor-pointer ${
+        galleryImage === url ? "ring-2 ring-blue-600" : ""
+      }`}
+      onClick={() => setGalleryImage(url)}
+    >
+      <Image
+        src={url}
+        alt={`${itemData?.name} thumbnail ${idx + 1}`}
+        fill
+        sizes="80px"
+        className="object-cover rounded"
+      />
+    </div>
+  ))}
+</div>
 
         {/* Main image */}
-        <div className="mb-8 lg:mb-0 lg:w-2/3">
-          <img
-            src={galleryImage}
-            alt={itemData?.name!}
-            className="w-full h-auto object-cover shadow"
-          />
-        </div>
+<div className="mb-8 lg:mb-0 lg:w-2/3">
+  <NextImage
+    src={galleryImage}
+    alt={itemData!.name!}
+    width={800}               // intrinsic width
+    height={600}              // intrinsic height
+    sizes="(min-width:1024px) 66vw, 100vw"
+    className="w-full h-auto object-cover shadow rounded"
+  />
+</div>
 
         {/* Details */}
         <div className="flex flex-col lg:w-1/3">
@@ -261,8 +273,8 @@ useEffect(() => {
                 ? "Add to Cart"
                 : "Out of Stock"
               : stock > 0
-              ? "Add to Cart"
-              : "Out of Stock"}
+                ? "Add to Cart"
+                : "Out of Stock"}
           </button>
         </div>
       </main>

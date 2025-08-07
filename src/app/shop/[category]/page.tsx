@@ -78,9 +78,7 @@ export default function CategoryPage() {
     data: imagesData,
     isLoading: imagesLoading,
     error: imagesError,
-  } = api.square.catalog.batchRetrieveCatalogObjects.useQuery(
-    imagesQueryInput
-  );
+  } = api.square.catalog.batchRetrieveCatalogObjects.useQuery(imagesQueryInput);
 
   /**
    * 9. Normalize image objects array
@@ -101,7 +99,7 @@ export default function CategoryPage() {
       const imageId = item.itemData?.imageIds?.[0];
       const imageObj = rawImages.find((img) => img.id === imageId);
       const url = imageObj?.imageData?.url ?? "";
-
+      
       const priceCents =
         item.itemData?.variations?.[0]?.itemVariationData?.priceMoney
           ?.amount ??

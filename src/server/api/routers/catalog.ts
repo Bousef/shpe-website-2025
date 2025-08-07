@@ -73,7 +73,6 @@ export const catalogRouter = createTRPCRouter({
         return await legacyClient.catalogApi.listCatalog(input.cursor, input.types, input.catalogVersion);
     }),
 
-
     upsertCatalogObject: publicProcedure.input(
         z.object({
             body: z.custom<UpsertCatalogObjectRequest>(),
