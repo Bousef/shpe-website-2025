@@ -1,7 +1,19 @@
 import { legacyClient } from "~/lib/square/client";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { object, z } from "zod";
-import { FileWrapper, type SearchCatalogObjectsRequest, type BatchDeleteCatalogObjectsRequest, type BatchRetrieveCatalogObjectsRequest, type BatchUpsertCatalogObjectsRequest, type CreateCatalogImageRequest, type UpdateCatalogImageRequest, type UpsertCatalogObjectRequest, type SearchCatalogItemsRequest, type UpdateItemModifierListsRequest, type UpdateItemTaxesRequest } from "square/legacy";
+import { FileWrapper,
+     type SearchCatalogObjectsRequest, 
+     type BatchDeleteCatalogObjectsRequest, 
+     type BatchRetrieveCatalogObjectsRequest, 
+     type BatchUpsertCatalogObjectsRequest, 
+     type CreateCatalogImageRequest, 
+     type UpdateCatalogImageRequest, 
+     type UpsertCatalogObjectRequest, 
+     type SearchCatalogItemsRequest, 
+     type UpdateItemModifierListsRequest, 
+     type UpdateItemTaxesRequest } from "square/legacy";
+import { catalogApi } from "../../../lib/square/client";
+import { RetrieveJobResponse } from "node_modules/square/serialization";
 
 export const catalogRouter = createTRPCRouter({
     batchDeleteCatalogObjects: publicProcedure.input(
@@ -61,7 +73,6 @@ export const catalogRouter = createTRPCRouter({
         return await legacyClient.catalogApi.listCatalog(input.cursor, input.types, input.catalogVersion);
     }),
 
-
     upsertCatalogObject: publicProcedure.input(
         z.object({
             body: z.custom<UpsertCatalogObjectRequest>(),
@@ -85,7 +96,7 @@ export const catalogRouter = createTRPCRouter({
             includeCaegoryPathToRoot: z.boolean().optional(),
         })
     ).query(async ({ input }) => {
-        return await legacyClient.catalogApi.retrieveCatalogObject(input.objectId, input.includeRelatedObjects, input.catalogVersion, input.includeCaegoryPathToRoot);
+        return await catalogApi.retrieveCatalogObject(input.objectId, input.includeRelatedObjects, input.catalogVersion, input.includeCaegoryPathToRoot);
     }),
 
     searchCatalogObjects: publicProcedure.input(
@@ -96,7 +107,7 @@ export const catalogRouter = createTRPCRouter({
     ).query(async ({ input }) => {
         return await legacyClient.catalogApi.searchCatalogObjects(input.body, input.requestOptions);
     }),
-
+    
 
 
     //-- This endpoint is used to search for catalog items.
@@ -127,5 +138,5 @@ export const catalogRouter = createTRPCRouter({
         return await legacyClient.catalogApi.updateItemTaxes(input.body);
     }),
  
-
+     
 });

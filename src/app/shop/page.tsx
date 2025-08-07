@@ -1,88 +1,105 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getCatalog, getObjectURL, wipeCatalog } from "./actions/actions";
+import { useMemo } from "react";
 import Navbar from "../_components/NavBar";
 import Link from "next/link";
-import { api } from "~/trpc/react";
 import Image from "next/image";
-import type { CatalogCategory, CatalogObject, CatalogObjectCategory } from "node_modules/square/api";
-
-export type CategoryImage = {
-  object: CatalogCategory;
-  image: string; // semicolon-separated filenames
-};
-
-function isCategory(obj: CatalogObject): obj is CatalogObject & { categoryData: CatalogCategory } {
-  return obj.type === "CATEGORY" && !!(obj as any).categoryData;
-}
+import { api } from "~/trpc/react";
+import { skipToken } from "@tanstack/react-query";
 
 export default function ShopPage() {
-  const [categories, setCategories] = useState<CategoryImage[]>([]);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  
+  // 1. Fetch current member (for permissioning)
+  const { data: member } = api.user.getCurrentMember.useQuery();
+
+  // 2. Fetch all CATEGORY catalog objects
   const {
-    data,
-    isLoading,
-    error,
-  } = api.user.getCurrentMember.useQuery();
+    data: categoriesData,
+    isLoading: isLoadingCategories,
+    error: categoriesError,
+  } = api.square.catalog.listCatalog.useQuery({ types: "CATEGORY" });
 
-  let showEdit = false;
+  // 3. Extract raw category objects array
+  const rawCategories = useMemo(
+    () => categoriesData?.result.objects ?? [],
+    [categoriesData]
+  );
+  
+  // 4. Gather the first imageId from each category for lookup
+  const categoryImageIds = useMemo(
+    () =>
+      rawCategories.map(
+        (c) => c.categoryData?.imageIds?.[0] ?? ""  // might be undefined
+      ),
+    [rawCategories]
+  );
 
-  if (error) {
-    console.log(error.message);
+  const imagesQueryInput =
+    categoryImageIds.length > 0 && categoryImageIds.every((id) => id !== "")
+      ? { body: { objectIds: categoryImageIds } }
+      : skipToken;
+
+  // 5. Batch-fetch those Image catalog objects
+  const {
+    data: imagesData,
+    isLoading: isLoadingImages,
+    error: imagesError,
+  } = api.square.catalog.batchRetrieveCatalogObjects.useQuery(imagesQueryInput);
+
+  // 6. Extract the raw image objects array
+  const rawImages = useMemo(
+    () => imagesData?.result.objects ?? [],
+    [imagesData]
+  );
+
+  // 7. Derive parallel arrays of names & URLs
+  const categoryNames = useMemo(
+    () => rawCategories.map((c) => c.categoryData?.name ?? "Unnamed"),
+    [rawCategories]
+  );
+  const categoryImageUrls = useMemo(
+    () =>
+      rawImages.map((i) => i.imageData?.url ?? ""), // fallback to empty string
+    [rawImages]
+  );
+
+  // 8. Zip into a single array for rendering
+  const categories = useMemo(
+    () =>
+      rawCategories.map((catObj, idx) => ({
+        object: catObj,
+        name: categoryNames[idx]!,
+        imageUrl: categoryImageUrls[idx]!,
+      })),
+    [rawCategories, categoryNames, categoryImageUrls]
+  );
+
+  // 9. Permission: show “Manage Inventory” only to Treasurers
+  const showEdit = member?.position === "Treasurer";
+
+  // 10. Early returns for loading / errors / missing data
+  if (isLoadingCategories || isLoadingImages) {
+    return <div>Loading categories...</div>;
+  }
+  if (categoriesError) {
+    return <div>Error loading categories: {categoriesError.message}</div>;
+  }
+  if (imagesError) {
+    return <div>Error loading images: {imagesError.message}</div>;
+  }
+  if (categories.length === 0) {
+    return <div>No categories found</div>;
+  }
+  // (optional) quick sanity check
+  if (!categories.every((c) => c.imageUrl)) {
+    return <div>Some categories are missing images</div>;
   }
 
-  if (data?.position === "Treasurer") {
-    showEdit = true;
-  } else if (!data && !isLoading) {
-    console.log("No user Found");
-  }
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const catalogObjects = await getCatalog();
-        console.log("Fetched catalog:", catalogObjects);
-
-        const onlyCategories = catalogObjects?.filter(
-          (obj: any) => obj.type === "CATEGORY"
-        );
-
-const placeholderUrl = "https://vdujevvvreearypjztgb.supabase.co/storage/v1/object/public/product-images//2025-07-11T00-12-23-043Z-placeholder-store.png";
-
-const categoryImages: CategoryImage[] = await Promise.all(
-  onlyCategories
-    .filter(isCategory) // narrow types safely
-    .map(async (cat) => {
-      const id = cat.categoryData.imageIds?.[0]; // using image_ids per spec
-      if (!id) {
-        console.warn("No imageId for category:", cat.id);
-        return { object: cat.categoryData, image: placeholderUrl };
-      }
-      const url = await getObjectURL(id);
-      if (!url) {
-        console.warn("Could not fetch image for id:", id);
-        return { object: cat.categoryData, image: placeholderUrl };
-      }
-      return { object: cat.categoryData, image: url };
-    })
-);
-
-        setCategories(categoryImages);
-      } catch (err) {
-        console.error("Failed to load catalog:", err);
-        setErrorMsg("Something went wrong loading categories.");
-      }
-    }
-
-    fetchData();
-  }, []);
-
+  // 11. Main render
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-100">
       <Navbar />
 
+      {/* Top actions */}
       <div className="flex justify-end px-4 lg:px-48 mt-4">
         {showEdit && (
           <Link
@@ -100,6 +117,7 @@ const categoryImages: CategoryImage[] = await Promise.all(
         </Link>
       </div>
 
+      {/* Header */}
       <main className="px-4 py-10 lg:px-48">
         <div className="flex items-center mb-8">
           <h1 className="flex-1 text-center text-5xl text-yellow-500 lg:text-6xl">
@@ -107,34 +125,34 @@ const categoryImages: CategoryImage[] = await Promise.all(
           </h1>
         </div>
 
-        {errorMsg && <p className="mb-4 text-center text-red-600">{errorMsg}</p>}
-
+        {/* Category grid */}
         <div
-          className={`grid gap-10 ${
-            categories.length === 1
+          className={`grid gap-10 ${categories.length === 1
               ? "grid-cols-1 justify-center"
               : categories.length === 2
-              ? "grid-cols-2 justify-center"
-              : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-          }`}
+                ? "grid-cols-2 justify-center"
+                : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+            }`}
         >
-          {categories.map(({ object, image }) => {
-            const categoryName = object.name ?? "Unnamed Category";
-            return (
-              <Link
-                key={object.name}
-                href={`/shop/${encodeURIComponent(categoryName)}`}
-                className="block overflow-hidden text-center"
-              >
-                <div className="relative mb-4 aspect-[9/11] w-full max-w-[450px] lg:mb-8 mx-auto">
-                  <Image src={image} alt={categoryName} fill className="object-cover" />
-                </div>
-                <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-wider text-blue-900 uppercase">
-                  {categoryName}
-                </p>
-              </Link>
-            );
-          })}
+          {categories.map(({ object, name, imageUrl }) => (
+            <Link
+              key={object.id}
+              href={`/shop/${encodeURIComponent(name)}`}
+              className="block overflow-hidden text-center"
+            >
+              <div className="relative mb-4 aspect-[9/11] w-full max-w-[450px] lg:mb-8 mx-auto">
+                <Image
+                  src={imageUrl}
+                  alt={name}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-wider text-blue-900 uppercase">
+                {name}
+              </p>
+            </Link>
+          ))}
         </div>
       </main>
     </div>

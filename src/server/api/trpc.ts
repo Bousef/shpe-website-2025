@@ -13,6 +13,7 @@ import { ZodError } from "zod";
 
 import { createClient } from "~/server/auth/server";
 import { db } from "~/server/db";
+import { SquareClient, SquareEnvironment } from "square";
 
 /**
  * 1. CONTEXT
@@ -30,9 +31,16 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
   const supabase = await createClient();
   // Error value is ignored as we check if session is null instead
 
+  // Initialize Square client once per request
+  const squareClient = new SquareClient({
+    token: process.env.NEXT_PUBLIC_SQUARE_SANDBOX_ACCESS_TOKEN!,
+    environment: SquareEnvironment.Sandbox,
+  });
+
   return {
     db,
     supabase,
+    squareClient,
     ...opts,
   };
 };
