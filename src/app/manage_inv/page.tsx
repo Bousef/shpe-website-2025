@@ -7,6 +7,7 @@ import { api } from "~/trpc/react";
 import { PlusCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useQueryClient } from "@tanstack/react-query";
 import CreateItemForm from "../_components/CreateItemForms";
+import type { CatalogCategory, CatalogItem } from "node_modules/square/api";
 
 export default function InventoryManagement() {
   // 1. Toggle state for showing the "Add Item" form
@@ -17,26 +18,26 @@ export default function InventoryManagement() {
 
   // 3. Fetch all items from Square Catalog
   const { data: itemsRes } = api.square.catalog.listCatalog.useQuery({ types: "ITEM" });
-  const rawItems = useMemo(() => itemsRes?.result.objects ?? [], [itemsRes]);
+  const rawItems = useMemo(() => itemsRes ?? [], [itemsRes]);
 
   // 4. Extract and filter image IDs
   const itemImageIds = useMemo(
     () =>
       rawItems
-        .map((item) => item.itemData?.imageIds?.[0] ?? "")
-        .filter((id) => id),
+        .map((item) => (item as CatalogItem).imageIds?.[0] ?? "")
+        .filter((id : string) => id),
     [rawItems]
   );
 
   // 5. Fetch all categories in one go
   const { data: categoriesRes } = api.square.catalog.listCatalog.useQuery({ types: "CATEGORY" });
-  const rawCategories = useMemo(() => categoriesRes?.result.objects ?? [], [categoriesRes]);
+  const rawCategories = useMemo(() => categoriesRes ?? [], [categoriesRes]);
 
   // 6. Build category lookup map
   const categoryLookup = useMemo(() => {
-    return rawCategories.reduce<Record<string, string>>((map, obj) => {
+    return rawCategories.reduce<Record<string, string>>((map, obj ) => {
       const id = obj.id;
-      const name = obj.categoryData?.name ?? "";
+      const name = (obj as CatalogCategory).name ?? "";
       if (id) map[id] = name;
       return map;
     }, {});
@@ -47,13 +48,14 @@ export default function InventoryManagement() {
     { body : {objectIds: itemImageIds} },
     { enabled: itemImageIds.length > 0 }
   );
-  const rawImages = useMemo(() => imagesData?.result.objects ?? [], [imagesData]);
+  const rawImages = useMemo(() => imagesData ?? [], [imagesData]);
 
   // 8. Combine item, image, category, and price data for table display
   const items = useMemo(
     () =>
-      rawItems.map((item) => {
-        const id = item.id;
+      rawItems.map((item : CatalogItem) => {
+
+        const id = item.;
         const name = item.itemData?.name ?? "Unnamed Item";
         const description = item.itemData?.description ?? "";
         const categoryId = item.itemData?.categories?.[0]?.id ?? "";
