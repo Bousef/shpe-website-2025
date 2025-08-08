@@ -1,19 +1,16 @@
-import { legacyClient } from "~/lib/square/client";
+import { squareClient } from "~/lib/square/client";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { object, z } from "zod";
-import { FileWrapper,
-     type SearchCatalogObjectsRequest, 
-     type BatchDeleteCatalogObjectsRequest, 
-     type BatchRetrieveCatalogObjectsRequest, 
-     type BatchUpsertCatalogObjectsRequest, 
-     type CreateCatalogImageRequest, 
-     type UpdateCatalogImageRequest, 
-     type UpsertCatalogObjectRequest, 
-     type SearchCatalogItemsRequest, 
-     type UpdateItemModifierListsRequest, 
-     type UpdateItemTaxesRequest } from "square/legacy";
-import { catalogApi } from "../../../lib/square/client";
-import { RetrieveJobResponse } from "node_modules/square/serialization";
+import {
+    type SearchCatalogObjectsRequest,
+    type BatchUpsertCatalogObjectsRequest,
+    type SearchCatalogItemsRequest,
+    type UpdateItemModifierListsRequest,
+    type UpdateItemTaxesRequest,
+    type BatchDeleteCatalogObjectsRequest,
+} from "node_modules/square/api";
+
+import type { CreateImagesRequest, UpsertCatalogObjectRequest } from "node_modules/square/api/resources/catalog";
 
 export const catalogRouter = createTRPCRouter({
     batchDeleteCatalogObjects: publicProcedure.input(
@@ -21,15 +18,15 @@ export const catalogRouter = createTRPCRouter({
             body: z.custom<BatchDeleteCatalogObjectsRequest>(),
         })
     ).query(async ({ input }) => {
-        return await legacyClient.catalogApi.batchDeleteCatalogObjects(input.body);
+        return await squareClient.catalog.batchDelete(input.body);
     }),
 
     batchRetrieveCatalogObjects: publicProcedure.input(
         z.object({
-            body: z.custom<BatchRetrieveCatalogObjectsRequest>(),
+            body: z.custom<BatchDeleteCatalogObjectsRequest>(),
         })
     ).query(async ({ input }) => {
-        return await legacyClient.catalogApi.batchRetrieveCatalogObjects(input.body);
+        return await squareClient.catalog.batchGet(input.body);
     }),
 
     batchUpsertCatalogObjects: publicProcedure.input(
@@ -37,78 +34,106 @@ export const catalogRouter = createTRPCRouter({
             body: z.custom<BatchUpsertCatalogObjectsRequest>(),
         })
     ).query(async ({ input }) => {
-        return await legacyClient.catalogApi.batchUpsertCatalogObjects(input.body);
+        return await squareClient.catalog.batchUpsert(input.body);
     }),
 
-    createCatalogImage: publicProcedure.input(
+    createCatalogImage: publicProcedure
+        .input(
         z.object({
-            request: z.custom<CreateCatalogImageRequest>().optional(),
-            imageFile: z.instanceof(FileWrapper).optional(),
+            body: z.custom<CreateImagesRequest>(),
+            requestOptions: z.record(z.string(), z.any()).optional()
         })
-    ).query(async ({ input }) => {
-        return await legacyClient.catalogApi.createCatalogImage(input.request, input.imageFile);
+        )
+        .mutation(async ({ input }) => {
+
+      return await squareClient.catalog.images.create(input.body);
     }),
 
+    //  About to jump off a cliff, who 's with me?
+    //Meee, siuuuu
+    // Siuuuuu
+    //Fixed...I believed 
+    // I believe!
+    // I ... believe
+    // siuuuuuuuu
+    
     updateCatalogImage: publicProcedure.input(
         z.object({
             imageId: z.string(),
-            request: z.custom<UpdateCatalogImageRequest>().optional(),
-            imageFile: z.instanceof(FileWrapper).optional(),
+            idempotencyKey: z.string(),
+            imageFile: z.instanceof(File),
         })
-    ).query(async ({ input }) => {
-        return await legacyClient.catalogApi.updateCatalogImage(input.imageId, input.request, input.imageFile);
+    ).mutation(async ({ input }) => {
+        return await squareClient.catalog.images.update({
+            imageId: input.imageId,
+            request: {
+                idempotencyKey: input.idempotencyKey,
+            },
+            imageFile: input.imageFile,
+        });
     }),
 
     catalogInfo: publicProcedure.query(async () => {
-        return await legacyClient.catalogApi.catalogInfo();
+        const response = await squareClient.catalog.info();
+        return response;
     }),
-    
+
     listCatalog: publicProcedure.input(
         z.object({
-            cursor: z.string().optional(),
             types: z.string().optional(),
-            catalogVersion: z.bigint().optional(),
+            cursor: z.string().optional(),
+            catalogVersion: z.number().optional(),
         })
     ).query(async ({ input }) => {
-        return await legacyClient.catalogApi.listCatalog(input.cursor, input.types, input.catalogVersion);
+        const response = await squareClient.catalog.list({
+            types: input.types,
+            cursor: input.cursor,
+            catalogVersion: input.catalogVersion !== undefined
+            ? BigInt(input.catalogVersion)
+            : undefined,
+        });
+        return response;
     }),
 
     upsertCatalogObject: publicProcedure.input(
         z.object({
             body: z.custom<UpsertCatalogObjectRequest>(),
-            requestOptions: z.any().optional(),
+            requestOptions: z.record(z.string(), z.any()).optional(),
         })
-    ).mutation(async({input}) =>{
-        return await legacyClient.catalogApi.upsertCatalogObject(input.body, input.requestOptions);
+    ).mutation(async ({ input }) => {
+        return await squareClient.catalog.object.upsert(input.body, input.requestOptions);
     }),
 
     deleteCatalogObject: publicProcedure.input(
         z.object({ objectId: z.string() })
     ).mutation(async ({ input }) => {
-        return await legacyClient.catalogApi.deleteCatalogObject(input.objectId);
+        return await squareClient.catalog.object.delete({objectId: input.objectId});
     }),
 
     RetrieveCatalogObject: publicProcedure.input(
         z.object({
-            objectId: z.string(),   
+            objectId: z.string(),
             includeRelatedObjects: z.boolean().optional(),
             catalogVersion: z.bigint().optional(),
             includeCaegoryPathToRoot: z.boolean().optional(),
         })
     ).query(async ({ input }) => {
-        return await catalogApi.retrieveCatalogObject(input.objectId, input.includeRelatedObjects, input.catalogVersion, input.includeCaegoryPathToRoot);
+        return await squareClient.catalog.object.get({
+            objectId: input.objectId,
+            includeRelatedObjects: input.includeRelatedObjects,
+            catalogVersion: input.catalogVersion,
+            includeCategoryPathToRoot: input.includeCaegoryPathToRoot,
+        });
     }),
 
     searchCatalogObjects: publicProcedure.input(
         z.object({
             body: z.custom<SearchCatalogObjectsRequest>(),
-            requestOptions: z.any().optional(),
+            requestOptions: z.record(z.string(), z.any()).optional(),
         })
     ).query(async ({ input }) => {
-        return await legacyClient.catalogApi.searchCatalogObjects(input.body, input.requestOptions);
+        return await squareClient.catalog.search(input.body, input.requestOptions);
     }),
-    
-
 
     //-- This endpoint is used to search for catalog items.
     searchCatalogItems: publicProcedure.input(
@@ -116,27 +141,27 @@ export const catalogRouter = createTRPCRouter({
             body: z.custom<SearchCatalogItemsRequest>(),
         })
     ).query(async ({ input }) => {
-        return await legacyClient.catalogApi.searchCatalogItems(input.body);
+        return await squareClient.catalog.searchItems(input.body);
     }),
 
     //-- This endpoint is used to update item modifier lists in the catalog.
     updateItemModifierLists: publicProcedure.input(
         z.object({
-            body: z.custom<UpdateItemModifierListsRequest>(), 
+            body: z.custom<UpdateItemModifierListsRequest>(),
         })
     ).query(async ({ input }) => {
-        return await legacyClient.catalogApi.updateItemModifierLists(input.body);
+        return await squareClient.catalog.updateItemModifierLists(input.body);
     }
     ),
 
     //-- This endpoint is used to update item modifier lists in the catalog.
     updateItemTaxes: publicProcedure.input(
         z.object({
-            body: z.custom<UpdateItemTaxesRequest>(),   
+            body: z.custom<UpdateItemTaxesRequest>(),
         })
     ).query(async ({ input }) => {
-        return await legacyClient.catalogApi.updateItemTaxes(input.body);
+        return await squareClient.catalog.updateItemTaxes(input.body);
     }),
- 
-     
+
+
 });

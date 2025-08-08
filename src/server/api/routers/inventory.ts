@@ -22,5 +22,5 @@ export const inventoryRouter = createTRPCRouter({
             // Calls POST /v2/inventory/counts/batch-retrieve
             return await inventoryApi.batchRetrieveInventoryCounts(input.body);
         }),
-
+        
 });

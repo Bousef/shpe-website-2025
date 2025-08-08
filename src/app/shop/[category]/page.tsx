@@ -34,37 +34,44 @@ export default function CategoryPage() {
   /**
    * 4. Identify the matching category object by its `name` field
    */
-  const matchedCategory = categoriesData?.result.objects?.find(
-    (c) => c.categoryData?.name === category
+  const matchedCategory = categoriesData?.find(
+    (c) => c.type === "CATEGORY" && c.categoryData?.name === category
   );
+
   const categoryId = matchedCategory?.id;
 
   /**
    * 5. Normalize items array, defaulting to empty if data is unavailable
    */
   const rawItems = useMemo(
-    () => itemsData?.result.objects ?? [],
+    () => itemsData ?? [],
     [itemsData]
   );
 
   /**
    * 6. Filter items whose `categoryId` matches the selected category
    */
-  const itemsList = useMemo(
-    () =>
-      rawItems.filter((item) =>
-        item.itemData?.categories?.[0]?.id === categoryId
-      ),
-    [rawItems, categoryId]
-  );
+  const itemsList = useMemo(() => {
+    return rawItems.filter((item) => {
+      if (item.type !== "ITEM") return false;
+      const categories = item.itemData?.categories;
+      if (!categories || categories.length === 0) return false;
+      return categories[0]?.id === categoryId;
+    });
+  }, [rawItems, categoryId]);
 
   /**
    * 7. Extract primary image IDs for each item
    */
-  const itemImageIds = useMemo(
-    () => itemsList.map((item) => item.itemData?.imageIds?.[0] ?? ""),
-    [itemsList]
-  );
+  
+  const itemImageIds = useMemo((): string[] => {
+    return itemsList.map((item) => {
+      if (item.type === "ITEM" && item.itemData && Array.isArray(item.itemData.imageIds)) {
+        return item.itemData.imageIds[0] ?? "";
+      }
+      return "";
+    });
+  }, [itemsList]);
 
   /**
    * 8. Conditionally fetch image objects: skip if there are no valid IDs
@@ -84,7 +91,7 @@ export default function CategoryPage() {
    * 9. Normalize image objects array
    */
   const rawImages = useMemo(
-    () => imagesData?.result.objects ?? [],
+    () => imagesData?.objects ?? [],
     [imagesData]
   );
 
@@ -93,17 +100,36 @@ export default function CategoryPage() {
    */
   const items = useMemo(() => {
     return itemsList.map((item) => {
+      if (item.type !== "ITEM" || !item.itemData) {
+        // Fallback for unexpected types
+        return {
+          id: item.id,
+          name: "Unnamed Item",
+          description: "",
+          url: "",
+          price: "0.00",
+        };
+      }
       const id = item.id;
-      const name = item.itemData?.name ?? "Unnamed Item";
-      const description = item.itemData?.description;
-      const imageId = item.itemData?.imageIds?.[0];
+      const name = item.itemData.name ?? "Unnamed Item";
+      const description = item.itemData.description ?? "";
+      const imageId = item.itemData.imageIds?.[0];
       const imageObj = rawImages.find((img) => img.id === imageId);
-      const url = imageObj?.imageData?.url ?? "";
-      
-      const priceCents =
-        item.itemData?.variations?.[0]?.itemVariationData?.priceMoney
-          ?.amount ??
-        0n;
+      const url =
+        imageObj && imageObj.type === "IMAGE" && "imageData" in imageObj && imageObj.imageData && "url" in imageObj.imageData
+          ? (imageObj.imageData as { url?: string }).url ?? ""
+          : "";
+
+      let priceCents = 0n;
+      const firstVariation = item.itemData.variations?.[0];
+      if (
+        firstVariation &&
+        firstVariation.type === "ITEM_VARIATION" &&
+        firstVariation.itemVariationData &&
+        typeof firstVariation.itemVariationData.priceMoney?.amount === "bigint"
+      ) {
+        priceCents = firstVariation.itemVariationData.priceMoney.amount;
+      }
       const price = Number(priceCents) / 100;
 
       return { id, name, description, url, price: price.toFixed(2) };

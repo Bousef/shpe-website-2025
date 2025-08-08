@@ -33,7 +33,20 @@ export default function ItemPage() {
   });
 
   // 5. Extract ITEM object & variations
-  const obj = itemRes?.result.object;
+  const obj = itemRes?.object as
+    | ({
+        id: string;
+        type: string;
+        itemData?: {
+          name?: string;
+          variations?: Array<{
+            id: string;
+            type: string;
+            itemVariationData?: unknown;
+          }>;
+        };
+      })
+    | undefined;
   const itemData = obj?.itemData;
   const variations =
     itemData?.variations?.filter((v) => v.type === "ITEM_VARIATION") ?? [];
@@ -67,13 +80,25 @@ useEffect(() => {
 
   // 8. Build image gallery data (memoized)
   const relatedObjs = useMemo(
-    () => itemRes?.result.relatedObjects ?? [],
+    () =>
+      itemRes &&
+      typeof itemRes === "object" &&
+      "relatedObjects" in itemRes &&
+      Array.isArray((itemRes as { relatedObjects?: unknown[] }).relatedObjects)
+        ? ((itemRes as { relatedObjects?: unknown[] }).relatedObjects ?? [])
+        : [],
     [itemRes]
   );
   const allImages = useMemo(
     () =>
       relatedObjs
-        .filter((o) => o.type === "IMAGE")
+        .filter(
+          (o): o is { type: string; imageData?: { url?: string } } =>
+            typeof o === "object" &&
+            o !== null &&
+            "type" in o &&
+            (o as { type?: unknown }).type === "IMAGE"
+        )
         .map((o) => o.imageData?.url)
         .filter((url): url is string => !!url),
     [relatedObjs]
@@ -111,7 +136,10 @@ useEffect(() => {
   };
 
   // 10. Price & product info
-  const variationData = variations[0]?.itemVariationData;
+  const variationData = variations[0]?.itemVariationData as {
+    priceMoney?: { amount?: bigint };
+    [key: string]: unknown;
+  } | undefined;
   const amountCents = variationData?.priceMoney?.amount ?? 0n;
   const price = Number(amountCents) / 100;
   const product = { id: obj?.id ?? "", name: itemData?.name ?? "" };

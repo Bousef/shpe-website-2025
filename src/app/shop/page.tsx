@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import Navbar from "../_components/NavBar";
 import Link from "next/link";
 import Image from "next/image";
 import { api } from "~/trpc/react";
 import { skipToken } from "@tanstack/react-query";
+import type { CatalogObject } from "node_modules/square/api";
 
 export default function ShopPage() {
   // 1. Fetch current member (for permissioning)
@@ -18,18 +19,26 @@ export default function ShopPage() {
     error: categoriesError,
   } = api.square.catalog.listCatalog.useQuery({ types: "CATEGORY" });
 
+   useEffect(() => {
+    if (categoriesData) {
+      console.log("✅ Categories fetched:", categoriesData);
+    }
+  }, [categoriesData]);
+
   // 3. Extract raw category objects array
   const rawCategories = useMemo(
-    () => categoriesData?.result.objects ?? [],
+    () => categoriesData ?? [],
     [categoriesData]
   );
   
+
+
   // 4. Gather the first imageId from each category for lookup
-  const categoryImageIds = useMemo(
+  const categoryImageIds = useMemo<string[]>(
     () =>
-      rawCategories.map(
-        (c) => c.categoryData?.imageIds?.[0] ?? ""  // might be undefined
-      ),
+      rawCategories
+        .filter((c): c is Extract<CatalogObject, { type: "CATEGORY" }> => c.type === "CATEGORY")
+        .map((c) => c.categoryData?.imageIds?.[0] ?? ""),
     [rawCategories]
   );
 
@@ -47,21 +56,30 @@ export default function ShopPage() {
 
   // 6. Extract the raw image objects array
   const rawImages = useMemo(
-    () => imagesData?.result.objects ?? [],
+    () => imagesData?.objects ?? [],
     [imagesData]
   );
 
+
   // 7. Derive parallel arrays of names & URLs
-  const categoryNames = useMemo(
-    () => rawCategories.map((c) => c.categoryData?.name ?? "Unnamed"),
+  const categoryNames = useMemo<string[]>(
+    () =>
+      rawCategories
+        .filter((o): o is Extract<CatalogObject, { type: "CATEGORY" }> => o.type === "CATEGORY")
+        .map((c) => c.categoryData?.name ?? "Unnamed"),
     [rawCategories]
   );
-  const categoryImageUrls = useMemo(
-    () =>
-      rawImages.map((i) => i.imageData?.url ?? ""), // fallback to empty string
-    [rawImages]
-  );
-
+  
+const categoryImageUrls = useMemo<string[]>(
+  () =>
+    rawImages
+      .filter(
+        (o): o is Extract<CatalogObject, { type: "IMAGE" }> =>
+          o.type === "IMAGE"
+      )
+      .map((img) => img.imageData?.url ?? ""),
+  [rawImages]
+);
   // 8. Zip into a single array for rendering
   const categories = useMemo(
     () =>
