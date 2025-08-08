@@ -6,6 +6,8 @@ import { squareClient } from "~/lib/square/client";
 
 /// Represents the currently signed-in user.
 export const userRouter = createTRPCRouter({
+  cart: cartRouter,
+  
   retrieveCurrentOrder: publicProcedure
         .query(async({ctx}) => {
           if (!ctx.supabase) return null;
