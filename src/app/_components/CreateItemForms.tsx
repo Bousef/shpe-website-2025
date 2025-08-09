@@ -53,7 +53,7 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
 
   const clothesCat = categories.find((c) => (c as CatalogCategory).name === "Clothes");
   const clothesId = clothesCat?.id;
-  
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
@@ -98,9 +98,15 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
         }
       };
 
+      // Upsert the item
       await upsertMutation.mutateAsync({ body: itemData });
 
+      // create image if file selected
+      
 
+      // Create inventory entries for sizes if category is Clothes
+      // api inventory
+      
 
       onSave?.();
     } catch (error) {

@@ -19,6 +19,13 @@ export default function ItemPage() {
   const [quantity, setQuantity] = useState<number>(1);
   const [galleryImage, setGalleryImage] = useState<string>("");
 
+    const {
+    data: imageData,
+    isLoading: imageLoading,
+    error: imageError, }
+    = api.square.catalog.getImages.useQuery({ objectId: itemId, includeRelatedObjects: true });
+
+
   // 3. Current member (for customerId)
   const { data: member } = api.user.getCurrentMember.useQuery();
 
@@ -35,17 +42,17 @@ export default function ItemPage() {
   // 5. Extract ITEM object & variations
   const obj = itemRes?.object as
     | ({
-        id: string;
-        type: string;
-        itemData?: {
-          name?: string;
-          variations?: Array<{
-            id: string;
-            type: string;
-            itemVariationData?: unknown;
-          }>;
-        };
-      })
+      id: string;
+      type: string;
+      itemData?: {
+        name?: string;
+        variations?: Array<{
+          id: string;
+          type: string;
+          itemVariationData?: unknown;
+        }>;
+      };
+    })
     | undefined;
   const itemData = obj?.itemData;
   const variations =
@@ -61,13 +68,6 @@ export default function ItemPage() {
     body: { catalogObjectIds: variationIds },
   });
 
-  // Log the full inventory response once it’s fetched
-useEffect(() => {
-  if (invRes) {
-    console.log("✅ Inventory counts fetched:", invRes);
-    console.log("🔢 Counts array:", invRes.result.counts);
-  }
-}, [invRes]);
 
   // 7. Build size/stock arrays
   const stocks: number[] =
@@ -78,33 +78,8 @@ useEffect(() => {
     stock: stocks[idx] ?? 0,
   }));
 
-  // 8. Build image gallery data (memoized)
-  const relatedObjs = useMemo(
-    () =>
-      itemRes &&
-      typeof itemRes === "object" &&
-      "relatedObjects" in itemRes &&
-      Array.isArray((itemRes as { relatedObjects?: unknown[] }).relatedObjects)
-        ? ((itemRes as { relatedObjects?: unknown[] }).relatedObjects ?? [])
-        : [],
-    [itemRes]
-  );
-  const allImages = useMemo(
-    () =>
-      relatedObjs
-        .filter(
-          (o): o is { type: string; imageData?: { url?: string } } =>
-            typeof o === "object" &&
-            o !== null &&
-            "type" in o &&
-            (o as { type?: unknown }).type === "IMAGE"
-        )
-        .map((o) => o.imageData?.url)
-        .filter((url): url is string => !!url),
-    [relatedObjs]
-  );
-  const firstImage = allImages[0] ?? "";
-
+  const allImages = imageData ?? [];
+  const firstImage = allImages[0] || "";
 
   // 9. Derived hooks & helpers (all unconditionally here)
   const stockBySize = useMemo(
@@ -158,7 +133,10 @@ useEffect(() => {
   if (invError) return <div>Error loading stock</div>;
   if (!obj || obj.type !== "ITEM") return <div>Not an item</div>;
   if (!variationData) return <div>No variations available</div>;
-
+    if (imageData === undefined) {
+      console.error(imageError);
+      return <div>Error: No images found for this item.</div>;
+    }
   // 13. Final render
   return (
     <div className="min-h-screen bg-white">
@@ -176,37 +154,36 @@ useEffect(() => {
 
       <main className="max-w-6xl mx-auto py-10 px-4 lg:px-0 flex flex-col lg:flex-row lg:space-x-8">
         {/* Thumbnails */}
-<div className="hidden lg:flex flex-col gap-4 flex-shrink-0 w-24">
-  {allImages.map((url, idx) => (
-    <div
-      key={idx}
-      className={`relative w-20 h-20 border cursor-pointer ${
-        galleryImage === url ? "ring-2 ring-blue-600" : ""
-      }`}
-      onClick={() => setGalleryImage(url)}
-    >
-      <Image
-        src={url}
-        alt={`${itemData?.name} thumbnail ${idx + 1}`}
-        fill
-        sizes="80px"
-        className="object-cover rounded"
-      />
-    </div>
-  ))}
-</div>
+        <div className="hidden lg:flex flex-col gap-4 flex-shrink-0 w-24">
+          {allImages.map((url, idx) => (
+            <div
+              key={idx}
+              className={`relative w-20 h-20 border cursor-pointer ${galleryImage === url ? "ring-2 ring-blue-600" : ""
+                }`}
+              onClick={() => setGalleryImage(url)}
+            >
+              <Image
+                src={url}
+                alt={`${itemData?.name} thumbnail ${idx + 1}`}
+                fill
+                sizes="80px"
+                className="object-cover rounded"
+              />
+            </div>
+          ))}
+        </div>
 
         {/* Main image */}
-<div className="mb-8 lg:mb-0 lg:w-2/3">
-  <NextImage
-    src={galleryImage}
-    alt={itemData!.name!}
-    width={800}               // intrinsic width
-    height={600}              // intrinsic height
-    sizes="(min-width:1024px) 66vw, 100vw"
-    className="w-full h-auto object-cover shadow rounded"
-  />
-</div>
+        <div className="mb-8 lg:mb-0 lg:w-2/3">
+          <NextImage
+            src={galleryImage}
+            alt={itemData!.name!}
+            width={800}               // intrinsic width
+            height={600}              // intrinsic height
+            sizes="(min-width:1024px) 66vw, 100vw"
+            className="w-full h-auto object-cover shadow rounded"
+          />
+        </div>
 
         {/* Details */}
         <div className="flex flex-col lg:w-1/3">

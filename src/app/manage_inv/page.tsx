@@ -53,9 +53,9 @@ export default function InventoryManagement() {
   // 8. Combine item, image, category, and price data for table display
   const items = useMemo(
     () =>
-      rawItems.map((item : CatalogItem) => {
+      rawItems.map((item : any) => {
 
-        const id = item.;
+        const id = item.id;
         const name = item.itemData?.name ?? "Unnamed Item";
         const description = item.itemData?.description ?? "";
         const categoryId = item.itemData?.categories?.[0]?.id ?? "";

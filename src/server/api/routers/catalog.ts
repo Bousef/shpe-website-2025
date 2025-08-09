@@ -12,6 +12,7 @@ import {
 
 import type { CreateImagesRequest, UpsertCatalogObjectRequest } from "node_modules/square/api/resources/catalog";
 
+
 export const catalogRouter = createTRPCRouter({
     batchDeleteCatalogObjects: publicProcedure.input(
         z.object({
@@ -39,15 +40,15 @@ export const catalogRouter = createTRPCRouter({
 
     createCatalogImage: publicProcedure
         .input(
-        z.object({
-            body: z.custom<CreateImagesRequest>(),
-            requestOptions: z.record(z.string(), z.any()).optional()
-        })
+            z.object({
+                body: z.custom<CreateImagesRequest>(),
+                requestOptions: z.record(z.string(), z.any()).optional()
+            })
         )
         .mutation(async ({ input }) => {
 
-      return await squareClient.catalog.images.create(input.body);
-    }),
+            return await squareClient.catalog.images.create(input.body);
+        }),
 
     //  About to jump off a cliff, who 's with me?
     //Meee, siuuuu
@@ -56,7 +57,7 @@ export const catalogRouter = createTRPCRouter({
     // I believe!
     // I ... believe
     // siuuuuuuuu
-    
+
     updateCatalogImage: publicProcedure.input(
         z.object({
             imageId: z.string(),
@@ -89,8 +90,8 @@ export const catalogRouter = createTRPCRouter({
             types: input.types,
             cursor: input.cursor,
             catalogVersion: input.catalogVersion !== undefined
-            ? BigInt(input.catalogVersion)
-            : undefined,
+                ? BigInt(input.catalogVersion)
+                : undefined,
         });
         return response;
     }),
@@ -107,7 +108,7 @@ export const catalogRouter = createTRPCRouter({
     deleteCatalogObject: publicProcedure.input(
         z.object({ objectId: z.string() })
     ).mutation(async ({ input }) => {
-        return await squareClient.catalog.object.delete({objectId: input.objectId});
+        return await squareClient.catalog.object.delete({ objectId: input.objectId });
     }),
 
     RetrieveCatalogObject: publicProcedure.input(
@@ -125,6 +126,57 @@ export const catalogRouter = createTRPCRouter({
             includeCategoryPathToRoot: input.includeCaegoryPathToRoot,
         });
     }),
+
+    getImages: publicProcedure
+        .input(
+            z.object({
+                objectId: z.string(),
+                includeRelatedObjects: z.boolean().optional(), // doesn’t change our logic, but allowed
+            })
+        )
+        .query(async ({ input }) => {
+            // 1) Get the object (we don’t actually need related objects for this)
+            const resp = await squareClient.catalog.object.get({
+                objectId: input.objectId,
+                includeRelatedObjects: false,
+            });
+
+            const obj = resp.object;
+            if (!obj) return []; // per your rule #3
+
+            // 2) Pull imageIds from the object itself (no traversal)
+            const type = obj.type;
+            let imageIds: string[] = [];
+
+            // The new SDK uses camelCase data keys (itemData, imageIds, etc.)
+            if (type === "ITEM") {
+                imageIds = obj.itemData?.imageIds ?? [];
+            } else if (type === "ITEM_VARIATION") {
+                imageIds = obj.itemVariationData?.imageIds ?? [];
+            } else if (type === "CATEGORY") {
+                imageIds = obj.categoryData?.imageIds ?? [];
+            } else if ("imageIds" in (obj as any)) {
+                // generic safety net for any other types that might expose imageIds
+                imageIds = (obj as any).imageIds ?? [];
+            }
+
+            if (imageIds.length === 0) return []; // per your rule #3
+
+            // 3) Resolve those IDs to CatalogImage objects, then map to URLs
+            const batch = await squareClient.catalog.batchGet({
+                objectIds: imageIds,
+                includeRelatedObjects: false,
+            });
+
+            const imageObjects = batch.objects ?? [];
+            const urls = imageObjects
+                .filter(o => o.type === "IMAGE")
+                .map(o => o.imageData?.url)
+                .filter((u): u is string => Boolean(u));
+
+            // 4) Return URLs (don’t throw on empty)
+            return urls;
+        }),
 
     searchCatalogObjects: publicProcedure.input(
         z.object({
