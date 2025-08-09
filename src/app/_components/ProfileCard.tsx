@@ -101,8 +101,8 @@ export default function ProfileCard() {
 
 	return (
 		<main id="profile" className="relative bg-white py-10 px-15 text-[var(--shpe-navy-blue)] min-w-6xl mx-auto min-h-[80vh]">
-			<div className='flex flex-row gap-5 h-full'>
-				<section className="w-1/2 flex items-stretch space-x-5 p-5 bg-[var(--shpe-light-blue)] shadow-sm">
+			<div className='flex flex-row gap-6 h-full'>
+				<section className="w-1/2 flex items-stretch space-x-6 p-5 bg-[var(--shpe-light-blue)] shadow-sm">
 					{/* LEFT */}
 					<div className="w-1/3 bg-[#b3cad6] rounded flex flex-col items-center">
 						{profile.image &&
@@ -299,7 +299,7 @@ export default function ProfileCard() {
 					<div className="p-5 bg-[var(--shpe-light-blue)] shadow-sm">
 						<div className="bg-[#b3cad6] p-5 rounded shadow">
 							<h2 className="text-2xl font-bold mb-2 font-helios tracking-[0.1em]">ORDER RECEIPTS</h2>
-							<div className="max-h-[150px] overflow-y-auto pr-2 space-y-3 text-sm">
+							<div className="max-h-[150px] overflow-y-auto px-2 space-y-3 text-sm">
 								{orders && orders.length > 0 ? (
 									<ul className="space-y-3 text-sm">
 										{orders.map((order, i) => (

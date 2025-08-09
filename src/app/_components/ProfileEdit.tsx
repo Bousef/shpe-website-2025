@@ -3,6 +3,7 @@
 import { supabase } from "~/supabase-client";
 import { api } from "~/trpc/react";
 import { useState, useEffect } from "react";
+import type { Session } from "@supabase/supabase-js";
 
 type ProfileEditProps = {
     profile: {
@@ -24,24 +25,48 @@ export default function ProfileEdit({ profile, onClose }: ProfileEditProps) {
     const [phone, setPhone] = useState(profile?.phone_number || "");
     const [major, setMajor] = useState(profile?.major || "");
     const [resumeFile, setResumeFile] = useState<File | null>(null);
+    const [phoneError, setPhoneError] = useState("");
 
     const { mutateAsync: updateProfile } = api.member.updateMember.useMutation();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // useEffect(() => {
-    //     const getToken = async () => {
-    //         const {
-    //             data: { session },
-    //         } = await supabase.auth.getSession();
-    //         console.log("JWT Access Token:", session?.access_token);
-    //     };
-    //     getToken();
-    // }, []);
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (!files || files.length === 0) {
+            setResumeFile(null);
+            return;
+        }
+
+        const file = files[0]!;
+
+        // validate file type
+        const allowedTypes = ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
+        if (!allowedTypes.includes(file.type)) {
+            alert("Only PDF or Word documents are allowed.");
+            e.target.value = ""; // reset input
+            return;
+        }
+
+        // validate file size (limit to 1 MB)
+        const maxSize = 1 * 1024 * 1024; // 1MB
+        if (file.size > maxSize) {
+            alert("File size must be under 1 MB.");
+            e.target.value = "";
+            return;
+        }
+
+        setResumeFile(file);
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsSubmitting(true);
 
+        if (phone.length !== 10) {
+            setPhoneError("Phone number must be exactly 10 digits.");
+            return;
+        }
+
+        setIsSubmitting(true);
         try {
             let resumeUrl: string | null = profile?.resume_url ?? null;
 
@@ -69,7 +94,6 @@ export default function ProfileEdit({ profile, onClose }: ProfileEditProps) {
                 resume: resumeUrl ?? undefined,
             });
 
-            // alert("Profile updated!");
             onClose();
         } catch (err: any) {
             console.error("Error updating profile:", err?.message || err);
@@ -105,8 +129,8 @@ export default function ProfileEdit({ profile, onClose }: ProfileEditProps) {
                     <input
                         type="email"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="w-full p-2 border rounded"
+                        disabled
+                        className="w-full p-2 border rounded cursor-not-allowed"
                     />
                 </div>
                 <div>
@@ -114,9 +138,21 @@ export default function ProfileEdit({ profile, onClose }: ProfileEditProps) {
                     <input
                         type="tel"
                         value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
+                        onChange={(e) => {
+                            const digits = e.target.value.replace(/\D/g, "");   // remove non-digits
+                            if (digits.length <= 10) {
+                                setPhone(digits);
+                                if (digits.length === 10) 
+                                    setPhoneError("");
+                            }
+                        }}
+                        maxLength={10}
+                        // pattern="\d{10}"
                         className="w-full p-2 border rounded"
                     />
+                    {phoneError && (
+                        <p className="text-red-500 text-sm mt-1">{phoneError}</p>
+                    )}
                 </div>
                 <div>
                     <label className="block font-semibold">Major</label>
@@ -129,11 +165,21 @@ export default function ProfileEdit({ profile, onClose }: ProfileEditProps) {
                 </div>
                 <div>
                     <label className="block font-semibold">Resume (PDF)</label>
-                    <input
-                        type="file"
-                        accept="application/pdf"
-                        onChange={(e) => setResumeFile(e.target.files?.[0] ?? null)}
-                    />
+                    <div className="flex">
+                        <label className="bg-[var(--shpe-light-blue)] hover:bg-[var(--shpe-blue)] text-white mt-2 px-4 py-1 rounded cursor-pointer inline-block">
+                            Choose File
+                            <input
+                                type="file"
+                                name="resume"
+                                accept=".pdf,.doc,.docx"
+                                onChange={handleFileChange}
+                                className="hidden"
+                            />
+                        </label>
+                        {resumeFile && (
+                            <p className="mt-3 mx-2 text-md text-gray-700">{resumeFile.name}</p>
+                        )}
+                    </div>
                 </div>
                 <div className="text-right">
                     <button
@@ -142,7 +188,7 @@ export default function ProfileEdit({ profile, onClose }: ProfileEditProps) {
                         className="inline-flex items-center justify-center
                             bg-[#f2ac02] hover:bg-[#e0a200]
                             text-black font-helvetica
-                            text-base sm:text-md font-bold
+                            text-base sm:text-lg font-bold
                             tracking-[0.1em]
                             px-7 py-3
                             rounded-full
