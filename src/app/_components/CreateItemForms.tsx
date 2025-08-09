@@ -1,9 +1,9 @@
 // src/_components/CreateItemForm.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { api } from "~/trpc/react";
-import { skipToken } from "@tanstack/react-query";
+import type { CatalogCategory } from "node_modules/square/api";
 
 /**
  * Props for CreateItemForm component
@@ -44,14 +44,19 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
   /**
    * 2. Fetch existing categories to populate dropdown
    */
-  const { data: categoriesData } = api.square.catalog.listCatalog.useQuery({ types: "CATEGORY" });
-  const categories = categoriesData?.result.objects ?? [];
+  const { data } = api.square.catalog.listCatalog.useQuery({ types: "CATEGORY" });
+
+  if (data === undefined) {
+    return null;
+  }
+
+  const categories = data as CatalogCategory[];
 
   /**
    * 3. Determine "Clothes" category ID for conditional size inputs
    */
-  const clothesCat = categories.find(c => c.categoryData?.name === "Clothes");
-  const clothesId = clothesCat?.id;
+  const clothesCat = categories.find(c => c.name === "Clothes");
+  const clothesId = clothesCat?.parentCategory?.id;
 
   /**
    * 4. Handle input changes for form fields
@@ -123,8 +128,12 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
       setForm({ mode: "CATEGORY", name: "" });
       setFile(null);
       setSizes({ S: 0, M: 0, L: 0, XL: 0, XXL: 0, XXXL: 0 });
-    } catch (error: any) {
-      setErrorMsg(error.message ?? "Failed to save.");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setErrorMsg(error.message ?? "Failed to save.");
+      } else {
+        setErrorMsg("Failed to save.");
+      }
     } finally {
       setLoading(false);
     }
@@ -155,7 +164,7 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
           <input name="variationPrice" placeholder="Variation Price" value={form.variationPrice} onChange={handleChange} className="w-full border rounded px-3 py-2" />
           <select name="categoryId" value={form.categoryId} onChange={handleChange} className="w-full border rounded px-3 py-2">
             <option value="">Select Category</option>
-            {categories.map(c => <option key={c.id} value={c.id}>{c.categoryData?.name ?? c.id}</option>)}
+            {categories.map(c => <option key={c.parentCategory?.id} value={c.parentCategory?.id}>{c.name ?? c.parentCategory?.id}</option>)}
           </select>
 
           {/* Sizes only for Clothes category */}
