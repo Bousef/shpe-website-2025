@@ -20,9 +20,15 @@ type CartItem = {
 export default function CartItemsContainer({ items: initialItems }: { items: CartItem[] }) {
     const [items, setItems] = useState(initialItems);
 
+    const getImage = (uid: string) => {
+      const {data, isLoading, error} = api.square.catalog.getImages.useQuery({objectId: uid, includeRelatedObjects: true});
+
+      return data?.[0];
+    }
+
+    
 
     const {data: currentOrder, isLoading, error} = api.user.retrieveCurrentOrder.useQuery();
-
 
     // const updateItemQuantity = api.user.cart.updateItemQuantity.useMutation({
     //     onSuccess: () => {
@@ -59,11 +65,12 @@ export default function CartItemsContainer({ items: initialItems }: { items: Car
               key={item.uid}
               className="flex items-center gap-4 border-b pb-4"
             >
-              {/* <img
-                src={item.image ?? ""} // this should be a placeholder image 
+
+              <img
+                src={getImage(item.uid!)} // this should be a placeholder image 
                 alt={item.name ?? ""}
                 className="w-20 h-20 object-contain bg-gray-100 rounded"
-              /> */}
+              />
 
               <div className="flex-1">
                 <h2 className="font-semibold">{item.name}</h2>
