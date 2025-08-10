@@ -9,24 +9,21 @@ export const userRouter = createTRPCRouter({
   cart: cartRouter,
   
   retrieveCurrentOrder: publicProcedure
-
         .query(async({ctx}) => {
           if (!ctx.supabase) return null;
 
           const { data: { user } } = await ctx.supabase.auth.getUser();
 
-          console.log("working?");
-
           if (!user) return null;
-          
-          const member = await ctx.db
-          .select()
-          .from(members)
-          .where(eq(members.uuid, user.id));
 
-          console.log("working 2?");
+          const member = await ctx.db
+            .select()
+            .from(members)
+            .where(eq(members.uuid, user.id));
 
           const currentMember =  member[0] ?? null;
+
+          if (!currentMember?.square_customer_id) return null;
           
           console.log("currentMember: ", currentMember);
 
@@ -38,7 +35,7 @@ export const userRouter = createTRPCRouter({
                   states: ["OPEN" , "DRAFT"]
                 },
                 customerFilter:{
-                  customerIds: [currentMember?.square_customer_id!]
+                  customerIds: [currentMember?.square_customer_id]
                 }
               },
               sort:{

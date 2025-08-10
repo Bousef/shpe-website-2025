@@ -14,15 +14,52 @@ import {
 } from "react-square-web-payments-sdk";
 import { useState } from "react";
 import { api } from "~/trpc/react";
+import type { CatalogImage, OrderLineItem } from "node_modules/square/api";
 
 export default function CheckoutPage() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const { data: member } = api.user.getCurrentMember.useQuery();
 
   const createPayment = api.square.payments.createPayment.useMutation();
 
   // CART
   const utils = api.useUtils();
-  const { data: items = [], isLoading } = api.user.cart.getItems.useQuery();
+  const { data: order, isLoading } = api.user.retrieveCurrentOrder.useQuery();
+
+  const items = order?.lineItems ?? [];
+
+  const catalogIds = items.map(lineItem => lineItem.catalogObjectId ?? "");
+
+  const processItemsWithImages = (items: OrderLineItem[]) => {
+    if (catalogIds.length !== 0) {
+      const batchRetrieveCatalogObjects = api.square.catalog.batchRetrieveCatalogObjects.useMutation();
+      batchRetrieveCatalogObjects.mutate({ objectIds: catalogIds });
+
+      const imageIds = batchRetrieveCatalogObjects.data?.objects?.map(item => item.imageId ?? "") ?? [];
+
+      if (imageIds.length !== 0) {
+        batchRetrieveCatalogObjects.mutate({ objectIds: imageIds });
+        const images = batchRetrieveCatalogObjects.data?.objects ?? [];
+        console.log(images);
+
+        return items.map(lineItem => {
+          const image = images.find(img => img.id === lineItem.catalogObjectId) as CatalogImage;
+          
+          return {
+            ...lineItem,
+            imageUrl: image?.url ?? "",
+          };
+        });
+      }
+
+      return [];
+    }
+
+    return [];
+  }
+
+  const itemsWithImages = processItemsWithImages(order?.lineItems ?? []);
 
   const updateItemQuantity = api.user.cart.updateItemQuantity.useMutation({
     onSuccess: () => utils.user.cart.getItems.invalidate(),
@@ -36,12 +73,10 @@ export default function CheckoutPage() {
   const locationId = process.env.NEXT_PUBLIC_SQUARE_LOCATION_ID ?? "";
   if (!appId || !locationId) throw new Error("Square IDs missing.");
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   // Totals
-  const subtotal = items.reduce((a, i) => a + i.price * i.quantity, 0);
-  const amountCents = Math.round(subtotal * 100);
-  const amountStr = (amountCents / 100).toFixed(2);
+  const subtotal = (order?.totalMoney?.amount ?? 0n) / 100n;
+  const amountCents = order?.totalMoney?.amount ?? 0n;
+  const amountStr = subtotal.toString();
 
   const createPaymentRequest = () => ({
     countryCode: "US",
@@ -187,25 +222,27 @@ export default function CheckoutPage() {
             {/* RIGHT: Summary */}
             <aside className="space-y-6">
               <div className="rounded-xl bg-white/90 border border-white/20 backdrop-blur-sm p-6">
-                <h2 className="mb-4 text-lg font-medium text-gray-900">Order summary ({items.length})</h2>
+                <h2 className="mb-4 text-lg font-medium text-gray-900">Order summary ({order?.lineItems?.length ?? 0})</h2>
 
                 <div className="mt-4 space-y-3">
                   {isLoading ? (
                     <p className="text-sm text-gray-500">Loading…</p>
                   ) : (
-                    items.map((item) => (
-                      <div key={item.id} className="flex items-start gap-4">
-                        <img
-                          src={item.image ?? ""}
-                          alt={item.name ?? ""}
-                          className="h-12 w-12 rounded object-contain bg-gray-100"
-                        />
+                    itemsWithImages.map((item) => (
+                      <div key={item.uid} className="flex items-start gap-4">
+                        (
+                          <img
+                            src={item.imageUrl}
+                            alt={item.name ?? ""}
+                            className="h-12 w-12 rounded object-contain bg-gray-100"
+                          />
+                        )
                         <div className="flex-1">
                           <p className="text-sm font-medium text-gray-800">{item.name}</p>
                           <p className="text-xs text-gray-500">Qty {item.quantity}</p>
                         </div>
                         <p className="text-sm font-medium text-gray-800">
-                          ${(item.price * item.quantity).toFixed(2)}
+                          ${(item.totalMoney?.amount ?? 0n * BigInt(item.quantity)) / 100n}
                         </p>
                       </div>
                     ))
