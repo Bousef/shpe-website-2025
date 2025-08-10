@@ -27,5 +27,4 @@ export const legacyClient = new LegacyClient({
 });
 
 // Export the exact client.handle for catalog:
-export const catalogApi = legacyClient.catalogApi;
 export const inventoryApi = legacyClient.inventoryApi;

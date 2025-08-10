@@ -42,17 +42,20 @@ export default function ShopPage() {
     [rawCategories]
   );
 
-  const imagesQueryInput =
+  const imagesQueryInput = useMemo(() =>
     categoryImageIds.length > 0 && categoryImageIds.every((id) => id !== "")
       ? { body: { objectIds: categoryImageIds } }
-      : skipToken;
+      : skipToken
+  , [categoryImageIds]);
 
   // 5. Batch-fetch those Image catalog objects
-  const {
-    data: imagesData,
-    isLoading: isLoadingImages,
-    error: imagesError,
-  } = api.square.catalog.batchRetrieveCatalogObjects.useQuery(imagesQueryInput);
+  const { mutate: batchRetrieveCatalogObjects, data: imagesData, isError, error, isPending } = api.square.catalog.batchRetrieveCatalogObjects.useMutation();
+
+  useEffect(() => {
+    if (imagesQueryInput !== skipToken) {
+      batchRetrieveCatalogObjects(imagesQueryInput.body);
+    }
+  }, [imagesQueryInput, batchRetrieveCatalogObjects]);
 
   // 6. Extract the raw image objects array
   const rawImages = useMemo(
@@ -95,14 +98,14 @@ const categoryImageUrls = useMemo<string[]>(
   const showEdit = member?.position === "Treasurer";
 
   // 10. Early returns for loading / errors / missing data
-  if (isLoadingCategories || isLoadingImages) {
+  if (isLoadingCategories || isPending) {
     return <div>Loading categories...</div>;
   }
   if (categoriesError) {
     return <div>Error loading categories: {categoriesError.message}</div>;
   }
-  if (imagesError) {
-    return <div>Error loading images: {imagesError.message}</div>;
+  if (isError) {
+    return <div>Error loading images: {error.message}</div>;
   }
   if (categories.length === 0) {
     return <div>No categories found</div>;

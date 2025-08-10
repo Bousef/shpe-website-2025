@@ -1,7 +1,7 @@
 // src/app/shop/[category]/page.tsx
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Navbar from "../../_components/NavBar";
@@ -76,16 +76,24 @@ export default function CategoryPage() {
   /**
    * 8. Conditionally fetch image objects: skip if there are no valid IDs
    */
-  const imagesQueryInput =
-    itemImageIds.every((id) => id) // ensure non-empty strings
+  const imagesQueryInput = useMemo(() => {
+    return itemImageIds.every((id) => id) // ensure non-empty strings
       ? { body: { objectIds: itemImageIds } }
       : skipToken;
+  }, [itemImageIds]);
 
   const {
+    mutate: batchRetrieveCatalogObjects,
     data: imagesData,
-    isLoading: imagesLoading,
+    isPending: imagesLoading,
     error: imagesError,
-  } = api.square.catalog.batchRetrieveCatalogObjects.useQuery(imagesQueryInput);
+  } = api.square.catalog.batchRetrieveCatalogObjects.useMutation();
+
+  useEffect(() => {
+    if (!itemsLoading && imagesQueryInput !== skipToken) {
+      batchRetrieveCatalogObjects(imagesQueryInput.body);
+    }
+  }, [batchRetrieveCatalogObjects, imagesQueryInput, itemsLoading]);
 
   /**
    * 9. Normalize image objects array
@@ -98,7 +106,11 @@ export default function CategoryPage() {
   /**
    * 10. Combine item and image data into a render-friendly format
    */
-  const items = useMemo(() => {
+
+
+  // removed useMemo as it makes this operation async and thus renders the page with empty urls, causing errors
+  // we can add the useMemo later when we have placeholder images instead of empty urls
+  const items = (() => {
     return itemsList.map((item) => {
       if (item.type !== "ITEM" || !item.itemData) {
         // Fallback for unexpected types
@@ -134,7 +146,7 @@ export default function CategoryPage() {
 
       return { id, name, description, url, price: price.toFixed(2) };
     });
-  }, [itemsList, rawImages]);
+  })();
 
   /**
    * 11. Early returns for loading and error states
@@ -148,6 +160,7 @@ export default function CategoryPage() {
   if (imagesError) {
     return <div>Error loading images: {imagesError.message}</div>;
   }
+
   if (!categoryId) {
     return <div>Invalid category</div>;
   }
@@ -176,16 +189,19 @@ export default function CategoryPage() {
         </Link>
       </header>
       <main className="px-4 py-10 lg:px-96 grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
-        {items.map(({ id, name, description, url, price }) => (
-          <Link key={id} href={`/shop/${category}/${id}`} className="block">
-            <div className="relative mb-2 aspect-[3/4] bg-gray-200">
-              <Image src={url} alt={name} fill className="object-cover" />
-            </div>
-            <p className="text-lg font-semibold text-blue-900">{name}</p>
+        {items.map(({ id, name, description, url, price }) => {
+          console.log("item: ", { id, name, description, url, price });
+          return (
+            <Link key={id} href={`/shop/${category}/${id}`} className="block">
+              <div className="relative mb-2 aspect-[3/4] bg-gray-200">
+                <Image src={url} alt={name} fill className="object-cover" />
+              </div>
+              <p className="text-lg font-semibold text-blue-900">{name}</p>
             {description && <p className="text-blue-900 mb-1">{description}</p>}
             <p className="text-xl text-blue-900">${price}</p>
           </Link>
-        ))}
+        );
+      })}
       </main>
     </div>
   );

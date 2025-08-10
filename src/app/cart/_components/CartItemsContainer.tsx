@@ -2,6 +2,7 @@
 "use client";
 
 import Link from "next/link";
+import { orders } from "node_modules/square/api";
 import { useState } from "react";
 import { api } from "~/trpc/react";
 
@@ -19,59 +20,65 @@ type CartItem = {
 export default function CartItemsContainer({ items: initialItems }: { items: CartItem[] }) {
     const [items, setItems] = useState(initialItems);
 
-    const updateItemQuantity = api.user.cart.updateItemQuantity.useMutation({
-        onSuccess: () => {
-            return;
-        },
-    });
 
-    const removeItem = api.user.cart.removeItem.useMutation({
-        onSuccess: () => {
-            return;
-        },
-    });
+    const {data: currentOrder, isLoading, error} = api.user.retrieveCurrentOrder.useQuery();
 
-    const updateQuantityAction = (id: number, qty: number) => {
-        updateItemQuantity.mutate({ id, quantity: qty });
-    };
 
-    const removeItemAction = (id: number) => {
-        removeItem.mutate({ id });
-    };
+    // const updateItemQuantity = api.user.cart.updateItemQuantity.useMutation({
+    //     onSuccess: () => {
+    //         return;
+    //     },
+    // });
 
-    const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    // const removeItem = api.user.cart.removeItem.useMutation({
+    //     onSuccess: () => {
+    //         return;
+    //     },
+    // });
+
+    // const updateQuantityAction = (id: number, qty: number) => {
+    //     updateItemQuantity.mutate({ id, quantity: qty });
+    // };
+
+    // const removeItemAction = (id: number) => {
+    //     removeItem.mutate({ id });
+    // };
+
+    if (currentOrder === null || currentOrder === undefined) {
+        return <p className="text-gray-600">No items in your cart.</p>;
+    }
+
+
 
     return <>
-        {items.length === 0 ? (
-        <p className="text-gray-600">Your cart is empty.</p>
-      ) : (
+        
         <div className="space-y-6">
-          {items.map((item) => {
+          {currentOrder.lineItems?.map((item) => {
             return (
             <div
-              key={item.id}
+              key={item.uid}
               className="flex items-center gap-4 border-b pb-4"
             >
-              <img
+              {/* <img
                 src={item.image ?? ""} // this should be a placeholder image 
                 alt={item.name ?? ""}
                 className="w-20 h-20 object-contain bg-gray-100 rounded"
-              />
+              /> */}
 
               <div className="flex-1">
                 <h2 className="font-semibold">{item.name}</h2>
-                <p className="text-gray-600">${item.price.toFixed(2)}</p>
+                <p className="text-gray-600">${(item.totalMoney?.amount ?? 0n) / 100n}</p>
                 <div className="mt-2 flex items-center gap-2">
                   <label className="text-sm">Qty:</label>
                   <select
                     value={item.quantity}
-                    onChange={(e) => {
-                      const newQuantity = parseInt(e.target.value);
+                    // onChange={(e) => {
+                    //   const newQuantity = parseInt(e.target.value);
 
-                      item.quantity = newQuantity;
+                    //   item.quantity = newQuantity;
 
-                      updateQuantityAction(item.id, newQuantity);
-                    }}
+                    //   updateQuantityAction(item.id, newQuantity);
+                    // }}
                     className="border px-2 py-1"
                   >
                     {[...Array<number>(10)].map((_, i) => (
@@ -84,10 +91,10 @@ export default function CartItemsContainer({ items: initialItems }: { items: Car
               </div>
 
               <button
-                onClick={() => {
-                    setItems((prevItems) => prevItems.filter((item2) => item.id !== item2.id));
-                    removeItemAction(item.id);
-                }}
+                // onClick={() => {
+                //     setItems((prevItems) => prevItems.filter((item2) => item.id !== item2.id));
+                //     removeItemAction(item.uid);
+                // }}
                 className="text-sm text-red-600 hover:underline"
               >
                 Remove
@@ -98,7 +105,7 @@ export default function CartItemsContainer({ items: initialItems }: { items: Car
 
           <div className="text-right pt-4 border-t">
             <p className="text-lg font-semibold">
-              Subtotal: ${subtotal.toFixed(2)}
+              Subtotal: ${(currentOrder?.totalMoney?.amount ?? 0n) / 100n}
             </p>
             <Link
             href ="/checkout"
@@ -107,6 +114,6 @@ export default function CartItemsContainer({ items: initialItems }: { items: Car
             </Link>
           </div>
         </div>
-      )}
+      
     </>
 }

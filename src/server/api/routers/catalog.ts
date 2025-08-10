@@ -12,6 +12,7 @@ import {
 
 import type { CreateImagesRequest, DeleteObjectRequest, GetObjectRequest, ListCatalogRequest, UpdateImagesRequest, UpsertCatalogObjectRequest } from "node_modules/square/api/resources/catalog";
 
+
 export const catalogRouter = createTRPCRouter({
     batchDeleteCatalogObjects: publicProcedure.input(
         z.custom<BatchDeleteCatalogObjectsRequest>(),
@@ -49,15 +50,7 @@ export const catalogRouter = createTRPCRouter({
                 acc + val.detail + "\n"
             , ""))
         }
-
-        if (response.objects === undefined) {
-            throw Error("batchRetrieveCatalogObjects returned undefined objects. This should not happen.");
-        }
-
-        if (response.relatedObjects === undefined) {
-            throw Error("batchRetrieveCatalogObjects returned undefined related objects. This should not happen.");
-        }
-
+        
         // reconstruct to remove errors variable from object
         return {
             objects: response.objects, 
@@ -122,7 +115,7 @@ export const catalogRouter = createTRPCRouter({
     // I believe!
     // I ... believe
     // siuuuuuuuu
-    
+
     updateCatalogImage: publicProcedure.input(
         z.custom<UpdateImagesRequest>()
     ).mutation(async ({ input }) => {
@@ -168,13 +161,6 @@ export const catalogRouter = createTRPCRouter({
     listCatalog: publicProcedure.input(
         z.custom<ListCatalogRequest>().optional()
     ).query(async ({ input }) => {
-            console.log('🔍 Debug Info:');
-    console.log('NODE_ENV:', process.env.NODE_ENV);
-    console.log('Has SQUARE_SANDBOX_ACCESS_TOKEN:', process.env.SQUARE_SANDBOX_ACCESS_TOKEN);
-    console.log('Token length:', process.env.SQUARE_SANDBOX_ACCESS_TOKEN?.length);
-    console.log('Token starts with:', process.env.SQUARE_SANDBOX_ACCESS_TOKEN?.substring(0, 10) + '...');
-    console.log('Input:', input);
-
         const response = await squareClient.catalog.list(input);
 
         return response;
@@ -209,7 +195,7 @@ export const catalogRouter = createTRPCRouter({
     deleteCatalogObject: publicProcedure.input(
         z.custom<DeleteObjectRequest>()
     ).mutation(async ({ input }) => {
-        const response = await squareClient.catalog.object.delete({objectId: input.objectId});
+        const response = await squareClient.catalog.object.delete(input);
 
         if (response.errors && response.errors?.length > 0) {
             throw Error(response.errors.reduce((acc, val) => 
@@ -257,6 +243,57 @@ export const catalogRouter = createTRPCRouter({
             relatedObjects: response.relatedObjects,
         };
     }),
+
+    getImages: publicProcedure
+        .input(
+            z.object({
+                objectId: z.string(),
+                includeRelatedObjects: z.boolean().optional(), // doesn’t change our logic, but allowed
+            })
+        )
+        .query(async ({ input }) => {
+            // 1) Get the object (we don’t actually need related objects for this)
+            const resp = await squareClient.catalog.object.get({
+                objectId: input.objectId,
+                includeRelatedObjects: false,
+            });
+
+            const obj = resp.object;
+            if (!obj) return []; // per your rule #3
+
+            // 2) Pull imageIds from the object itself (no traversal)
+            const type = obj.type;
+            let imageIds: string[] = [];
+
+            // The new SDK uses camelCase data keys (itemData, imageIds, etc.)
+            if (type === "ITEM") {
+                imageIds = obj.itemData?.imageIds ?? [];
+            } else if (type === "ITEM_VARIATION") {
+                imageIds = obj.itemVariationData?.imageIds ?? [];
+            } else if (type === "CATEGORY") {
+                imageIds = obj.categoryData?.imageIds ?? [];
+            } else if ("imageIds" in (obj)) {
+                // generic safety net for any other types that might expose imageIds
+                imageIds = obj.imageIds as string[] ?? [];
+            }
+
+            if (imageIds.length === 0) return []; // per your rule #3
+
+            // 3) Resolve those IDs to CatalogImage objects, then map to URLs
+            const batch = await squareClient.catalog.batchGet({
+                objectIds: imageIds,
+                includeRelatedObjects: false,
+            });
+
+            const imageObjects = batch.objects ?? [];
+            const urls = imageObjects
+                .filter(o => o.type === "IMAGE")
+                .map(o => o.imageData?.url)
+                .filter((u): u is string => Boolean(u));
+
+            // 4) Return URLs (don’t throw on empty)
+            return urls;
+        }),
 
     searchCatalogObjects: publicProcedure.input(
         z.custom<SearchCatalogObjectsRequest>()
