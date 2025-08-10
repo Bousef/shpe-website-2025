@@ -20,15 +20,15 @@ type CartItem = {
 export default function CartItemsContainer({ items: initialItems }: { items: CartItem[] }) {
     const [items, setItems] = useState(initialItems);
 
-    const getImage = (uid: string) => {
-      const {data, isLoading, error} = api.square.catalog.getImages.useQuery({objectId: uid, includeRelatedObjects: true});
+    // const getImage = (uid: string) => {
+    //   const {data, isLoading, error} = api.square.catalog.getImages.useQuery({objectId: uid, includeRelatedObjects: true});
 
-      return data?.[0];
-    }
+    //   return data?.[0];
+    // }
 
-    
 
     const {data: currentOrder, isLoading, error} = api.user.retrieveCurrentOrder.useQuery();
+
 
     // const updateItemQuantity = api.user.cart.updateItemQuantity.useMutation({
     //     onSuccess: () => {
@@ -54,8 +54,6 @@ export default function CartItemsContainer({ items: initialItems }: { items: Car
         return <p className="text-gray-600">No items in your cart.</p>;
     }
 
-
-
     return <>
         
         <div className="space-y-6">
@@ -65,12 +63,12 @@ export default function CartItemsContainer({ items: initialItems }: { items: Car
               key={item.uid}
               className="flex items-center gap-4 border-b pb-4"
             >
-
+{/* 
               <img
                 src={getImage(item.uid!)} // this should be a placeholder image 
                 alt={item.name ?? ""}
                 className="w-20 h-20 object-contain bg-gray-100 rounded"
-              />
+              /> */}
 
               <div className="flex-1">
                 <h2 className="font-semibold">{item.name}</h2>
@@ -78,7 +76,7 @@ export default function CartItemsContainer({ items: initialItems }: { items: Car
                 <div className="mt-2 flex items-center gap-2">
                   <label className="text-sm">Qty:</label>
                   <select
-                    value={item.quantity}
+                    defaultValue={item.quantity}
                     // onChange={(e) => {
                     //   const newQuantity = parseInt(e.target.value);
 
@@ -89,7 +87,7 @@ export default function CartItemsContainer({ items: initialItems }: { items: Car
                     className="border px-2 py-1"
                   >
                     {[...Array<number>(10)].map((_, i) => (
-                      <option key={i + 1} value={i + 1}>
+                      <option key={i + 1} defaultValue={i + 1}>
                         {i + 1}
                       </option>
                     ))}
