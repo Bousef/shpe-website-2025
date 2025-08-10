@@ -2,7 +2,7 @@
 "use client";
 
 import Navbar from "../_components/NavBar";
-import { createPayment } from "./actions/actions";
+
 import {
   CreditCard,
   GooglePay,
@@ -17,6 +17,8 @@ import { api } from "~/trpc/react";
 
 export default function CheckoutPage() {
   const { data: member } = api.user.getCurrentMember.useQuery();
+
+  const createPayment = api.square.payments.createPayment.useMutation();
 
   // CART
   const utils = api.useUtils();
@@ -124,12 +126,21 @@ export default function CheckoutPage() {
                       billingContact,
                     })}
                     cardTokenizeResponseReceived={async (token, buyer) => {
+                      if ("token" in token) {
+                        console.error("Failed to tokenize card");
+                        return;
+                      }
+
                       setIsSubmitting(true);
                       try {
-                        await createPayment({
-                          token: token.token!,
-                          amount: amountCents,
-                          buyerEmail: member?.email,
+                        await createPayment.mutateAsync({
+                          // token defaults to any on my ts so I have to be explicit here
+                          sourceId: (token as { token: string }).token,
+                          idempotencyKey: crypto.randomUUID(),
+                          // why do i have to convert to unknown first...
+                          
+                          amountMoney: { amount: BigInt(amountCents), currency: "USD" },
+                          buyerEmailAddress: member?.email,
                         });
                         alert("Payment successful! Check your email for the receipt.");
                       } catch (err) {
