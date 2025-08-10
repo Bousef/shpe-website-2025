@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import Navbar from "../_components/NavBar";
 import CreateCatalogObjectForm from "../shop/_components/CreateItemForm";
 
 import {
@@ -81,7 +80,6 @@ export default function InventoryManagement() {
 
   return (
     <>
-      <Navbar />
       <div className="p-6 max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-blue-900">Inventory</h1>

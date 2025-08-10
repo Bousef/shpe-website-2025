@@ -1,6 +1,5 @@
 "use server";
 
-import Navbar from "../_components/NavBar";
 import AlumniCard from "../_components/AlumniCard";
 import SearchBar from "./_components/search-bar";
 import { api } from "~/trpc/server";
@@ -64,8 +63,6 @@ export default async function Alumni({ searchParams }: { searchParams: Promise<{
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-100">
-      <Navbar />
-
       <div className="text-center py-10">
         <h1 className="text-4xl text-blue-800">2024 - 2025</h1>
       </div>

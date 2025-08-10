@@ -36,5 +36,5 @@ export async function login(prevState: unknown, formData: FormData): Promise<{er
   }
 
   revalidatePath('/', 'layout');
-  redirect('/');
+  redirect('/?refetchUser=1');
 }

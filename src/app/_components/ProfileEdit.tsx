@@ -26,6 +26,7 @@ export default function ProfileEdit({ profile, onClose }: ProfileEditProps) {
     const [major, setMajor] = useState(profile?.major || "");
     const [resumeFile, setResumeFile] = useState<File | null>(null);
     const [phoneError, setPhoneError] = useState("");
+    const [resumeError, setResumeError] = useState("");
 
     const { mutateAsync: updateProfile } = api.member.updateMember.useMutation();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,7 +43,7 @@ export default function ProfileEdit({ profile, onClose }: ProfileEditProps) {
         // validate file type
         const allowedTypes = ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
         if (!allowedTypes.includes(file.type)) {
-            alert("Only PDF or Word documents are allowed.");
+            setResumeError("Only PDF or Word documents are allowed.");
             e.target.value = ""; // reset input
             return;
         }
@@ -50,11 +51,12 @@ export default function ProfileEdit({ profile, onClose }: ProfileEditProps) {
         // validate file size (limit to 1 MB)
         const maxSize = 1 * 1024 * 1024; // 1MB
         if (file.size > maxSize) {
-            alert("File size must be under 1 MB.");
+            setResumeError("File size must be under 1 MB.");
             e.target.value = "";
             return;
         }
 
+        setResumeError("");
         setResumeFile(file);
     };
 
@@ -180,6 +182,9 @@ export default function ProfileEdit({ profile, onClose }: ProfileEditProps) {
                             <p className="mt-3 mx-2 text-md text-gray-700">{resumeFile.name}</p>
                         )}
                     </div>
+                    {resumeError && (
+                        <p className="text-red-500 text-sm mt-1">{resumeError}</p>
+                    )}
                 </div>
                 <div className="text-right">
                     <button

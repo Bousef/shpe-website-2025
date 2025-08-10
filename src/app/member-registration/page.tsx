@@ -1,6 +1,5 @@
 "use client";
 
-import Navbar from "../_components/NavBar";
 import { z } from "zod";
 import { defineStepper } from "@stepperize/react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -222,7 +221,6 @@ export default function MemberRegistrationPage() {
 
   return (
     <>
-      <Navbar />
       <main className="mx-auto my-10 max-w-3xl">
         <h1 className="mb-8 text-center text-5xl text-yellow-500 lg:text-6xl">
           MEMBER REGISTRATION

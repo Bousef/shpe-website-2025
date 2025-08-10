@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { ArrowRightCircle } from "lucide-react";
 import { api } from "~/trpc/react";
-import Navbar from "~/app/_components/NavBar";
 import SquareCheckoutPopup from "~/app/_components/SquareCheckout";
 
 const ITEM_ID = "RXJH5DVHSI7IFB3W2LYFIE3P"; // chapter item ID 
@@ -66,8 +65,7 @@ export default function ChapterPage() {
 
     return (
         <div>
-            <Navbar />
-             <main className="min-h-screen bg-white py-12 px-4 flex justify-center">
+            <main className="min-h-screen bg-white py-12 px-4 flex justify-center">
                 <div className="max-w-3xl w-full rounded-3xl shadow-xl p-15">
                     <h1 className="text-4xl sm:text-5xl font-semibold text-center text-[var(--shpe-yellow)] mb-6 drop-shadow-md">
                         {itemObject?.result.object?.itemData?.name || "Chapter Contribution"}
