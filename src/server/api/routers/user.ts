@@ -9,10 +9,13 @@ export const userRouter = createTRPCRouter({
   cart: cartRouter,
   
   retrieveCurrentOrder: publicProcedure
+
         .query(async({ctx}) => {
           if (!ctx.supabase) return null;
 
           const { data: { user } } = await ctx.supabase.auth.getUser();
+
+          console.log("working?");
 
           if (!user) return null;
           
@@ -21,14 +24,21 @@ export const userRouter = createTRPCRouter({
           .from(members)
           .where(eq(members.uuid, user.id));
 
+          console.log("working 2?");
+
           const currentMember =  member[0] ?? null;
+          
+          console.log("currentMember: ", currentMember);
 
           const currentOrder = await squareClient.orders.search({
-            locationIds: [currentMember?.square_customer_id ?? ""], 
+            locationIds: [process.env.SQUARE_LOCATION_ID!], 
             query:{
               filter:{
                 stateFilter:{
                   states: ["OPEN" , "DRAFT"]
+                },
+                customerFilter:{
+                  customerIds: [currentMember?.square_customer_id!]
                 }
               },
               sort:{
@@ -38,11 +48,12 @@ export const userRouter = createTRPCRouter({
             },
             limit: 1
           })
+          console.log("working 3?");
           if (currentOrder.errors && currentOrder.errors.length > 0) {
               throw Error(currentOrder.errors.reduce((acc, val) => acc + val.detail + "\n", ""));
           }
 
-          if (!currentOrder.orders) {
+          if (currentOrder.orders === undefined) {
               throw Error("retrieveCurrentOrder returned an undefined orders.");
           }
 
