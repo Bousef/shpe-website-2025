@@ -90,7 +90,7 @@ export default function CategoryPage() {
   } = api.square.catalog.batchRetrieveCatalogObjects.useMutation();
 
   useEffect(() => {
-    if (!itemsLoading && imagesQueryInput !== skipToken) {
+    if (!itemsLoading && imagesQueryInput !== skipToken && imagesQueryInput.body.objectIds.length !== 0) {
       batchRetrieveCatalogObjects(imagesQueryInput.body);
     }
   }, [batchRetrieveCatalogObjects, imagesQueryInput, itemsLoading]);
@@ -107,10 +107,7 @@ export default function CategoryPage() {
    * 10. Combine item and image data into a render-friendly format
    */
 
-
-  // removed useMemo as it makes this operation async and thus renders the page with empty urls, causing errors
-  // we can add the useMemo later when we have placeholder images instead of empty urls
-  const items = (() => {
+  const items = useMemo(() => {
     return itemsList.map((item) => {
       if (item.type !== "ITEM" || !item.itemData) {
         // Fallback for unexpected types
@@ -146,7 +143,7 @@ export default function CategoryPage() {
 
       return { id, name, description, url, price: price.toFixed(2) };
     });
-  })();
+  }, [itemsList, rawImages]);
 
   /**
    * 11. Early returns for loading and error states
@@ -194,7 +191,7 @@ export default function CategoryPage() {
           return (
             <Link key={id} href={`/shop/${category}/${id}`} className="block">
               <div className="relative mb-2 aspect-[3/4] bg-gray-200">
-                <Image src={url} alt={name} fill className="object-cover" />
+                {url && <Image src={url} alt={name} fill className="object-cover" />}
               </div>
               <p className="text-lg font-semibold text-blue-900">{name}</p>
             {description && <p className="text-blue-900 mb-1">{description}</p>}
