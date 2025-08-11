@@ -13,7 +13,7 @@ export default function CartItemsContainer() {
     // }
 
 
-    const {data: order, isLoading, isError, error} = api.user.retrieveCurrentOrder.useQuery();
+    const {data: order, isLoading, isError, error, refetch} = api.user.retrieveCurrentOrder.useQuery();
 
 
     // const updateItemQuantity = api.user.cart.updateItemQuantity.useMutation({
@@ -42,7 +42,7 @@ export default function CartItemsContainer() {
             <p className="text-gray-600">No items in your cart.</p> :
               isLoading ? <p>Loading order...</p> :
               isError ? <p className="text-red-600">Error loading order: {error.message}</p> :
-            <CartItems order={order} />
+            <CartItems order={order} refetch={refetch} />
           }
 
           <div className="text-right pt-4 border-t">

@@ -1,9 +1,37 @@
 /* eslint-disable @next/next/no-img-element */
 import type { Order } from "node_modules/square/api";
 import useEnrichedOrderItems from "~/hooks/useEnrichedOrderItems";
+import { api } from "~/trpc/react";
 
-export default function CartItems({ order }: { order: Order }) {
+export default function CartItems({ order, refetch }: { order: Order, refetch: () => void }) {
     const { items, isLoading, isError, error} = useEnrichedOrderItems(order);
+    const updateOrder = api.square.orders.updateOrder.useMutation({
+        onSuccess: () => {
+            console.log("test");
+            // Trigger a rerender on success
+            refetch();
+        }
+    });
+
+    const deleteItem = (itemId: string) => {
+        console.log("Old fields: ", order.lineItems);
+        const updatedOrder = order.lineItems?.filter(item => item.uid !== itemId);
+        console.log(updatedOrder);
+        console.log("order:", order);
+
+        if (!order.id) return;
+
+        updateOrder.mutate({
+            orderId: order.id,
+            order: {
+                ...order,
+                lineItems: updatedOrder,
+            },
+            fieldsToClear: [
+                `line_items[${itemId}]`,
+            ]
+        });
+    }
 
     if (isLoading) {
         return <div>Loading...</div>;
@@ -11,6 +39,10 @@ export default function CartItems({ order }: { order: Order }) {
 
     if (isError && error) {
         return <div>Error: {error.message}</div>;
+    }
+
+    if (!items) {
+        return <div>No items in cart</div>;
     }
 
     return <div>
@@ -51,6 +83,11 @@ export default function CartItems({ order }: { order: Order }) {
                 </div>
 
                 <button
+                    onClick={() => {
+                        if (!item.uid) return;
+
+                        deleteItem(item.uid);
+                    }}
                 // onClick={() => {
                 //     setItems((prevItems) => prevItems.filter((item2) => item.id !== item2.id));
                 //     removeItemAction(item.uid);
