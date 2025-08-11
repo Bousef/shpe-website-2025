@@ -13,6 +13,7 @@ import { useRef } from "react";
 import KnightConnectSection from "./KnightConnectSection";
 import NationalMemberFields from "./NationalMemberFields";
 import ResumeUploadFields from "./ResumeUploadFields";
+import { submitToJotform } from "~/lib/submitToJotform";
 
 function ucfEmailValidator() {
   return z
@@ -194,6 +195,15 @@ const resumeUploadSchema = z.object({
 });
 export type ResumeUploadSchema = z.infer<typeof resumeUploadSchema>;
 
+export type SubmitSchema = z.infer<
+  typeof generalSchema &
+    typeof demographicSchema &
+    typeof educationSchema &
+    typeof experienceSchema &
+    typeof nationalMemberSchema &
+    typeof resumeUploadSchema
+>;
+
 const { useStepper, steps, utils } = defineStepper(
   { id: "general", title: "General", schema: generalSchema },
   { id: "demographic", title: "Demographic", schema: demographicSchema },
@@ -219,6 +229,31 @@ export default function MemberRegistrationPage() {
     mode: "onTouched",
     resolver: zodResolver(stepper.current.schema),
   });
+
+  async function submitTestData() {
+    form.setValue("firstName", "John");
+    form.setValue("lastName", "Doe");
+    form.setValue("email", "johndoe@ucf.edu");
+    form.setValue("confirmEmail", "johndoe@ucf.edu");
+    form.setValue("phoneNumber", "1234567890");
+    form.setValue("dateOfBirth", new Date("2000-01-01"));
+    form.setValue("discord", "johndoe#1234");
+    form.setValue("memberStatus", "new");
+    form.setValue("race", "White");
+    form.setValue("ucfId", 1234567);
+    form.setValue("academicYear", "Senior");
+    form.setValue("major", "Computer Science");
+    form.setValue("projectedGraduation", new Date().getFullYear() + 1);
+    form.setValue("studentStatus", "undergraduate");
+    form.setValue("gender", "male");
+    form.setValue("country", "USA");
+    form.setValue("legalStatus", "citizen");
+    form.setValue("ethnicity", "Non-Hispanic");
+    form.setValue("memberId", 1234567);
+    form.setValue("invoiceNumber", 1234567);
+
+    form.handleSubmit(async () => await submitToJotform(form.getValues()))();
+  }
 
   return (
     <>
@@ -258,12 +293,17 @@ export default function MemberRegistrationPage() {
           <p>Welcome to SHPE UCF: En la Florida Central, ¡Juntos sin parar!</p>
         </div>
         <div ref={internshipPortalRef}></div>
+        <button onClick={submitTestData}>submit test data</button>
         <FormProvider {...form}>
           <form
             className="space-y-4"
-            onSubmit={form.handleSubmit(
-              stepper.isLast ? stepper.reset : stepper.next,
-            )}
+            onSubmit={form.handleSubmit(async () => {
+              if (stepper.isLast) {
+                  await submitToJotform(form.getValues()),
+              } else {
+                stepper.next();
+              }
+            })}
           >
             {stepper.switch({
               general: () => <GeneralFields />,
