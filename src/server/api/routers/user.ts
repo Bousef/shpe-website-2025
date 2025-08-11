@@ -1,4 +1,4 @@
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
+import { createTRPCRouter, publicProcedure } from "../trpc";
 import { cartRouter } from "./cart";
 import { members } from "~/server/db/schema";
 import { eq } from "drizzle-orm";

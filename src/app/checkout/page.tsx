@@ -1,21 +1,16 @@
 /* eslint-disable @next/next/no-img-element */
 "use client"
 
-import { useState } from "react";
 import { Afterpay, ApplePay, CashAppPay, CreditCard, Divider, GooglePay, PaymentForm } from "react-square-web-payments-sdk";
 import Navbar from "~/app/_components/NavBar";
 import useEnrichedOrderItems from "~/hooks/useEnrichedOrderItems";
 import { api } from "~/trpc/react";
 
 export default function CheckoutPage() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   const { data: order } = api.user.retrieveCurrentOrder.useQuery();
 
   // move this inside component along with order summary to prevent conditionally rendering this hook
   const { items } = useEnrichedOrderItems(order!);
-
-  const utils = api.useUtils();
 
   const { data: member } = api.user.getCurrentMember.useQuery();
   const createPayment = api.square.payments.createPayment.useMutation();
@@ -44,13 +39,6 @@ export default function CheckoutPage() {
       email: member?.email ?? "",
       countryCode: "US",
   };
-
-  const updateItemQuantity = api.user.cart.updateItemQuantity.useMutation({
-      onSuccess: () => utils.user.cart.getItems.invalidate(),
-  });
-  const removeItem = api.user.cart.removeItem.useMutation({
-      onSuccess: () => utils.user.cart.getItems.invalidate(),
-  });
 
   return (
   <div className="min-h-screen flex flex-col bg-gradient-brand">
@@ -119,13 +107,12 @@ export default function CheckoutPage() {
                     intent: "CHARGE",
                     billingContact,
                   })}
-                  cardTokenizeResponseReceived={async (token, buyer) => {
+                  cardTokenizeResponseReceived={async (token, _buyer) => {
                     if ("token" in token) {
                       console.error("Failed to tokenize card");
                       return;
                     }
 
-                    setIsSubmitting(true);
                     try {
                       await createPayment.mutateAsync({
                         // token defaults to any on my ts so I have to be explicit here
@@ -140,8 +127,6 @@ export default function CheckoutPage() {
                     } catch (err) {
                       console.error(err);
                       alert("Payment failed. Please try again.");
-                    } finally {
-                      setIsSubmitting(false);
                     }
                   }}
                 >
