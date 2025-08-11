@@ -10,7 +10,7 @@ export default function CheckoutPage() {
   const { data: order } = api.user.retrieveCurrentOrder.useQuery();
 
   // move this inside component along with order summary to prevent conditionally rendering this hook
-  const { items } = useEnrichedOrderItems(order!);
+  const { items, isLoading: isLoadingItems } = useEnrichedOrderItems(order!);
 
   const { data: member } = api.user.getCurrentMember.useQuery();
   const createPayment = api.square.payments.createPayment.useMutation();
@@ -170,6 +170,8 @@ export default function CheckoutPage() {
 
               <div className="mt-4 space-y-3">
                 {!items ? (
+                  <p className="text-sm text-gray-500">No items in cart</p>
+                ) : isLoadingItems ? (
                   <p className="text-sm text-gray-500">Loading…</p>
                 ) : (
                   items.map((item) => (
