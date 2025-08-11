@@ -10,8 +10,7 @@ import {
     type BatchDeleteCatalogObjectsRequest,
 } from "node_modules/square/api";
 
-import type { CreateImagesRequest, DeleteObjectRequest, GetObjectRequest, ListCatalogRequest, UpdateImagesRequest, UpsertCatalogObjectRequest } from "node_modules/square/api/resources/catalog";
-
+import type { BatchGetCatalogObjectsRequest, CreateImagesRequest, DeleteObjectRequest, GetObjectRequest, ListCatalogRequest, UpdateImagesRequest, UpsertCatalogObjectRequest } from "node_modules/square/api/resources/catalog";
 
 export const catalogRouter = createTRPCRouter({
     batchDeleteCatalogObjects: publicProcedure.input(
@@ -41,7 +40,7 @@ export const catalogRouter = createTRPCRouter({
     }),
 
     batchRetrieveCatalogObjects: publicProcedure.input(
-        z.custom<BatchDeleteCatalogObjectsRequest>(),
+        z.custom<BatchGetCatalogObjectsRequest>(),
     ).mutation(async ({ input }) => {
         const response =  await squareClient.catalog.batchGet(input);
 
@@ -50,7 +49,7 @@ export const catalogRouter = createTRPCRouter({
                 acc + val.detail + "\n"
             , ""))
         }
-        
+
         // reconstruct to remove errors variable from object
         return {
             objects: response.objects, 
