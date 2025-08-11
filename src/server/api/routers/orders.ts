@@ -1,10 +1,8 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { legacyClient, squareClient } from "~/lib/square/client";
-import { SortOrder, type Order, type OrderLineItem, type OrderLineItemDiscount } from "node_modules/square/api";
+import { squareClient } from "~/lib/square/client";
+import { type Order, type OrderLineItem, type OrderLineItemDiscount } from "node_modules/square/api";
 import { randomUUID } from "crypto";
-import { type BatchRetrieveOrdersRequest, type CreateOrderRequest, type UpdateOrderRequest } from "square/legacy";
-import { request } from "http";
 
 export const ordersRouter = createTRPCRouter ({
 
@@ -282,12 +280,13 @@ export const ordersRouter = createTRPCRouter ({
         }),
 
         
-    updateOrders: publicProcedure
+    updateOrder: publicProcedure
         .input(
             z.object({
                 orderId: z.string(),
-                order: z.custom<Order>(),       //the order object to update
-                idempotencyKey: z.string(),
+                // order is not optional contrary to the API specification
+                order: z.custom<Order>(),   // the order object to update
+                idempotencyKey: z.string().optional(),
                 fieldsToClear: z.array(z.string()).optional(), 
             })
         ).mutation(async ({input}) => {
@@ -305,7 +304,7 @@ export const ordersRouter = createTRPCRouter ({
             }
 
             if (!response.order) {
-                throw Error("updateOrders returned an undefined order.");
+                throw Error("updateOrder returned an undefined order.");
             }
 
             return response.order;
