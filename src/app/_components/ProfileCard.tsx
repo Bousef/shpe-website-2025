@@ -3,9 +3,14 @@
 import { api } from '~/trpc/react';
 import { useEffect, useState } from "react";
 import ProfileEdit from './ProfileEdit';
+import { supabase } from '~/supabase-client';
+import type { Session } from '@supabase/supabase-js';
 
 export default function ProfileCard() {
 	const [sessionChecked, setSessionChecked] = useState(false);
+	const [session, setSession] = useState<Session | null>(null);
+  	const [loadingSession, setLoadingSession] = useState(true);
+
 	const [showResume, setShowResume] = useState(false);
 	const [showEdit, setShowEdit] = useState(false);
 	const [cursorHistory, setCursorHistory] = useState<(string | undefined)[]>([undefined]); // for going back
@@ -15,6 +20,24 @@ export default function ProfileCard() {
 
 	useEffect(() => {
 		setSessionChecked(true);
+
+		async function fetchUser() {
+			// check for existing session when component mounts
+			const { data: { session } } = await supabase.auth.getSession();
+			setSession(session);
+			setLoadingSession(false);
+
+			// listen for changes in auth state (login/logout) without refreshing page
+			const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+				setSession(session);
+				setLoadingSession(false);
+			});
+
+			return () => {
+				subscription.unsubscribe();	// cleanup on unmount
+			};			
+		}
+		fetchUser();
 	}, []);
 
 	// call existing getMember endpoint
@@ -24,7 +47,7 @@ export default function ProfileCard() {
 		error,
 		refetch: refetchProfile,
 	} = api.user.getCurrentMember.useQuery(undefined, {
-		enabled: sessionChecked,
+		enabled: !!session && sessionChecked,
 	})
 
 	// create orders
@@ -95,9 +118,11 @@ export default function ProfileCard() {
 		}
 	};
 	
+	if (loadingSession) return <p>Loading session...</p>; 
+  	if (!session) return <p>Please log in to view this content.</p>;
 	if (!sessionChecked || isLoading) return <p>Loading profile…</p>
-	if (!profile) return <p>No profile found for this user.</p>;
 	if (error) return <p>Error: {error.message}</p>;
+	if (!profile) return <p>No profile found for this user.</p>;
 
 	return (
 		<main id="profile" className="relative bg-white py-10 px-15 text-[var(--shpe-navy-blue)] min-w-6xl mx-auto min-h-[80vh]">

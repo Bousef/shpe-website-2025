@@ -1,15 +1,38 @@
 "use client";
 
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import { login } from '../login/actions';
 import Link from 'next/link';
 import InputBox, { InputField, PasswordInputField } from './InputBox';
+import { supabase } from '~/supabase-client';
+import { useRouter } from 'next/navigation';
 
 export default function Login(){
-	const [loginState, loginAction] = useActionState(login, { error: "" });
+	// const [loginState, loginAction] = useActionState(login, { error: "" });
+	// const currentError = loginState.error;
+	// const formData = loginState.formData;
 
-	const currentError = loginState.error;
-	const formData = loginState.formData;
+	const router = useRouter();
+	const [error, setError] = useState<string | null>(null);
+
+	async function handleSubmit(formData: FormData) {
+		setError(null);
+		const result = await login(null, formData);
+
+		if (result?.error) {
+			setError(result.error);
+		return;
+		}
+
+		if (result?.session) {
+		await supabase.auth.setSession({
+			access_token: result.session.access_token,
+			refresh_token: result.session.refresh_token,
+		});
+
+		router.push('/?refetchUser=1');
+		}
+	}
 
 	return (
 		<section className="flex flex-col items-center pb-[6rem] py-[2rem] px-4 min-w-[280px]">
@@ -19,7 +42,7 @@ export default function Login(){
 				<h2 className="text-5xl text-[var(--shpe-orange)]">LOG IN</h2>
 			</div>
 
-			<form className="w-full max-w-md space-y-1" action={loginAction}>
+			<form className="w-full max-w-md space-y-1" action={handleSubmit}>
 				<InputBox>
 				<InputField 
 					id="email"
@@ -27,7 +50,7 @@ export default function Login(){
 					name="email"
 					required
 					placeholder="UCF Email"
-					defaultValue={formData?.email ?? ""}
+					// defaultValue={formData?.email ?? ""}
 				 />
 				 <PasswordInputField
 				 	id='password'
@@ -37,9 +60,10 @@ export default function Login(){
 				 />
 				</InputBox>
 
-				{currentError && (
+				{/* {currentError && (
 					<div className="text-red-600 text-sm mb-1">{currentError}</div>
-				)}
+				)} */}
+				{error && <p className="text-red-500">{error}</p>}
 
 				{/* REMEMBER ME + FORGET PASSWORD */}
 				<div className="flex justify-between items-center mb-2">

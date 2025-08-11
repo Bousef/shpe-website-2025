@@ -1,4 +1,3 @@
-import Navbar          from "./_components/NavBar";
 import WeeklyEvents    from "./_components/WeeklyEvents";
 import Slideshow    from "./_components/MeetFam";
 import AboutSection    from "./_components/AboutSection";

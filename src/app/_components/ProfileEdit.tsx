@@ -2,8 +2,7 @@
 
 import { supabase } from "~/supabase-client";
 import { api } from "~/trpc/react";
-import { useState, useEffect } from "react";
-import type { Session } from "@supabase/supabase-js";
+import { useState } from "react";
 
 type ProfileEditProps = {
     profile: {
@@ -35,16 +34,16 @@ export default function ProfileEdit({ profile, onClose }: ProfileEditProps) {
         const files = e.target.files;
         if (!files || files.length === 0) {
             setResumeFile(null);
+            setResumeError("");
             return;
         }
-
         const file = files[0]!;
 
         // validate file type
         const allowedTypes = ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
         if (!allowedTypes.includes(file.type)) {
             setResumeError("Only PDF or Word documents are allowed.");
-            e.target.value = ""; // reset input
+            setResumeFile(null);
             return;
         }
 
@@ -52,7 +51,7 @@ export default function ProfileEdit({ profile, onClose }: ProfileEditProps) {
         const maxSize = 1 * 1024 * 1024; // 1MB
         if (file.size > maxSize) {
             setResumeError("File size must be under 1 MB.");
-            e.target.value = "";
+            setResumeFile(null);
             return;
         }
 
@@ -73,19 +72,47 @@ export default function ProfileEdit({ profile, onClose }: ProfileEditProps) {
             let resumeUrl: string | null = profile?.resume_url ?? null;
 
             if (resumeFile) {
-                const { error } = await supabase.storage
+                const ext = resumeFile.name.split('.').pop()?.toLowerCase();
+                const allowedExtensions = ['pdf', 'doc', 'docx'];
+                if (!ext || !allowedExtensions.includes(ext)) {
+                    setResumeError("Only PDF or Word documents are allowed.");
+                    setIsSubmitting(false);
+                    return;
+                }
+
+                // get current user session
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) throw new Error("User session not found");
+
+                const userSub = session.user.id;
+                const filePath = `${userSub}.${ext}`;
+
+                console.log("uploading file path: ", filePath)
+                console.log("user session id: ", userSub)
+
+                // upload to supabase storage (overwrite if exists)
+                const { data: upload, error: uploadError } = await supabase.storage
                     .from("resumes")
-                    .upload(`resumes/${profile?.ucf_id}.pdf`, resumeFile, { upsert: true });
+                    .upload(filePath, resumeFile, { upsert: true, metadata: { owner: userSub }});
 
-                if (error) throw error;
+                if (uploadError) {
+                    console.log("Upload error details:", uploadError);
+                    throw new Error("Failed to upload resume.");
+                }
 
+                if (upload) console.log("up: ", upload)
+
+                // get public url
                 const { data: publicUrlData } = supabase.storage
                     .from("resumes")
-                    .getPublicUrl(`resumes/${profile?.ucf_id}.pdf`);
+                    .getPublicUrl(filePath);
+
+                if (!publicUrlData?.publicUrl) throw new Error("Failed to retrieve resume URL.");
 
                 resumeUrl = publicUrlData.publicUrl;
             }
 
+            // call updateMember
             await updateProfile({
                 ucf_id: profile!.ucf_id,
                 first_name: firstName,
@@ -179,7 +206,7 @@ export default function ProfileEdit({ profile, onClose }: ProfileEditProps) {
                             />
                         </label>
                         {resumeFile && (
-                            <p className="mt-3 mx-2 text-md text-gray-700">{resumeFile.name}</p>
+                            <p className="mt-3 mx-2 text-md text-gray-700">{resumeFile.name} ({(resumeFile.size / 1024).toFixed(1)} KB)</p>
                         )}
                     </div>
                     {resumeError && (
