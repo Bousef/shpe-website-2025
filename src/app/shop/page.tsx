@@ -1,126 +1,105 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import Navbar from "../_components/NavBar";
 import Link from "next/link";
 import Image from "next/image";
 import { api } from "~/trpc/react";
-import { skipToken } from "@tanstack/react-query";
-import type { CatalogObject } from "node_modules/square/api";
+// removed: skipToken, useEffect
+// if you need types from Square, import them from the pkg root instead of a node_modules path
+// import type { CatalogObject } from "square"; // example
 
 export default function ShopPage() {
-  // 1. Fetch current member (for permissioning)
+  // 1) current member (for permission)
   const { data: member } = api.user.getCurrentMember.useQuery();
 
-  // 2. Fetch all CATEGORY catalog objects
+  // 2) categories list
   const {
     data: categoriesData,
     isLoading: isLoadingCategories,
     error: categoriesError,
   } = api.square.catalog.listCatalog.useQuery({ types: "CATEGORY" });
 
-   useEffect(() => {
-    if (categoriesData) {
-      console.log("✅ Categories fetched:", categoriesData);
-    }
-  }, [categoriesData]);
+  // 3) raw categories array
+  const rawCategories = useMemo(() => categoriesData ?? [], [categoriesData]);
 
-  // 3. Extract raw category objects array
-  const rawCategories = useMemo(
-    () => categoriesData ?? [],
-    [categoriesData]
-  );
-  
-
-
-  // 4. Gather the first imageId from each category for lookup
-  const categoryImageIds = useMemo<string[]>(
-    () =>
-      rawCategories
-        .filter((c): c is Extract<CatalogObject, { type: "CATEGORY" }> => c.type === "CATEGORY")
-        .map((c) => c.categoryData?.imageIds?.[0] ?? ""),
-    [rawCategories]
-  );
-
-  const imagesQueryInput = useMemo(() =>
-    categoryImageIds.length > 0 && categoryImageIds.every((id) => id !== "")
-      ? { body: { objectIds: categoryImageIds } }
-      : skipToken
-  , [categoryImageIds]);
-
-  // 5. Batch-fetch those Image catalog objects
-  const { mutate: batchRetrieveCatalogObjects, data: imagesData, isError, error, isPending } = api.square.catalog.batchRetrieveCatalogObjects.useMutation();
-
-  useEffect(() => {
-    if (imagesQueryInput !== skipToken) {
-      batchRetrieveCatalogObjects(imagesQueryInput.body);
-    }
-  }, [imagesQueryInput, batchRetrieveCatalogObjects]);
-
-  // 6. Extract the raw image objects array
-  const rawImages = useMemo(
-    () => imagesData?.objects ?? [],
-    [imagesData]
-  );
-
-
-  // 7. Derive parallel arrays of names & URLs
+  // 4) category names (parallel to rawCategories order)
   const categoryNames = useMemo<string[]>(
     () =>
       rawCategories
-        .filter((o): o is Extract<CatalogObject, { type: "CATEGORY" }> => o.type === "CATEGORY")
+        .filter((o) => o.type === "CATEGORY")
         .map((c) => c.categoryData?.name ?? "Unnamed"),
     [rawCategories]
   );
-  
-const categoryImageUrls = useMemo<string[]>(
-  () =>
-    rawImages
-      .filter(
-        (o): o is Extract<CatalogObject, { type: "IMAGE" }> =>
-          o.type === "IMAGE"
-      )
-      .map((img) => img.imageData?.url ?? ""),
-  [rawImages]
-);
-  // 8. Zip into a single array for rendering
+
+  // 5) ids in the same order we’ll render
+  const categoryIds = useMemo<string[]>(
+    () =>
+      (rawCategories ?? [])
+        .map((c) => c.id)
+        .filter((id): id is string => !!id && id.trim() !== ""),
+    [rawCategories]
+  );
+
+  // 6) batch get FIRST image url per category (server should return array aligned to input order OR {objectId,url}[])
+  // this version assumes you're returning [{ objectId, url }] as discussed
+  const {
+    data: categoryImagePairs = [],
+    isLoading: isLoadingImages,
+    error: imagesError,
+  } = api.square.catalog.batchGetImages.useQuery(
+    { objectIds: categoryIds, includeRelatedObjects: false },
+    { enabled: categoryIds.length > 0 }
+  );
+
+  // 7) build id->url map so we never depend on array index ordering
+  const imageByCategoryId = useMemo(() => {
+    const map = new Map<string, string | null>();
+    for (const { objectId, url } of categoryImagePairs) {
+      map.set(objectId, url ?? null);
+    }
+    return map;
+  }, [categoryImagePairs]);
+
+  // 8) final data for render
   const categories = useMemo(
     () =>
       rawCategories.map((catObj, idx) => ({
         object: catObj,
-        name: categoryNames[idx]!,
-        imageUrl: categoryImageUrls[idx]!,
+        name: categoryNames[idx] ?? "Unnamed",
+        imageUrl: imageByCategoryId.get(catObj.id ?? "") ?? "",
       })),
-    [rawCategories, categoryNames, categoryImageUrls]
+    [rawCategories, categoryNames, imageByCategoryId]
   );
 
-  // 9. Permission: show “Manage Inventory” only to Treasurers
+  // 9) permission
   const showEdit = member?.position === "Treasurer";
 
-  // 10. Early returns for loading / errors / missing data
-  if (isLoadingCategories || isPending) {
+  // 10) loading / error states (fixed variable names)
+  if (isLoadingCategories || isLoadingImages) {
     return <div>Loading categories...</div>;
   }
   if (categoriesError) {
     return <div>Error loading categories: {categoriesError.message}</div>;
   }
-  if (isError) {
-    return <div>Error loading images: {error.message}</div>;
+  if (imagesError) {
+    return <div>Error loading images: {imagesError.message}</div>;
   }
   if (categories.length === 0) {
     return <div>No categories found</div>;
   }
-  // (optional) quick sanity check
-  if (!categories.every((c) => c.imageUrl)) {
-    return <div>Some categories are missing images</div>;
-  }
 
-  // 11. Main render
+  // optional sanity check — you can keep or remove
+  // if (!categories.every((c) => c.imageUrl)) {
+  //   return <div>Some categories are missing images</div>;
+  // }
+
+  // 11) render
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-100">
       <Navbar />
 
-      {/* Top actions */}
+      {/* top actions */}
       <div className="flex justify-end px-4 lg:px-48 mt-4">
         {showEdit && (
           <Link
@@ -138,7 +117,7 @@ const categoryImageUrls = useMemo<string[]>(
         </Link>
       </div>
 
-      {/* Header */}
+      {/* header */}
       <main className="px-4 py-10 lg:px-48">
         <div className="flex items-center mb-8">
           <h1 className="flex-1 text-center text-5xl text-yellow-500 lg:text-6xl">
@@ -146,14 +125,15 @@ const categoryImageUrls = useMemo<string[]>(
           </h1>
         </div>
 
-        {/* Category grid */}
+        {/* grid */}
         <div
-          className={`grid gap-10 ${categories.length === 1
+          className={`grid gap-10 ${
+            categories.length === 1
               ? "grid-cols-1 justify-center"
               : categories.length === 2
-                ? "grid-cols-2 justify-center"
-                : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-            }`}
+              ? "grid-cols-2 justify-center"
+              : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+          }`}
         >
           {categories.map(({ object, name, imageUrl }) => (
             <Link
@@ -162,11 +142,15 @@ const categoryImageUrls = useMemo<string[]>(
               className="block overflow-hidden text-center"
             >
               <div className="relative mb-4 aspect-[9/11] w-full max-w-[450px] lg:mb-8 mx-auto">
+                {/* guard src to avoid runtime crash if empty */}
                 <Image
-                  src={imageUrl}
+                  src={imageUrl || "/placeholder.png"}
                   alt={name}
                   fill
                   className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 450px"
+                  // optionally add priority to fold images
+                  // priority
                 />
               </div>
               <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-wider text-blue-900 uppercase">

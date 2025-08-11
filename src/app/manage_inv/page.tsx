@@ -8,36 +8,23 @@ import { PlusCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useQueryClient } from "@tanstack/react-query";
 import CreateItemForm from "../_components/CreateItemForms";
 import type { CatalogCategory } from "node_modules/square/api";
+import { is } from "drizzle-orm";
 
 export default function InventoryManagement() {
-  // 1. Toggle state for showing the "Add Item" form
   const [showAdd, setShowAdd] = useState(false);
-
-  // 2. Query client for invalidating catalog queries after creation
   const queryClient = useQueryClient();
 
-  // 3. Fetch all items from Square Catalog
-  const { data: itemsRes, isLoading: itemsLoading } = api.square.catalog.listCatalog.useQuery({ types: "ITEM" });
+  // 1) Items
+  const { data: itemsRes } = api.square.catalog.listCatalog.useQuery({ types: "ITEM" });
   const rawItems = useMemo(() => itemsRes ?? [], [itemsRes]);
 
-  // 4. Extract and filter image IDs
-  const itemImageIds = useMemo(() => {
-      return rawItems
-        .map((item) => {
-          if (!("itemData" in item) || !item.itemData) return "";
-
-          return item.itemData.imageIds?.[0] ?? "";
-        })
-        .filter((id : string) => id)
-  }, [rawItems]);
-
-  // 5. Fetch all categories in one go
+  // 2) Categories
   const { data: categoriesRes } = api.square.catalog.listCatalog.useQuery({ types: "CATEGORY" });
   const rawCategories = useMemo(() => categoriesRes ?? [], [categoriesRes]);
 
-  // 6. Build category lookup map
+  // 3) Category lookup
   const categoryLookup = useMemo(() => {
-    return rawCategories.reduce<Record<string, string>>((map, obj ) => {
+    return rawCategories.reduce<Record<string, string>>((map, obj) => {
       const id = obj.id;
       const name = (obj as CatalogCategory).name ?? "";
       if (id) map[id] = name;
@@ -45,62 +32,43 @@ export default function InventoryManagement() {
     }, {});
   }, [rawCategories]);
 
-  // 7. Conditionally fetch image objects if IDs are available
-  const { mutate: batchRetrieveCatalogObjects, data } = api.square.catalog.batchRetrieveCatalogObjects.useMutation();
-
-  useEffect(() => {
-    if (!itemsLoading) {
-         batchRetrieveCatalogObjects({
-        objectIds: itemImageIds
-      });
-    }
-   
-  }, [batchRetrieveCatalogObjects, itemImageIds, itemsLoading]);
-
-  const rawImages = useMemo(() => 
-    data?.objects ?? [], 
-    [data?.objects]
+  // 4) Collect itemIds (for image lookup)
+  const itemIds = useMemo<string[]>(
+    () =>
+      rawItems
+        .map((it: any) => it.id as string | undefined)
+        .filter((id): id is string => !!id && id.trim() !== ""),
+    [rawItems]
   );
 
-  // 8. Combine item, image, category, and price data for table display
+  // 5) Batch fetch the FIRST image URL for each item (server returns a flat array aligned to input order)
+  const {
+    data: itemImageUrls = [], // string[]
+    isLoading: isLoadingImages,
+    error: imagesError,
+  } = api.square.catalog.batchGetImages.useQuery(
+    { objectIds: itemIds, includeRelatedObjects: false },
+    { enabled: itemIds.length > 0 }
+  );
+
+  const imageByItemId = useMemo(() => {
+    const map = new Map<string, string | null>();
+    for (const { objectId, url } of itemImageUrls) {
+      map.set(objectId, url ?? null);
+    }
+    return map;
+  }, [itemImageUrls]);
+
+  // 7) Final table data
   const items = useMemo(
     () =>
-      rawItems.map((item) => {
-        if (!("itemData" in item)) {
-          console.error(`Item data not found for ID: ${item.id}`);
-          return null;
-        }
-
-        const id = item.id;
+      rawItems.map((item: any) => {
+        const id = item.id as string;
         const name = item.itemData?.name ?? "Unnamed Item";
         const description = item.itemData?.description ?? "";
         const categoryId = item.itemData?.categories?.[0]?.id ?? "";
         const category = categoryLookup[categoryId] ?? "";
-
-        const imageId = item.itemData?.imageIds?.[0] ?? "";
-        const imageObj = rawImages.find((rawImage) => rawImage.id === imageId);
-
-        if (!imageObj) {
-          console.log(`Image not found for ID: ${imageId}`);
-          return null;
-        }
-
-        if (!("imageData" in imageObj)) {
-          console.log(`Image data not found for ID: ${imageId}`);
-          return null;
-        }
-
-        const url = imageObj?.imageData?.url ?? "";
-
-        if (!item.itemData?.variations?.[0] || !("itemVariationData" in item.itemData.variations[0])) {
-          console.error(`Item variation data not found for ID: ${item.id}`);
-          return null;
-        }
-
-        if (item.itemData?.variations?.[0]?.itemVariationData && !("priceMoney" in item.itemData?.variations?.[0]?.itemVariationData)) {
-          console.error(`Item variation data not found for ID: ${item.id}`);
-          return null;
-        }
+        const url = imageByItemId.get(id) ?? "";
 
         const priceCents =
           item.itemData?.variations?.[0]?.itemVariationData?.priceMoney?.amount ?? 0n;
@@ -108,9 +76,12 @@ export default function InventoryManagement() {
 
         return { id, name, description, category, url, price };
       }),
-    [rawItems, rawImages, categoryLookup]
+    [rawItems, categoryLookup, imageByItemId]
   );
 
+  if (isLoadingImages) {
+    return <div>Loading...</div>;
+  }
   return (
     <>
       <Navbar />
