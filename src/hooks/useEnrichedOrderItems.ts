@@ -4,7 +4,7 @@ import { enrichItemsWithImageUrls } from "~/lib/square/catalog";
 import { api } from "~/trpc/react";
 
 export default function useEnrichedOrderItems(order: Order) {
-    const { mutate: batchRetrieveCatalogObjects, data: catalogData, isPending: isCatalogPending, error } = api.square.catalog.batchRetrieveCatalogObjects.useMutation();
+    const { mutate: batchRetrieveCatalogObjects, data: catalogData, isPending, isError, error } = api.square.catalog.batchRetrieveCatalogObjects.useMutation();
 
     useEffect(() => {
         // we filter with Boolean to only get truthy values (eg. non-empty strings)
@@ -25,7 +25,8 @@ export default function useEnrichedOrderItems(order: Order) {
 
     return {
         items,
-        isCatalogPending,
+        isLoading: isPending,
+        isError,
         error,
     };
 }
