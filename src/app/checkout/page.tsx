@@ -1,73 +1,19 @@
 /* eslint-disable @next/next/no-img-element */
 "use client"
 
-import type { CatalogObject, OrderLineItem } from "node_modules/square/api";
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { Afterpay, ApplePay, CashAppPay, CreditCard, Divider, GooglePay, PaymentForm } from "react-square-web-payments-sdk";
 import Navbar from "~/app/_components/NavBar";
+import useEnrichedOrderItems from "~/hooks/useEnrichedOrderItems";
 import { api } from "~/trpc/react";
-
-function enrichItemsWithImageUrls(catalogData: {
-    objects: CatalogObject[] | undefined;
-    relatedObjects: CatalogObject[] | undefined;
-}, items: OrderLineItem[]): (OrderLineItem & { imageUrl?: string | null | undefined })[] {
-  if (!catalogData.objects || !catalogData.relatedObjects) return items;
-
-  const enrichedItems = items.map(item => {
-    const itemVariation = catalogData.objects?.find(obj => obj.id === item.catalogObjectId);
-
-    if (itemVariation?.type !== "ITEM_VARIATION") return item;
-
-    const parentItem = catalogData.relatedObjects?.find(obj => obj.id === itemVariation?.itemVariationData?.itemId && obj.type === "ITEM");
-
-    if (!parentItem || parentItem.type !== "ITEM") return item;
-
-    const imageId = parentItem?.itemData?.imageIds?.[0];
-    const image = imageId ? catalogData.relatedObjects?.find(obj => obj.id === imageId) : undefined;
-
-    if (image?.type !== "IMAGE") return item;
-
-    return {
-      ...item,
-      imageUrl: image.imageData?.url,
-    };
-  });
-
-  return enrichedItems;
-}
 
 export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [items, setItems] = useState<(OrderLineItem & { imageUrl?: string | null | undefined })[]>([]);
 
-  const {data: order} = api.user.retrieveCurrentOrder.useQuery();
-  
-  useEffect(() => {
-    setItems(order?.lineItems ?? []);
-  }, [order?.lineItems]);
+  const { data: order } = api.user.retrieveCurrentOrder.useQuery();
 
-  const { mutate: batchRetrieveCatalogObjects, data: catalogData, isPending: isLoadingCatalog } = api.square.catalog.batchRetrieveCatalogObjects.useMutation();
-
-  useEffect(() => {
-    // we filter with Boolean to only get truthy values (eg. non-empty strings)
-    const catalogIds = order?.lineItems?.map(lineItem => lineItem.catalogObjectId).filter((item): item is string => Boolean(item)) ?? [];
-
-    if (catalogIds.length > 0) {
-      batchRetrieveCatalogObjects({ objectIds: catalogIds, includeRelatedObjects: true });
-    }
-  }, [batchRetrieveCatalogObjects, order?.lineItems]);
-
-  const enrichedItems = useMemo(() => {
-    if (!catalogData) return order?.lineItems as (OrderLineItem & { imageUrl?: string | null | undefined })[];
-    if (!order?.lineItems) return [];
-
-    // we use order?.lineItems instead of items to not cause an infinite loop
-    return enrichItemsWithImageUrls(catalogData, order?.lineItems);
-  }, [catalogData, order?.lineItems]);
-
-  useEffect(() => {
-    setItems(enrichedItems);
-  }, [enrichedItems]);
+  // move this inside component along with order summary to prevent conditionally rendering this hook
+  const { items } = useEnrichedOrderItems(order!);
 
   const utils = api.useUtils();
 
