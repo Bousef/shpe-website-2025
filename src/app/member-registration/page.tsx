@@ -14,6 +14,7 @@ import KnightConnectSection from "./KnightConnectSection";
 import NationalMemberFields from "./NationalMemberFields";
 import ResumeUploadFields from "./ResumeUploadFields";
 import { submitToJotform } from "~/lib/submitToJotform";
+import PaymentSection from "./PaymentSection";
 
 function ucfEmailValidator() {
   return z
@@ -23,6 +24,8 @@ function ucfEmailValidator() {
     });
 }
 
+const phoneRegex = new RegExp(/^\+[1-9]\d{1,14}$/);
+
 const generalSchema = z
   .object({
     memberStatus: z.enum(["new", "returning"]),
@@ -30,7 +33,7 @@ const generalSchema = z
     lastName: z.string().min(1, "Last name is required"),
     email: ucfEmailValidator(),
     confirmEmail: ucfEmailValidator(),
-    phoneNumber: z.string().min(10, "Phone number is required"),
+    phoneNumber: z.string().regex(phoneRegex, "Invalid phone number"),
     dateOfBirth: z.preprocess(
       (val) => {
         if (typeof val === "string") {
@@ -161,37 +164,28 @@ const nationalMemberSchema = z.object({
 export type NationalMemberSchema = z.infer<typeof nationalMemberSchema>;
 
 const resumeUploadSchema = z.object({
-  resume: z
-    .instanceof(File)
-    .check((ctx) => {
-      const file = ctx.value;
-      if (!file) {
-        return;
-      }
-      const namePattern = /^[a-zA-Z]+_[a-zA-Z]+_Resume\.(pdf|doc|docx)$/;
-      if (!namePattern.test(file.name)) {
-        ctx.issues.push({
-          code: "custom",
-          input: file,
-          message:
-            "File name must be in the format LastName_FirstName_Resume and have a valid extension (pdf, doc, docx)",
-        });
-      }
-      if (
-        ![
-          "application/pdf",
-          "application/msword",
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        ].includes(file.type)
-      ) {
-        ctx.issues.push({
-          code: "custom",
-          input: file,
-          message: "File must be a PDF, DOC, or DOCX",
-        });
-      }
-    })
-    .optional(),
+  resume: z.preprocess(
+    (val: File | FileList) => {
+      if ("name" in val && "size" in val && "type" in val) {
+        return val;
+      } else return undefined;
+    },
+    z
+      .file()
+      .mime([
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      ])
+      .optional()
+      .refine((file) => {
+        if (!file) {
+          return true;
+        }
+        const namePattern = /^[a-zA-Z]+_[a-zA-Z]+_Resume\.(pdf|doc|docx)$/;
+        return namePattern.test(file.name);
+      }, "Resume must be named in the format 'FirstName_LastName_Resume.pdf'"),
+  ),
 });
 export type ResumeUploadSchema = z.infer<typeof resumeUploadSchema>;
 
@@ -204,7 +198,10 @@ export type SubmitSchema = z.infer<
     typeof resumeUploadSchema
 >;
 
-const { useStepper, steps, utils } = defineStepper(
+const paymentSchema = z.object({ paymentId: z.string("Payment is required") });
+export type PaymentSchema = z.infer<typeof paymentSchema>;
+
+const { useStepper } = defineStepper(
   { id: "general", title: "General", schema: generalSchema },
   { id: "demographic", title: "Demographic", schema: demographicSchema },
   { id: "education", title: "Education", schema: educationSchema },
@@ -220,6 +217,11 @@ const { useStepper, steps, utils } = defineStepper(
     title: "Resume Upload",
     schema: resumeUploadSchema,
   },
+  {
+    id: "payment",
+    title: "Payment",
+    schema: paymentSchema,
+  },
 );
 
 export default function MemberRegistrationPage() {
@@ -228,6 +230,9 @@ export default function MemberRegistrationPage() {
   const form = useForm({
     mode: "onTouched",
     resolver: zodResolver(stepper.current.schema),
+    defaultValues: {
+      phoneNumber: "",
+    },
   });
 
   async function submitTestData() {
@@ -299,7 +304,7 @@ export default function MemberRegistrationPage() {
             className="space-y-4"
             onSubmit={form.handleSubmit(async () => {
               if (stepper.isLast) {
-                  await submitToJotform(form.getValues()),
+                await submitToJotform(form.getValues());
               } else {
                 stepper.next();
               }
@@ -313,6 +318,7 @@ export default function MemberRegistrationPage() {
               "knight-connect": () => <KnightConnectSection />,
               "national-member": () => <NationalMemberFields />,
               "resume-upload": () => <ResumeUploadFields />,
+              payment: () => <PaymentSection />,
             })}
             <div className="float-right flex items-center gap-2">
               <button
