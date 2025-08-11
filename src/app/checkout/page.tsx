@@ -1,11 +1,40 @@
 /* eslint-disable @next/next/no-img-element */
 "use client"
 
-import type { OrderLineItem } from "node_modules/square/api";
-import { useEffect, useState } from "react";
+import type { CatalogObject, OrderLineItem } from "node_modules/square/api";
+import { useEffect, useMemo, useState } from "react";
 import { Afterpay, ApplePay, CashAppPay, CreditCard, Divider, GooglePay, PaymentForm } from "react-square-web-payments-sdk";
 import Navbar from "~/app/_components/NavBar";
 import { api } from "~/trpc/react";
+
+function enrichItemsWithImageUrls(catalogData: {
+    objects: CatalogObject[] | undefined;
+    relatedObjects: CatalogObject[] | undefined;
+}, items: OrderLineItem[]): (OrderLineItem & { imageUrl?: string | null | undefined })[] {
+  if (!catalogData.objects || !catalogData.relatedObjects) return items;
+
+  const enrichedItems = items.map(item => {
+    const itemVariation = catalogData.objects?.find(obj => obj.id === item.catalogObjectId);
+
+    if (itemVariation?.type !== "ITEM_VARIATION") return item;
+
+    const parentItem = catalogData.relatedObjects?.find(obj => obj.id === itemVariation?.itemVariationData?.itemId && obj.type === "ITEM");
+
+    if (!parentItem || parentItem.type !== "ITEM") return item;
+
+    const imageId = parentItem?.itemData?.imageIds?.[0];
+    const image = imageId ? catalogData.relatedObjects?.find(obj => obj.id === imageId) : undefined;
+
+    if (image?.type !== "IMAGE") return item;
+
+    return {
+      ...item,
+      imageUrl: image.imageData?.url,
+    };
+  });
+
+  return enrichedItems;
+}
 
 export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -20,60 +49,25 @@ export default function CheckoutPage() {
   const { mutate: batchRetrieveCatalogObjects, data: catalogData, isPending: isLoadingCatalog } = api.square.catalog.batchRetrieveCatalogObjects.useMutation();
 
   useEffect(() => {
-    const catalogIds = order?.lineItems?.map(lineItem => lineItem.catalogObjectId ?? "") ?? [];
+    // we filter with Boolean to only get truthy values (eg. non-empty strings)
+    const catalogIds = order?.lineItems?.map(lineItem => lineItem.catalogObjectId).filter((item): item is string => Boolean(item)) ?? [];
 
     if (catalogIds.length > 0) {
       batchRetrieveCatalogObjects({ objectIds: catalogIds, includeRelatedObjects: true });
     }
   }, [batchRetrieveCatalogObjects, order?.lineItems]);
 
-  console.log("items: ", items);
+  const enrichedItems = useMemo(() => {
+    if (!catalogData) return order?.lineItems as (OrderLineItem & { imageUrl?: string | null | undefined })[];
+    if (!order?.lineItems) return [];
+
+    // we use order?.lineItems instead of items to not cause an infinite loop
+    return enrichItemsWithImageUrls(catalogData, order?.lineItems);
+  }, [catalogData, order?.lineItems]);
 
   useEffect(() => {
-    if (!isLoadingCatalog && catalogData) {
-      console.log("catalogData:", catalogData);
-
-      const newItems = items.map(item => {
-        const itemVariation = catalogData.objects?.find(obj => obj.id === item.catalogObjectId);
-        console.log("itemVariation:", itemVariation);
-
-        if (itemVariation?.type === "ITEM_VARIATION") {
-          const itemObject = catalogData.relatedObjects?.find(obj => obj.id === itemVariation?.itemVariationData?.itemId);
-
-          if (itemObject?.type === "ITEM") {
-            if (itemObject.itemData?.imageIds && itemObject.itemData?.imageIds?.length > 0) {
-              const imageId = itemObject.itemData?.imageIds?.[0];
-              const image = imageId ? catalogData.relatedObjects?.find(obj => obj.id === imageId) : undefined;
-
-              console.log("image:", image);
-
-              if (image?.type === "IMAGE") {
-                console.log("here")
-                return {
-                  ...item,
-                  imageUrl: image.imageData?.url,
-                };
-              }
-
-              return item;
-            }
-
-            return item;
-          }
-
-          return item;
-        }
-
-        return item;
-      });
-
-      console.log("newItems:", newItems);
-
-      setItems(newItems);
-    }
-  }, [isLoadingCatalog, catalogData]);
-
-  console.log(batchRetrieveCatalogObjects);
+    setItems(enrichedItems);
+  }, [enrichedItems]);
 
   const utils = api.useUtils();
 
