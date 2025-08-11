@@ -293,6 +293,87 @@ export const catalogRouter = createTRPCRouter({
             // 4) Return URLs (don’t throw on empty)
             return urls;
         }),
+batchGetImages: publicProcedure
+  .input(
+    z.object({
+      objectIds: z.array(z.string()).min(1),
+      includeRelatedObjects: z.boolean().optional(),
+    })
+  )
+  .query(async ({ input }) => {
+    const { objectIds } = input;
+
+    // 1) Fetch all requested objects
+    const resp = await squareClient.catalog.batchGet({
+      objectIds,
+      includeRelatedObjects: false,
+    });
+    const objects = resp.objects ?? [];
+    if (objects.length === 0) {
+      return objectIds.map(objectId => ({ objectId, url: null }));
+    }
+
+    // Build a quick lookup so we can preserve the input order
+    const objById = new Map(objects.map(o => [o.id, o]));
+
+    // 2) For each objectId in input order, get the first imageId
+    const firstImageIdByObjectId = new Map<string, string | null>();
+    const imageIds: string[] = [];
+
+    for (const id of objectIds) {
+      const obj = objById.get(id);
+      if (!obj) {
+        firstImageIdByObjectId.set(id, null);
+        continue;
+      }
+
+      const type = obj.type;
+      let firstImageId: string | undefined;
+      let relatedObjectId: string | undefined;
+
+      if (type === "ITEM") {
+        firstImageId = obj.itemData?.imageIds?.[0];
+      } else if (type === "ITEM_VARIATION") {
+        firstImageId = obj.itemVariationData?.imageIds?.[0];
+      } else if (type === "CATEGORY") {
+        firstImageId = obj.categoryData?.imageIds?.[0];
+      } else if ("imageIds" in (obj as any)) {
+        firstImageId = (obj as any).imageIds?.[0];
+      }
+
+      relatedObjectId = obj.id; // ✅ fixed from `relatedObjectId:` to assignment
+
+      firstImageIdByObjectId.set(id, firstImageId ?? null);
+      if (firstImageId) {
+        imageIds.push(firstImageId);
+      }
+    }
+
+    if (imageIds.length === 0) {
+      return objectIds.map(objectId => ({ objectId, url: null }));
+    }
+
+    // 3) Resolve unique image IDs to URLs
+    const uniqueImageIds = [...new Set(imageIds)];
+    const imgBatch = await squareClient.catalog.batchGet({
+      objectIds: uniqueImageIds,
+      includeRelatedObjects: false,
+    });
+
+    const urlByImageId = new Map<string, string>();
+    for (const o of imgBatch.objects ?? []) {
+      if (o.type === "IMAGE" && o.id && o.imageData?.url) {
+        urlByImageId.set(o.id, o.imageData.url);
+      }
+    }
+
+    // 4) Return array in the same order as input
+    return objectIds.map(objectId => {
+      const imgId = firstImageIdByObjectId.get(objectId);
+      const url = imgId ? urlByImageId.get(imgId) ?? null : null;
+      return { objectId, url };
+    });
+  }),
 
     searchCatalogObjects: publicProcedure.input(
         z.custom<SearchCatalogObjectsRequest>()
