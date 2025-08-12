@@ -175,7 +175,7 @@ export const catalogRouter = createTRPCRouter({
                 acc + val.detail + "\n"
             , ""))
         }
-
+        
         if (response.catalogObject === undefined) {
             throw Error("upsertCatalogObject returned undefined catalog object. This should not happen.");
         }
