@@ -25,31 +25,48 @@ export default function SearchBar({ initialQuery, initialPageSize }: { initialQu
     }
 
     return (
-        <div>
-            <input className="border-2" value={query} onChange={(e) => setQuery(e.currentTarget.value)} onKeyDown={(e) => {
+        <div className="flex items-center justify-between gap-4 p-4 mx-6"> 
+            <div className="flex-grow max-w-md relative">
+                <div className="relative">
+
+            <input 
+            className="w-full px-4 py-2 border-4 border-[var(--shpe-yellow)] rounded-full 
+             focus:outline-none focus:ring-4 focus:ring-[var(--shpe-yellow)] 
+             text-center text-black placeholder:text-center placeholder:text-black placeholder:font-semi-bold placeholder:font-helvetica" value={query} onChange={(e) => setQuery(e.currentTarget.value)} onKeyDown={(e) => {
                 if (e.key === "Enter") {
                     search();
                 }
-            }} placeholder="Search..." />
+            }} placeholder="NAME" />
 
-            <Dropdown>
-                <DropdownButton>{pageSize ?? DEFAULT_PAGE_SIZE} / page</DropdownButton>
-                <DropdownItems>
-                    {[10, 20, 50, 100].map(size => (
-                        <DropdownItem key={size} onClick={() => {
-                            setPageSize(size);
-                        }}>
-                            {size} / page
-                        </DropdownItem>
-                    ))}
-                </DropdownItems>
-            </Dropdown>
+            <button 
+                        onClick={search}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                    >
+                        <svg 
+                            xmlns="http://www.w3.org/2000/svg" 
+                            className="h-5 w-5 text-gray-500 hover:text-gray-700" 
+                            fill="none" 
+                            viewBox="0 0 24 24" 
+                            stroke="currentColor"
+                        >
+                            <path 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round" 
+                                strokeWidth={2} 
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
+                            />
+                        </svg>
+                    </button>
+            </div>
+            </div>
+            <div className = "flex-gap 2"> 
             <Dropdown>
                 <DropdownButton>Sort By: {sortBy === "first_name" ? "First Name" : sortBy === "last_name" ? "Last Name" : sortBy === "grad_year" ? "Graduation Year" : sortBy}</DropdownButton>
                 <DropdownItems>
                     {["grad_year", "first_name", "last_name", ...positionEnumValues].map(field => (
                         <DropdownItem key={field} onClick={() => {
                             setSortBy(field as "first_name" | "last_name" | "grad_year" | Position);
+                            search();
                         }}>
                             {field === "first_name" ? "First Name" : field === "last_name" ? "Last Name" : field === "grad_year" ? "Graduation Year" : field}
                         </DropdownItem>
@@ -62,15 +79,29 @@ export default function SearchBar({ initialQuery, initialPageSize }: { initialQu
                     {["desc", "asc"].map(direction => (
                         <DropdownItem key={direction} onClick={() => {
                             setSortDirection(direction as "desc" | "asc");
-                        }}>
+                            search();
+                            }}>
+
                             {direction === "desc" ? "Descending" : "Ascending"}
                         </DropdownItem>
                     ))}
                 </DropdownItems>
             </Dropdown>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 cursor-pointer" onClick={search}>
-                Search
-            </button>
+             <Dropdown>
+                <DropdownButton>{pageSize ?? DEFAULT_PAGE_SIZE} / page</DropdownButton>
+                <DropdownItems>
+                    {[10, 20, 50, 100].map(size => (
+                        <DropdownItem key={size} onClick={() => {
+                            setPageSize(size);
+                            search();
+                        }}>
+                            {size} / page
+                        </DropdownItem>
+                    ))}
+                </DropdownItems>
+            </Dropdown>
+           
+        </div>
         </div>
     )
 }
