@@ -3,10 +3,14 @@
 import React, { useState, useMemo } from "react";
 import { api } from "~/trpc/react";
 import type { UpsertCatalogObjectRequest } from "node_modules/square/api/resources/catalog";
+import type { C } from "node_modules/drizzle-kit/index-BAUrj6Ib.mjs";
+import type { BatchChangeInventoryRequest, CatalogObject, CatalogItem, InventoryChange, InventoryState, } from "node_modules/square/api";
+import type { CatalogItemVariation } from "square/legacy";
 
 type CreateItemFormProps = {
   onSave?: () => void;
 };
+
 
 type ItemForm = {
   name: string;
@@ -14,6 +18,7 @@ type ItemForm = {
   variationName?: string;
   variationPrice?: string;
   categoryId?: string;
+  locationId: string;            // <— required by Inventory API
 };
 
 export default function CreateItemForm({ onSave }: CreateItemFormProps) {
@@ -40,11 +45,13 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
     variationName: "",
     variationPrice: "",
     categoryId: "",
+    locationId: process.env.NEXT_PUBLIC_SQUARE_LOCATION_ID || "",
   });
 
   // tRPC mutations
   const upsertMutation = api.square.catalog.upsertCatalogObject.useMutation();
   const uploadImageMutation = api.square.catalog.createCatalogImage.useMutation();
+  const batchChangeInventoryMutation = api.square.inventory.batchChangeInventory.useMutation();
 
   // Fetch categories
   const { data: categoriesData } = api.square.catalog.listCatalog.useQuery({ types: "CATEGORY" });
@@ -80,85 +87,156 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
-
+  // Build item variations based on form input
   function buildVariations(
-  isClothes: boolean,
-  variationName: string | undefined,
-  variationPrice: string | undefined
-) {
-  const ts = Date.now();
-  const priceInCents = Math.round(parseFloat(variationPrice ?? "0") * 100);
-  const priceMoney = { amount: BigInt(priceInCents), currency: "USD" as const };
+    isClothes: boolean,
+    variationName: string | undefined,
+    variationPrice: string | undefined
+  ) {
+    const ts = Date.now();
+    const priceInCents = Math.round(parseFloat(variationPrice ?? "0") * 100);
+    const priceMoney = { amount: BigInt(priceInCents), currency: "USD" as const };
 
-  const makeVariation = (vName: string) => ({
-    id: `variation-${vName}-${ts}`,
-    type: "ITEM_VARIATION" as const,
-    itemVariationData: {
-      name: vName,
-      priceMoney,
+    const makeVariation = (vName: string) => ({
+      id: `#variation-${vName}-${ts}`,
+      type: "ITEM_VARIATION" as const,
+      itemVariationData: {
+        name: vName,
+        priceMoney,
+      },
+    });
+
+    return isClothes
+      ? SIZE_KEYS.map(sz => makeVariation(sz))
+      : [makeVariation((variationName ?? "").trim() || "Default")];
+  }
+
+  // Map variation name -> variation id from CatalogObject[]
+  function indexVariationsByName(variations: CatalogObject[] | null | undefined) {
+    const m = new Map<string, string>();
+    for (const v of variations ?? []) {
+      if (v?.type !== "ITEM_VARIATION") continue;
+      const n = v.itemVariationData?.name?.trim();
+      if (v.id && n) m.set(n, v.id);
+    }
+    return m;
+  }
+
+function buildInventoryChanges(
+  isClothes: boolean,
+  createdVariations: CatalogObject[],
+  sizeStocks: Record<"S" | "M" | "L" | "XL" | "XXL" | "XXXL", number>,
+  singleStock: number,
+  locationId: string,
+  occurredAtISO: string, // optional but nice to include
+): NonNullable<BatchChangeInventoryRequest["changes"]> {
+
+  // Build a name->id map if names exist (works when response carries names)
+  const byName = new Map<string, string>();
+
+  for (const v of createdVariations) {
+    const name = (v as CatalogItemVariation).name?.trim?.();
+    if (name && v.id) byName.set(name, v.id);
+  }
+
+  const makeCount = (catalogObjectId: string, quantity: number): InventoryChange => ({
+    type: "PHYSICAL_COUNT",
+    physicalCount: {
+      catalogObjectId,
+      state: "IN_STOCK" as InventoryState,
+      locationId,
+      quantity: String(quantity ?? 0),
+      occurredAt: occurredAtISO, // optional
     },
   });
 
-  return isClothes
-    ? SIZE_KEYS.map(sz => makeVariation(sz))
-    : [makeVariation((variationName ?? "").trim() || "Default")];
+  if (isClothes) {
+
+    const SIZES = ["S", "M", "L", "XL", "XXL", "XXXL"] as const;
+    return SIZES.map(size => makeCount(byName.get(size)!, sizeStocks[size]));
+
+  }
+
+  const onlyVarId = createdVariations[0]?.id;
+  if (!onlyVarId) throw new Error("Missing created variation ID for non-clothes item.");
+  return [makeCount(onlyVarId, singleStock)];
 }
 
+
   // replace your current handleSubmit with this
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setLoading(true);
-  setErrorMsg("");
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setErrorMsg("");
 
-  try {
-    const { name, description, variationName, variationPrice, categoryId } = form;
+    try {
+      const { name, description, variationName, variationPrice, locationId, categoryId } = form;
 
-    // minimal validation
-    if (!name?.trim()) throw new Error("Please enter a name.");
-    if (!categoryId) throw new Error("Please select a category.");
-    if (!variationPrice || isNaN(Number(variationPrice))) {
-      throw new Error("Enter a valid price.");
-    }
-    if (!isClothes && !variationName?.trim()) {
-      throw new Error("Please enter a variation name.");
-    }
+      // minimal validation
+      if (!name?.trim()) throw new Error("Please enter a name.");
+      if (!categoryId) throw new Error("Please select a category.");
+      if (!variationPrice || isNaN(Number(variationPrice))) {
+        throw new Error("Enter a valid price.");
+      }
+      if (!isClothes && !variationName?.trim()) {
+        throw new Error("Please enter a variation name.");
+      }
 
-    const ts = Date.now();
+      //  Create timestamp
+      const ts = Date.now();
 
-    // ✅ variations built to your requirements
-    const variations = buildVariations(isClothes, variationName, variationPrice);
+      // Call buildVariations
+      const variations = buildVariations(isClothes, variationName, variationPrice);
 
-    const itemData: UpsertCatalogObjectRequest = {
-      idempotencyKey: `item-${ts}`,
-      object: {
-        id: `item-${ts}`,
-        type: "ITEM",
-        itemData: {
-          name,
-          description,
-          categoryId: categoryId!,
-          variations,
+      //  Create item data
+      const itemData: UpsertCatalogObjectRequest = {
+        idempotencyKey: `item-${ts}`,
+        object: {
+          id: `#item-${ts}`,
+          type: "ITEM",
+          itemData: {
+            name,
+            description,
+            categoryId: categoryId!,
+            variations,
+          },
         },
-      },
-    };
+      };
 
-    const stockPayload = isClothes
-      ? { type: "sizes", quantities: sizeStocks }
-      : { type: "single", quantity: singleStock };
+      // // Call the mutation to create the item
+      // const upsertRes = await upsertMutation.mutateAsync(itemData);
 
-    await upsertMutation.mutateAsync(itemData);
+      // // pull the real variation IDs that Square just created
+      // const createdItem = upsertRes?.catalogObject;
+      // const createdVariations = (createdItem as CatalogItem).variations ?? [];
 
-    // TODO: use stockPayload with your inventory API after you have the created itemId
-    // await api.inventory.createStock.mutateAsync({ itemId: createdItemId, stock: stockPayload });
+      // const occurredAtISO = new Date().toISOString();
 
-    onSave?.();
-  } catch (error: any) {
-    console.error("Error saving item:", error);
-    setErrorMsg(error?.message ?? "Failed to save item. Please try again.");
-  } finally {
-    setLoading(false);
-  }
-};
+      // const changes = buildInventoryChanges(
+      //   isClothes,
+      //   createdVariations,
+      //   sizeStocks,
+      //   singleStock,
+      //   locationId,
+      //   occurredAtISO,
+      // );
+
+      // // Now the request is correctly shaped for Inventory API
+      // const changeInventoryData: BatchChangeInventoryRequest = {
+      //   idempotencyKey: `inventory-${ts}`,
+      //   changes,
+      // };
+
+      // await batchChangeInventoryMutation.mutateAsync({ body: changeInventoryData });
+
+      onSave?.();
+    } catch (error: any) {
+      console.error("Error saving item:", error);
+      setErrorMsg(error?.message ?? "Failed to save item. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 max-w-lg p-4 border rounded shadow">

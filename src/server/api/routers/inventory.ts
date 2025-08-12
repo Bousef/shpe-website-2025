@@ -1,26 +1,42 @@
-import { inventoryApi } from "../../../lib/square/client";
+import { squareClient } from "../../../lib/square/client";
 import { object, z } from "zod";
-import { type BatchRetrieveInventoryCountsRequest } from "square/legacy";
 import { createTRPCRouter, publicProcedure } from "../trpc";
+import type {
+    BatchChangeInventoryRequest,
+    BatchGetInventoryCountsRequest,
+    GetInventoryRequest
+} from "node_modules/square/api";
 
 export const inventoryRouter = createTRPCRouter({
-
-    retrieveInventoryCount: publicProcedure
-        .input(
-            z.object({ objectId: z.string() })
-        ).query(async ({ input }) => {
-            return await inventoryApi.retrieveInventoryCount(input.objectId);
-        }),
 
     batchRetrieveInventoryCounts: publicProcedure
         .input(
             z.object({
-                 body: z.custom<BatchRetrieveInventoryCountsRequest>(),
+                body: z.custom<BatchGetInventoryCountsRequest>(),
             })
         )
         .query(async ({ input }) => {
-            // Calls POST /v2/inventory/counts/batch-retrieve
-            return await inventoryApi.batchRetrieveInventoryCounts(input.body);
+            return await squareClient.inventory.batchGetCounts(input.body);
         }),
-        
+
+    retrieveInventoryCount: publicProcedure
+        .input(
+            z.object({
+                body: z.custom<GetInventoryRequest>(),
+            })
+        )
+        .query(async ({ input }) => {
+            return await squareClient.inventory.get(input.body);
+        }),
+
+    batchChangeInventory: publicProcedure
+        .input(
+            z.object({
+                body: z.custom<BatchChangeInventoryRequest>(),
+            })
+        )
+        .mutation(async ({ input }) => {
+            // Calls POST /v2/inventory/counts/batch-change
+            return await squareClient.inventory.batchCreateChanges(input.body);
+        })
 });
