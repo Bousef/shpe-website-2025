@@ -12,10 +12,65 @@ type ProfileEditProps = {
         email?: string;
         phone_number?: string;
         major?: string;
-        resume_url?: string;
     } | null | undefined;
     onClose: () => void;
 };
+
+async function uploadResume(oldResume: string | null | undefined, uuid: string, resumeFile: File) {
+    // if member has an existing resume, extract filename and delete
+    if (oldResume) {
+        let prevFilename = null;
+        try {
+            const url = new URL(oldResume);
+            const parts = url.pathname.split('/');
+            prevFilename = parts[parts.length - 1]; // last segment is the filename
+        } catch (err: any) {
+            console.log("Error extracting filename:", err?.message || err);
+        }
+        if (prevFilename) {
+            const { error } = await supabase.storage
+                .from('resumes')
+                .remove([prevFilename]);
+        
+            if (error) console.log("Error deleting old resume: ", error);
+        }
+    }
+
+    // generate unique filename to prevent browser caching if filename stays same
+    // format: userId + timestamp + original extension
+    const timestamp = Date.now();
+    const ext = resumeFile.name.split('.').pop()?.toLowerCase();
+    const allowedExtensions = ["pdf", "doc", "docx"];
+    if (!ext || !allowedExtensions.includes(ext)) {
+        throw new Error("Only PDF, DOC, or DOCX files are allowed.");
+    }
+    const fileName = `${uuid}-${timestamp}.${ext}`;
+
+    // upload to supabase storage
+    const { data: upload, error: uploadError } = await supabase.storage
+        .from("resumes")
+        .upload(fileName, resumeFile, { 
+            cacheControl: "0",  // avoid CDN caching issues
+            upsert: true,       // don't overwrite automatically
+            metadata: { owner: uuid },
+        });
+
+    if (uploadError) {
+        throw new Error(`Failed to upload resume: ${uploadError.message}`);
+    }
+
+    // get public url
+    const { data: publicUrlData } = supabase.storage
+        .from("resumes")
+        .getPublicUrl(fileName);
+
+    if (!publicUrlData?.publicUrl) throw new Error("Failed to retrieve resume URL.");
+
+    return{
+        publicUrl: publicUrlData.publicUrl,
+        filename: fileName,
+    };
+}
 
 export default function ProfileEdit({ profile, onClose }: ProfileEditProps) {
     const [firstName, setFirstName] = useState(profile?.first_name || "");
@@ -26,9 +81,11 @@ export default function ProfileEdit({ profile, onClose }: ProfileEditProps) {
     const [resumeFile, setResumeFile] = useState<File | null>(null);
     const [phoneError, setPhoneError] = useState("");
     const [resumeError, setResumeError] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const { mutateAsync: updateProfile } = api.member.updateMember.useMutation();
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const member = api.member.getMember.useQuery({ ucf_id: profile!.ucf_id });
+    if (!member) throw new Error("Member not found");
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
@@ -40,7 +97,11 @@ export default function ProfileEdit({ profile, onClose }: ProfileEditProps) {
         const file = files[0]!;
 
         // validate file type
-        const allowedTypes = ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
+        const allowedTypes = [
+            "application/pdf",
+            "application/msword", 
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        ];
         if (!allowedTypes.includes(file.type)) {
             setResumeError("Only PDF or Word documents are allowed.");
             setResumeFile(null);
@@ -69,47 +130,19 @@ export default function ProfileEdit({ profile, onClose }: ProfileEditProps) {
 
         setIsSubmitting(true);
         try {
-            let resumeUrl: string | null = profile?.resume_url ?? null;
+            let resumeUrl = null;
+            let resumeFilename = null;
 
+            // only upload if file is selected
             if (resumeFile) {
-                const ext = resumeFile.name.split('.').pop()?.toLowerCase();
-                const allowedExtensions = ['pdf', 'doc', 'docx'];
-                if (!ext || !allowedExtensions.includes(ext)) {
-                    setResumeError("Only PDF or Word documents are allowed.");
-                    setIsSubmitting(false);
-                    return;
-                }
-
                 // get current user session
                 const { data: { session } } = await supabase.auth.getSession();
                 if (!session) throw new Error("User session not found");
 
                 const userSub = session.user.id;
-                const filePath = `${userSub}.${ext}`;
-
-                console.log("uploading file path: ", filePath)
-                console.log("user session id: ", userSub)
-
-                // upload to supabase storage (overwrite if exists)
-                const { data: upload, error: uploadError } = await supabase.storage
-                    .from("resumes")
-                    .upload(filePath, resumeFile, { upsert: true, metadata: { owner: userSub }});
-
-                if (uploadError) {
-                    console.log("Upload error details:", uploadError);
-                    throw new Error("Failed to upload resume.");
-                }
-
-                if (upload) console.log("up: ", upload)
-
-                // get public url
-                const { data: publicUrlData } = supabase.storage
-                    .from("resumes")
-                    .getPublicUrl(filePath);
-
-                if (!publicUrlData?.publicUrl) throw new Error("Failed to retrieve resume URL.");
-
-                resumeUrl = publicUrlData.publicUrl;
+                const result = await uploadResume(member.data?.resume, userSub, resumeFile);
+                resumeUrl = result.publicUrl;
+                resumeFilename = result.filename;
             }
 
             // call updateMember

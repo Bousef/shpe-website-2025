@@ -73,19 +73,19 @@ export const memberRouter = createTRPCRouter({
   }),
 
 
-  //get member
+  //get member by ucf_id
   getMember: publicProcedure
-  .input(z.object({uuid : z.string().uuid()}))
+  .input(z.object({ucf_id : z.number()}))
   .query(async ({input}) => {
     const member = await db
       .select()
       .from(members)
-      .where(eq(members.uuid, input.uuid));
+      .where(eq(members.ucf_id, input.ucf_id));
 
-    if (member.length == 0){
-      throw new Error("No member found!");
-    }
-    return member[0];
+      if (member.length == 0){
+        throw new Error("No member found!");
+      }
+      return member[0];
   }),
 
   //delete member - debugging

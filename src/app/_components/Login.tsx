@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from 'react';
+import { useState } from 'react';
 import { login } from '../login/actions';
 import Link from 'next/link';
 import InputBox, { InputField, PasswordInputField } from './InputBox';
@@ -8,10 +8,6 @@ import { supabase } from '~/supabase-client';
 import { useRouter } from 'next/navigation';
 
 export default function Login(){
-	// const [loginState, loginAction] = useActionState(login, { error: "" });
-	// const currentError = loginState.error;
-	// const formData = loginState.formData;
-
 	const router = useRouter();
 	const [error, setError] = useState<string | null>(null);
 

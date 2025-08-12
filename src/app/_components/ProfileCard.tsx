@@ -285,7 +285,6 @@ export default function ProfileCard() {
 										email: profile.email,
 										phone_number: profile.phone_number ?? undefined,
 										major: profile.major ?? undefined,
-										resume_url: profile.resume ?? undefined,
 									}}
 									onClose={() => {
 										setShowEdit(false);
