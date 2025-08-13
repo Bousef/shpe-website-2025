@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import Navbar from "../_components/NavBar";
 import { api } from "~/trpc/react";
-import { PlusCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { PlusCircleIcon, XMarkIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { useQueryClient } from "@tanstack/react-query";
 import CreateItemForm from "../_components/CreateItemForms";
 import type { CatalogCategory } from "node_modules/square/api";
@@ -13,11 +13,16 @@ import { is } from "drizzle-orm";
 export default function InventoryManagement() {
   const [showAdd, setShowAdd] = useState(false);
   const queryClient = useQueryClient();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // 1) Items
   const { data: itemsRes } = api.square.catalog.listCatalog.useQuery({ types: "ITEM" });
   const rawItems = useMemo(() => itemsRes ?? [], [itemsRes]);
 
+  useEffect(() => {
+    console.log("Raw items fetched:", rawItems);
+  }, [rawItems]);
+  
   // 2) Categories
   const { data: categoriesRes } = api.square.catalog.listCatalog.useQuery({ types: "CATEGORY" });
   const rawCategories = useMemo(() => categoriesRes ?? [], [categoriesRes]);
@@ -26,7 +31,7 @@ export default function InventoryManagement() {
   const categoryLookup = useMemo(() => {
     return rawCategories.reduce<Record<string, string>>((map, obj) => {
       const id = obj.id;
-      const name = (obj as CatalogCategory).name ?? "";
+      const name = obj.type === "CATEGORY" ? obj.categoryData?.name ?? "" : "";
       if (id) map[id] = name;
       return map;
     }, {});
@@ -61,12 +66,24 @@ export default function InventoryManagement() {
 
   // 7) Final table data
   const items = useMemo(
-    () =>
-      rawItems.map((item: any) => {
+    () => {
+      console.log("Processing items. Raw items:", rawItems);
+      console.log("Category lookup:", categoryLookup);
+      
+      return rawItems.map((item: any) => {
         const id = item.id as string;
         const name = item.itemData?.name ?? "Unnamed Item";
         const description = item.itemData?.description ?? "";
-        const categoryId = item.itemData?.categories?.[0]?.id ?? "";
+        
+        // Check all possible places where category could be stored
+        console.log("Item structure for", name, ":", {
+          categoryId: item.itemData?.categoryId,
+          categories: item.itemData?.categories,
+          fullItemData: item.itemData
+        });
+        
+        // Try the new categories array first, fallback to deprecated categoryId
+        const categoryId = item.itemData?.categories?.[0]?.id ?? item.itemData?.categoryId ?? "";
         const category = categoryLookup[categoryId] ?? "";
         const url = imageByItemId.get(id) ?? "";
 
@@ -75,9 +92,31 @@ export default function InventoryManagement() {
         const price = (Number(priceCents) / 100).toFixed(2);
 
         return { id, name, description, category, url, price };
-      }),
+      });
+    },
     [rawItems, categoryLookup, imageByItemId]
   );
+
+  const deleteMutation = api.square.catalog.deleteCatalogObject.useMutation({
+    onSuccess: async () => {
+      const idx = items.findIndex(item => item.id === deletingId);
+      items.splice(idx, 1);
+    },
+  });
+
+  const handleDelete = async (id: string, name: string) => {
+    const ok = window.confirm(`Delete "${name}"? This cannot be undone.`);
+    if (!ok) return;
+    try {
+      setDeletingId(id);
+      // If your router expects a different key than objectId, change it here.
+      await deleteMutation.mutateAsync({ objectId: id } as any);
+    } catch (err: any) {
+      window.alert(err?.message ?? "Failed to delete item.");
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   if (isLoadingImages) {
     return <div>Loading...</div>;
@@ -121,34 +160,49 @@ export default function InventoryManagement() {
                 <th className="py-3 px-4 border-b">Name</th>
                 <th className="py-3 px-4 border-b">Category</th>
                 <th className="py-3 px-4 border-b">Price</th>
+                <th className="py-3 px-4 border-b w-32">Actions</th>
+
               </tr>
             </thead>
             <tbody>
               {items.map((item) => {
                 if (!item) return null;
 
+                const isDeleting = deletingId === item.id;
+
                 return (
                   <tr key={item.id} className="hover:bg-gray-50 h-20">
                     <td className="px-4 border-b">
                       {item.url ? (
                         <Image
-                        src={item.url}
-                        alt={item.name}
-                        width={50}
-                        height={50}
-                        className="object-cover rounded"
-                      />
-                    ) : (
-                      "—"
-                    )}
-                  </td>
-                  <td className="px-4 border-b text-sm">{item.id}</td>
-                  <td className="px-4 border-b text-sm">{item.name}</td>
-                  <td className="px-4 border-b text-sm">{item.category}</td>
-                  <td className="px-4 border-b text-sm">${item.price}</td>
-                </tr>
-              );
-            })}
+                          src={item.url}
+                          alt={item.name}
+                          width={50}
+                          height={50}
+                          className="object-cover rounded"
+                        />
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                    <td className="px-4 border-b text-sm">{item.id}</td>
+                    <td className="px-4 border-b text-sm">{item.name}</td>
+                    <td className="px-4 border-b text-sm">{item.category}</td>
+                    <td className="px-4 border-b text-sm">${item.price}</td>
+                    <td className="px-4 border-b text-sm">
+                      <button
+                        onClick={() => handleDelete(item.id, item.name)}
+                        disabled={isDeleting}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-50"
+                        title="Delete item"
+                      >
+                        <TrashIcon className="h-4 w-4" />
+                        {isDeleting ? "Deleting..." : "Delete"}
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

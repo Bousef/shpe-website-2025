@@ -77,7 +77,7 @@ export default function Navbar() {
           </Link>
         )
       )}
- {/* account / login / logout */}
+ {/* account / login / logout / Sign up */}
           {!isLoading && (
             isLoggedIn ? (
               <div className="flex items-center space-x-4">
@@ -92,12 +92,21 @@ export default function Navbar() {
                 </button>
               </div>
             ) : (
+              <>
               <Link
                 href="/login"
-                className="px-3 py-1 text-[#001f5b] hover:text-[#001133] font-medium"
+                className="px-3 py-1 text-[#001f5b] font-medium hover:text-[#001133] hover:scale-105 transition-transform duration-150 rounded-3xl"
               >
-                Log in
+                LOG IN
               </Link>
+
+              <Link
+              href={"/signUp"}
+              className="px-3 py-1 text-[#001f5b] font-medium hover:text-[#001133] hover:scale-105 transition-transform duration-150 rounded-3xl"
+              >
+                SIGN UP
+              </Link>
+              </>
             )
           )}
     </div>
@@ -140,13 +149,23 @@ export default function Navbar() {
                 </button>
               </div>
             ) : (
+              <div className="flex flex-col space-y-2 w-full">
               <Link
                 href="/login"
                 onClick={() => setMobileOpen(false)}
-                className="px-4 py-2 bg-white/90 rounded-xl"
+                className="px-4 py-2 bg-white/90 rounded-xl text-[#001f5b] hover:text-[#001133] hover:scale-105 transition-transform duration-150"
               >
-                Log in
+                LOG IN
               </Link>
+
+               <Link
+                href="/signUp"
+                onClick={() => setMobileOpen(false)}
+                className="px-4 py-2 bg-white/90 rounded-xl text-[#001f5b] hover:text-[#001133] hover:scale-105 transition-transform duration-150"
+              >
+                SIGN UP
+              </Link>
+              </div>
             )
           )}
     </div>
