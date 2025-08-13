@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { BsLinkedin } from "react-icons/bs";
@@ -7,12 +6,12 @@ import type { Alumni } from "~/server/db/schema";
 export default function AlumniCard({ alumni }: { alumni: Alumni }) {
     const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(
         alumni.first_name + " " + alumni.last_name
-    )}&background=001f5b&color=ffffff&size=220`;
+    )}&background=001f5b&color=ffffff&size=500`;
 
     return (
-        <div className="w-[220px] mx-auto flex flex-col items-center">
-            {/* Image Section */}
-            <div className="relative aspect-[3/4] w-full rounded-lg overflow-hidden shadow-md">
+        <div className="flex flex-col items-center gap-4 mx-auto w-[280px]">
+            {/* Centered Portrait Rectangle */}
+            <div className="w-full aspect-[3/4] max-h-[373px] relative shadow-lg hover:shadow-xl transition-shadow overflow-hidden">
                 <img
                     src={alumni.image ?? fallbackUrl}
                     alt={`${alumni.first_name} ${alumni.last_name}`}
@@ -22,25 +21,31 @@ export default function AlumniCard({ alumni }: { alumni: Alumni }) {
                         e.currentTarget.src = fallbackUrl;
                     }}
                 />
+                
+                {/* LinkedIn Icon */}
                 {alumni.linkedIn && (
-                    <a
-                        href={alumni.linkedIn}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="absolute bottom-3 right-3 w-8 h-8 rounded-full flex items-center justify-center bg-white bg-opacity-80 shadow-md hover:bg-opacity-100 transition"
-                    >
-                        <BsLinkedin className="text-blue-600 w-5 h-5" />
-                    </a>
+                    <div className="absolute bottom-4 right-4 bg-white p-2 rounded-full shadow-md hover:scale-110 transition-transform">
+                        <a 
+                            href={alumni.linkedIn} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-800 block"
+                        >
+                            <BsLinkedin size={24} />
+                        </a>
+                    </div>
                 )}
             </div>
 
-            {/* Name & Position directly on page background */}
-            <p className="mt-3 text-base font-semi-bold text-[#001f5b] font-helvetica uppercase text-center">
-                {alumni.first_name} {alumni.last_name}
-            </p>
-            <p className="text-sm font-bold text-[#001f5b] font-helvetica uppercase tracking-tight text-center">
-                {alumni.position}
-            </p>
+            {/* Centered Text */}
+            <div className="text-center w-full px-2">
+                <p className="text-xl font-semi-bold font-helvetica text-[#001f5b] tracking-tight">
+                    {alumni.first_name} {alumni.last_name}
+                </p>
+                <p className="text-base font-bold font-helvetica text-[#001f5b] uppercase tracking-wider mt-1">
+                    {alumni.position}
+                </p>
+            </div>
         </div>
     );
 }
