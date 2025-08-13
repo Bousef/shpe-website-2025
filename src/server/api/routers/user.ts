@@ -34,7 +34,7 @@ export const userRouter = createTRPCRouter({
             query:{
               filter:{
                 stateFilter:{
-                  states: ["OPEN" , "DRAFT"]
+                  states: ["DRAFT"] // Only get draft orders for cart/checkout
                 },
                 customerFilter:{
                   customerIds: [currentMember?.square_customer_id]
@@ -52,8 +52,9 @@ export const userRouter = createTRPCRouter({
               throw Error(currentOrder.errors.reduce((acc, val) => acc + val.detail + "\n", ""));
           }
 
-          if (currentOrder.orders === undefined) {
-              throw Error("retrieveCurrentOrder returned an undefined orders.");
+          // Return null if no orders found (this is normal when cart is empty)
+          if (!currentOrder.orders || currentOrder.orders.length === 0) {
+              return null;
           }
 
           return currentOrder.orders[0] ?? null;
@@ -117,7 +118,7 @@ export const userRouter = createTRPCRouter({
         query: {
           filter: {
             stateFilter: {
-              states: ["OPEN", "DRAFT"]
+              states: ["DRAFT"] // Only look for draft orders for cart functionality
             },
             customerFilter: {
               customerIds: [currentMember.square_customer_id]

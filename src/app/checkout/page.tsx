@@ -5,8 +5,11 @@ import { Afterpay, ApplePay, CashAppPay, CreditCard, Divider, GooglePay, Payment
 import Navbar from "~/app/_components/NavBar";
 import useEnrichedOrderItems from "~/hooks/useEnrichedOrderItems";
 import { api } from "~/trpc/react";
+import { useState } from "react";
 
 export default function CheckoutPage() {
+  const utils = api.useUtils();
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const { data: order } = api.user.retrieveCurrentOrder.useQuery();
 
   // move this inside component along with order summary to prevent conditionally rendering this hook
@@ -14,6 +17,87 @@ export default function CheckoutPage() {
 
   const { data: member } = api.user.getCurrentMember.useQuery();
   const createPayment = api.square.payments.createPayment.useMutation();
+  const payOrder = api.square.orders.payOrder.useMutation();
+  const updateOrder = api.square.orders.updateOrder.useMutation();
+  const batchChangeInventory = api.square.inventory.batchChangeInventory.useMutation();
+  const createNewOrder = api.square.orders.createOrder.useMutation();
+
+  // Complete checkout process: payment + inventory reduction + order completion
+  const completeCheckout = async (token: { token: string }) => {
+    if (!order?.id) {
+      throw new Error("No order found");
+    }
+
+    try {
+      // Step 1: Update order state from DRAFT to OPEN (required for payment)
+      await updateOrder.mutateAsync({
+        orderId: order.id,
+        order: {
+          ...order,
+          state: "OPEN",
+        },
+      });
+
+      // Step 2: Create payment linked to the order
+      const paymentResponse = await createPayment.mutateAsync({
+        sourceId: token.token,
+        idempotencyKey: crypto.randomUUID(),
+        amountMoney: { amount: BigInt(amountCents), currency: "USD" },
+        buyerEmailAddress: member?.email,
+        orderId: order.id, // Link payment to order
+      });
+
+      // Step 3: Pay the order (marks it as completed in Square)
+      await payOrder.mutateAsync({
+        orderId: order.id,
+        idempotencyKey: crypto.randomUUID(),
+        paymentIds: [paymentResponse.id!],
+      });
+
+      // Step 4: Reduce inventory for each item
+      const inventoryChanges = order.lineItems?.map((item) => ({
+        type: "ADJUSTMENT" as const,
+        adjustment: {
+          catalogObjectId: item.catalogObjectId!,
+          locationId: locationId,
+          quantity: item.quantity!, // Positive quantity for the adjustment
+          fromState: "IN_STOCK" as const,
+          toState: "SOLD" as const,
+          occurredAt: new Date().toISOString(),
+        },
+      })) || [];
+
+      if (inventoryChanges.length > 0) {
+        await batchChangeInventory.mutateAsync({
+          body: {
+            idempotencyKey: crypto.randomUUID(),
+            changes: inventoryChanges,
+          },
+        });
+      }
+
+      // Step 5: Create a new empty draft order for future purchases (clears the cart)
+      if (member?.square_customer_id) {
+        await createNewOrder.mutateAsync({
+          idempotency_Key: crypto.randomUUID(),
+          order: {
+            locationId: locationId,
+            customerId: member.square_customer_id,
+            state: "DRAFT",
+            lineItems: [], // Empty cart for future purchases
+          },
+        });
+      }
+
+      // Step 6: Invalidate queries to refresh the UI with new order data
+      await utils.user.retrieveCurrentOrder.invalidate();
+
+      return paymentResponse;
+    } catch (error) {
+      console.error("Checkout failed:", error);
+      throw error;
+    }
+  };
 
   // SQUARE ENV
   const appId = process.env.NEXT_PUBLIC_SQUARE_SANDBOX_APPLICATION_ID ?? "";
@@ -44,6 +128,17 @@ export default function CheckoutPage() {
   <div className="min-h-screen flex flex-col bg-gradient-brand">
     <Navbar />
 
+    {/* Payment Processing Overlay */}
+    {isProcessingPayment && (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div className="bg-white/90 p-8 rounded-xl text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-lg font-medium text-gray-900">Processing payment...</p>
+          <p className="text-sm text-gray-600 mt-2">Please wait while we complete your order</p>
+        </div>
+      </div>
+    )}
+
     <main className="flex-grow w-full px-4 py-8 lg:px-12">
       <div className="mx-auto max-w-6xl">
         <button
@@ -55,6 +150,20 @@ export default function CheckoutPage() {
 
         <h1 className="mb-8 text-3xl font-semibold text-white">Checkout</h1>
 
+        {!order || !order.lineItems || order.lineItems.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="rounded-xl bg-white/90 border border-white/20 backdrop-blur-sm p-8">
+              <h2 className="text-xl font-medium text-gray-900 mb-4">Your cart is empty</h2>
+              <p className="text-gray-600 mb-6">Add some items to your cart before checking out.</p>
+              <button
+                onClick={() => window.location.href = "/shop"}
+                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Continue Shopping
+              </button>
+            </div>
+          </div>
+        ) : (
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
           {/* LEFT */}
           <section className="space-y-8">
@@ -108,25 +217,25 @@ export default function CheckoutPage() {
                     billingContact,
                   })}
                   cardTokenizeResponseReceived={async (token, _buyer) => {
-                    if ("token" in token) {
-                      console.error("Failed to tokenize card");
+                    if ("errors" in token) {
+                      console.error("Failed to tokenize card:", token.errors);
+                      alert("Failed to process card. Please check your card details and try again.");
                       return;
                     }
 
+                    setIsProcessingPayment(true);
                     try {
-                      await createPayment.mutateAsync({
-                        // token defaults to any on my ts so I have to be explicit here
-                        sourceId: (token as { token: string }).token,
-                        idempotencyKey: crypto.randomUUID(),
-                        // why do i have to convert to unknown first...
-                        
-                        amountMoney: { amount: BigInt(amountCents), currency: "USD" },
-                        buyerEmailAddress: member?.email,
-                      });
-                      alert("Payment successful! Check your email for the receipt.");
+                      await completeCheckout(token as { token: string });
+                      alert("Payment successful! Your order has been completed, inventory updated, and your cart is ready for new purchases. Check your email for the receipt.");
+                      
+                      // Small delay to ensure all async operations complete
+                      setTimeout(() => {
+                        window.location.href = "/shop";
+                      }, 1000);
                     } catch (err) {
                       console.error(err);
-                      alert("Payment failed. Please try again.");
+                      alert(`Payment failed: ${err instanceof Error ? err.message : "Please try again."}`);
+                      setIsProcessingPayment(false);
                     }
                   }}
                 >
@@ -218,9 +327,10 @@ export default function CheckoutPage() {
               </div>
               </div>
             </aside>
-          </div>
-        </div>
-      </main>
+      </div>
+      )}
+      </div>
+    </main>
     </div>
   );
 }
