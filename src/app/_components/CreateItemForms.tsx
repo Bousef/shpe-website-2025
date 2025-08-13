@@ -24,7 +24,10 @@ type ItemForm = {
 };
 
 export default function CreateItemForm({ onSave }: CreateItemFormProps) {
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  // state for handling image files
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [fileValidationMessage, setFileValidationMessage] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -42,12 +45,17 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
 
   // Fetch categories
   const { data: categoriesData } = api.square.catalog.listCatalog.useQuery({ types: "CATEGORY" });
-  const categories = useMemo(() => categoriesData ?? [], [categoriesData]);
+  const categories = useMemo(() => {
+    const cats = categoriesData ?? [];
+    console.log("Available categories:", cats);
+    return cats;
+  }, [categoriesData]);
 
 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    console.log("Form field changed:", name, "=", value);
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
@@ -86,8 +94,102 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const img = e.target.files?.[0] ?? null; // ensure File or null only
-      setImageFile(img);
+      const newFiles = Array.from(e.target.files);
+      
+      // Validate files immediately - Square API only accepts JPEG, PNG, GIF
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+      const validFiles = newFiles.filter(file => allowedTypes.includes(file.type));
+      const oversizedFiles = validFiles.filter(file => file.size > 10 * 1024 * 1024);
+      const goodFiles = validFiles.filter(file => file.size <= 10 * 1024 * 1024);
+      
+      // Filter out duplicates based on file name and size
+      const uniqueFiles = goodFiles.filter(newFile => 
+        !imageFiles.some(existingFile => 
+          existingFile.name === newFile.name && existingFile.size === newFile.size
+        )
+      );
+      
+      // Build validation message
+      let messages: string[] = [];
+      const invalidTypeCount = newFiles.length - validFiles.length;
+      const duplicateCount = goodFiles.length - uniqueFiles.length;
+      
+      if (invalidTypeCount > 0) {
+        messages.push(`${invalidTypeCount} file(s) rejected: Invalid type (only JPEG, PNG, GIF allowed)`);
+      }
+      if (oversizedFiles.length > 0) {
+        messages.push(`${oversizedFiles.length} file(s) rejected: Too large (max 10MB)`);
+      }
+      if (duplicateCount > 0) {
+        messages.push(`${duplicateCount} file(s) skipped: Already selected`);
+      }
+      if (uniqueFiles.length > 0) {
+        messages.push(`✅ ${uniqueFiles.length} file(s) added successfully`);
+      }
+      
+      if (messages.length > 0) {
+        setFileValidationMessage(messages.join(' • '));
+        setTimeout(() => setFileValidationMessage(""), 4000);
+      }
+      
+      setImageFiles(prev => [...prev, ...uniqueFiles]);
+      // Clear the input so the same file can be selected again if needed
+      e.target.value = '';
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    const validFiles = droppedFiles.filter(file => allowedTypes.includes(file.type));
+    const oversizedFiles = validFiles.filter(file => file.size > 10 * 1024 * 1024);
+    const goodFiles = validFiles.filter(file => file.size <= 10 * 1024 * 1024);
+    
+    // Filter out duplicates based on file name and size
+    const uniqueFiles = goodFiles.filter(newFile => 
+      !imageFiles.some(existingFile => 
+        existingFile.name === newFile.name && existingFile.size === newFile.size
+      )
+    );
+    
+    // Build validation message
+    let messages: string[] = [];
+    const invalidTypeCount = droppedFiles.length - validFiles.length;
+    const duplicateCount = goodFiles.length - uniqueFiles.length;
+    
+    if (invalidTypeCount > 0) {
+      messages.push(`${invalidTypeCount} file(s) rejected: Invalid type (only JPEG, PNG, GIF allowed)`);
+    }
+    if (oversizedFiles.length > 0) {
+      messages.push(`${oversizedFiles.length} file(s) rejected: Too large (max 10MB)`);
+    }
+    if (duplicateCount > 0) {
+      messages.push(`${duplicateCount} file(s) skipped: Already selected`);
+    }
+    if (uniqueFiles.length > 0) {
+      messages.push(`✅ ${uniqueFiles.length} file(s) added successfully`);
+    }
+    
+    if (messages.length > 0) {
+      setFileValidationMessage(messages.join(' • '));
+      setTimeout(() => setFileValidationMessage(""), 4000);
+    }
+    
+    if (uniqueFiles.length > 0) {
+      setImageFiles(prev => [...prev, ...uniqueFiles]);
     }
   };
 
@@ -111,6 +213,20 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
     setErrorMsg("");
 
     try {
+      // Validate image files before submission
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+      const invalidFiles = imageFiles.filter(file => !allowedTypes.includes(file.type));
+      
+      if (invalidFiles.length > 0) {
+        throw new Error(`Invalid file types detected: ${invalidFiles.map(f => f.name).join(', ')}. Only JPEG, PNG, and GIF images are allowed.`);
+      }
+
+      // Check file sizes (10MB limit)
+      const oversizedFiles = imageFiles.filter(file => file.size > 10 * 1024 * 1024);
+      if (oversizedFiles.length > 0) {
+        throw new Error(`Files too large: ${oversizedFiles.map(f => f.name).join(', ')}. Maximum size is 10MB per file.`);
+      }
+
       const { name, description, variations, categoryId } = form;
 
       //  Create timestamp
@@ -137,34 +253,43 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
                 sku: v.sku || undefined,
               },
             })),
-            categoryId: categoryId,
+            // Only include categoryId if one is actually selected
+            ...(categoryId && categoryId.trim() !== "" ? { categoryId: categoryId } : {}),
           },
         },
       };
 
+      console.log("Creating item with data:", itemData);
+      console.log("Selected categoryId:", categoryId);
+
       // upsert/create the item
       const upsertResponse = await upsertMutation.mutateAsync(itemData);
-
+      
       const createdItemId = upsertResponse.catalogObject.id;
       if (!createdItemId) throw new Error("Item ID not found in upsert response.");
 
-      // upload image if file selected
-      if (imageFile) {
-        const imageBase64 = await fileToBase64(imageFile);
-        await uploadImageMutation.mutateAsync({
-          imageBase64,
-          request: {
-            idempotencyKey: `image-${Date.now()}`,
-            objectId: createdItemId,
-            image: {
-              type: "IMAGE",
-              id: `#image-${Date.now()}`,
-              imageData: {
-                caption: `Image for ${form.name}`,
+      // upload images if files selected
+      if (imageFiles.length > 0) {
+        for (let i = 0; i < imageFiles.length; i++) {
+          const file = imageFiles[i];
+          if (file) {
+            const imageBase64 = await fileToBase64(file);
+            await uploadImageMutation.mutateAsync({
+              imageBase64,
+              request: {
+                idempotencyKey: `image-${Date.now()}-${i}`,
+                objectId: createdItemId,
+                image: {
+                  type: "IMAGE",
+                  id: `#image-${Date.now()}-${i}`,
+                  imageData: {
+                    caption: `Image ${i + 1} for ${form.name}`,
+                  },
+                },
               },
-            },
-          },
-        });
+            });
+          }
+        }
       }
 
 
@@ -263,8 +388,106 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
 
       {/* Image Upload */}
       <div>
-        <label className="block mb-1 font-medium">Image</label>
-        <input type="file" accept="image/*" onChange={handleFileChange} className="w-full" />
+        <label className="block mb-3 text-lg font-semibold text-gray-700">Product Images</label>
+        
+        <div 
+          className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+            isDragOver 
+              ? 'border-blue-500 bg-blue-50' 
+              : 'border-gray-300 hover:border-blue-400'
+          }`}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
+          <div className="space-y-2">
+            <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+              <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <div className="text-gray-600">
+              <label htmlFor="file-upload" className="cursor-pointer">
+                <span className="text-blue-600 font-medium hover:text-blue-500">Add more files</span>
+                <span className="text-gray-500"> or drag and drop images here</span>
+              </label>
+            </div>
+            <p className="text-xs text-gray-500">JPEG, PNG, GIF up to 10MB each • Files will be added to your selection</p>
+          </div>
+          <input 
+            id="file-upload"
+            type="file" 
+            accept="image/jpeg,image/jpg,image/png,image/gif" 
+            multiple 
+            onChange={handleFileChange} 
+            className="hidden" 
+          />
+        </div>
+
+        {/* File Validation Message */}
+        {fileValidationMessage && (
+          <div className={`mt-3 p-3 rounded-lg text-sm ${
+            fileValidationMessage.includes('✅') 
+              ? 'bg-green-50 text-green-700 border border-green-200' 
+              : 'bg-orange-50 text-orange-700 border border-orange-200'
+          }`}>
+            {fileValidationMessage}
+          </div>
+        )}
+
+        {imageFiles.length > 0 && (
+          <div className="mt-4">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-sm font-medium text-gray-700">
+                Selected Images ({imageFiles.length})
+              </h4>
+              <button
+                type="button"
+                onClick={() => setImageFiles([])}
+                className="text-sm text-red-600 hover:text-red-700 font-medium"
+              >
+                Clear all
+              </button>
+            </div>
+            <div className="grid grid-cols-1 gap-3 max-h-40 overflow-y-auto">
+              {imageFiles.map((file, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border">
+                  <div className="flex items-center space-x-3">
+                    <div className="flex-shrink-0 relative">
+                      <svg className="h-8 w-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                      </svg>
+                      {/* Valid file indicator */}
+                      <div className="absolute -top-1 -right-1 h-3 w-3 bg-green-500 rounded-full border border-white">
+                        <svg className="h-2 w-2 text-white m-0.5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-gray-900 truncate" title={file.name}>
+                        {file.name.length > 30 ? `${file.name.substring(0, 30)}...` : file.name}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {(file.size / 1024 / 1024).toFixed(2)} MB
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newFiles = imageFiles.filter((_, i) => i !== index);
+                      setImageFiles(newFiles);
+                    }}
+                    className="flex-shrink-0 ml-4 p-1 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-full transition-colors"
+                  >
+                    <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {errorMsg && <p className="text-red-600">{errorMsg}</p>}

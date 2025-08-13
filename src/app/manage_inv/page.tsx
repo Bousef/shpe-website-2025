@@ -66,12 +66,23 @@ export default function InventoryManagement() {
 
   // 7) Final table data
   const items = useMemo(
-    () =>
-      rawItems.map((item: any) => {
+    () => {
+      console.log("Processing items. Raw items:", rawItems);
+      console.log("Category lookup:", categoryLookup);
+      
+      return rawItems.map((item: any) => {
         const id = item.id as string;
         const name = item.itemData?.name ?? "Unnamed Item";
         const description = item.itemData?.description ?? "";
-        const categoryId = item.itemData?.categories?.[0]?.id ?? "";
+        
+        // Let's check all possible places where category could be stored
+        console.log("Item structure for", name, ":", {
+          categoryId: item.itemData?.categoryId,
+          categories: item.itemData?.categories,
+          fullItemData: item.itemData
+        });
+        
+        const categoryId = item.itemData?.categoryId ?? "";
         const category = categoryLookup[categoryId] ?? "";
         const url = imageByItemId.get(id) ?? "";
 
@@ -80,7 +91,8 @@ export default function InventoryManagement() {
         const price = (Number(priceCents) / 100).toFixed(2);
 
         return { id, name, description, category, url, price };
-      }),
+      });
+    },
     [rawItems, categoryLookup, imageByItemId]
   );
 
