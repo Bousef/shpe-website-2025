@@ -76,7 +76,7 @@ export default function CartItems({ order, refetch }: { order: Order, refetch: (
                     className="flex items-center gap-4 border-b pb-4"
                 >
                 <img
-                    src={item.imageUrl ?? ""} // this should be a placeholder image 
+                    src={item.imageUrl || "/assets/logo.svg"} // use placeholder when no image
                     alt={item.name ?? ""}
                     className="w-20 h-20 object-contain bg-gray-100 rounded"
                 />

@@ -29,6 +29,22 @@ export default function ItemPage() {
   // 3. Current member (for customerId)
   const { data: member } = api.user.getCurrentMember.useQuery();
 
+  // Add to cart mutation
+  const addToCart = api.user.addToCart.useMutation({
+    onSuccess: () => {
+      alert(`Added ${itemData?.name} (size ${selectedSize} x${quantity}) to cart!`);
+    },
+    onError: (error) => {
+      if (error.message.includes("not authenticated") || error.message.includes("Authentication required")) {
+        alert("Please log in to add items to your cart");
+        // Redirect to login page
+        window.location.href = "/login";
+      } else {
+        alert(`Error adding to cart: ${error.message}`);
+      }
+    },
+  });
+
   // 4. Fetch item + related objects
   const {
     data: itemRes,
@@ -124,14 +140,50 @@ export default function ItemPage() {
   };
 
   // 10. Price & product info
-  const variationData = variations[0]?.itemVariationData as {
-    priceMoney?: { amount?: bigint };
-    [key: string]: unknown;
-  } | undefined;
+  const getVariationData = () => {
+    if (!showSizes) {
+      return variations[0]?.itemVariationData as {
+        priceMoney?: { amount?: bigint };
+        [key: string]: unknown;
+      } | undefined;
+    }
+    
+    if (!selectedSize) {
+      return variations[0]?.itemVariationData as {
+        priceMoney?: { amount?: bigint };
+        [key: string]: unknown;
+      } | undefined;
+    }
+    
+    const sizeIndex = ["S", "M", "L", "XL", "XXL", "XXXL"].indexOf(selectedSize);
+    return variations[sizeIndex]?.itemVariationData as {
+      priceMoney?: { amount?: bigint };
+      [key: string]: unknown;
+    } | undefined;
+  };
+
+  const variationData = getVariationData();
   const amountCents = variationData?.priceMoney?.amount ?? 0n;
   const price = Number(amountCents) / 100;
   const product = { id: obj?.id ?? "", name: itemData?.name ?? "" };
   const locId = process.env.NEXT_PUBLIC_SQUARE_LOCATION_ID ?? "";
+
+  // Helper function to get the correct variation ID based on selected size
+  const getVariationId = () => {
+    if (!showSizes) {
+      // For non-clothing items, use the first (and likely only) variation
+      return variations[0]?.id ?? product.id;
+    }
+    
+    if (!selectedSize) {
+      return null; // No size selected yet
+    }
+    
+    // For clothing items, map size to variation index
+    const sizeIndex = ["S", "M", "L", "XL", "XXL", "XXXL"].indexOf(selectedSize);
+    const variation = variations[sizeIndex];
+    return variation?.id ?? null;
+  };
 
   // 11. Side‐effect: set initial gallery image
   useEffect(() => {
@@ -259,40 +311,50 @@ export default function ItemPage() {
             </select>
           </div>
 
-          {/* Add to Cart (draft order) */}
+          {/* Add to Cart */}
           <button
             onClick={() => {
-              createDraftOrder.mutate({
-                idempotency_Key: crypto.randomUUID(),
-                order: {
-                  locationId: locId,
-                  customerId: member?.square_customer_id,
-                  lineItems: [
-                    {
-                      catalogObjectId: product.id,
-                      quantity: quantity.toString(),
-                      basePriceMoney: {
-                        amount: BigInt(Math.round(price * 100)),
-                        currency: "USD",
-                      },
-                    },
-                  ],
+              // Check if user is logged in first
+              if (!member) {
+                window.location.href = "/login";
+                return;
+              }
+              
+              if (showSizes && !selectedSize) {
+                alert("Please select a size");
+                return;
+              }
+              
+              const variationId = getVariationId();
+              if (!variationId) {
+                alert("Unable to determine item variation. Please try again.");
+                return;
+              }
+              
+              addToCart.mutate({
+                catalogObjectId: variationId,
+                quantity: quantity.toString(),
+                basePriceMoney: {
+                  amount: BigInt(Math.round(price * 100)),
+                  currency: "USD",
                 },
+                selectedSize: selectedSize || undefined,
               });
-              alert(
-                `Added ${product.name} (size ${selectedSize} x${quantity}) to cart!`
-              );
             }}
-            disabled={availableQty < 1}
+            disabled={availableQty < 1 || addToCart.isPending}
             className="bg-yellow-500 text-black font-semibold py-3 hover:bg-yellow-600 disabled:opacity-50"
           >
-            {showSizes
-              ? availableQty > 0
-                ? "Add to Cart"
-                : "Out of Stock"
-              : stock > 0
-                ? "Add to Cart"
-                : "Out of Stock"}
+            {addToCart.isPending
+              ? "Adding..."
+              : !member
+                ? "Login to Add to Cart"
+                : showSizes
+                  ? availableQty > 0
+                    ? "Add to Cart"
+                    : "Out of Stock"
+                  : stock > 0
+                    ? "Add to Cart"
+                    : "Out of Stock"}
           </button>
         </div>
       </main>
