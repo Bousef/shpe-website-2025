@@ -47,7 +47,7 @@ export default function CartItemsContainer() {
 
           <div className="text-right pt-4 border-t">
             <p className="text-lg font-semibold">
-              Subtotal: ${(order?.totalMoney?.amount ?? 0n) / 100n}
+              Subtotal: ${Number((order?.totalMoney?.amount ?? 0n) / 100n).toFixed(2)}
             </p>
             <Link
             href ="/checkout"

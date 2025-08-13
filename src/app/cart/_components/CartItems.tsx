@@ -82,7 +82,7 @@ export default function CartItems({ order, refetch }: { order: Order, refetch: (
                 />
                 <div className="flex-1">
                     <h2 className="font-semibold">{item.name}</h2>
-                    <p className="text-gray-600">${(item.totalMoney?.amount ?? 0n) / 100n}</p>
+                    <p className="text-gray-600">${Number((item.basePriceMoney?.amount ?? 0n) / 100n).toFixed(2)}</p>
                     <div className="mt-2 flex items-center gap-2">
                         <label className="text-sm">Qty:</label>
                         <select defaultValue={item.quantity}
