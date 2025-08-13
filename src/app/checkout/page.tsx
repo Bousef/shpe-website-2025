@@ -21,9 +21,9 @@ export default function CheckoutPage() {
   if (!appId || !locationId) throw new Error("Square IDs missing.");
 
   // Totals
-  const subtotal = (order?.totalMoney?.amount ?? 0n) / 100n;
+  const subtotal = Number((order?.totalMoney?.amount ?? 0n) / 100n);
   const amountCents = order?.totalMoney?.amount ?? 0n;
-  const amountStr = subtotal.toString();
+  const amountStr = (subtotal.toFixed(2)).toString();
 
   const createPaymentRequest = () => ({
       countryCode: "US",
@@ -188,7 +188,7 @@ export default function CheckoutPage() {
                         <p className="text-xs text-gray-500">Qty {item.quantity}</p>
                       </div>
                       <p className="text-sm font-medium text-gray-800">
-                        ${(item.totalMoney?.amount ?? 0n * BigInt(item.quantity)) / 100n}
+                        ${Number((item.basePriceMoney?.amount ?? 0n) / 100n).toFixed(2)}
                       </p>
                     </div>
                   ))
@@ -202,7 +202,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Taxes</span>
-                  <span>$0.00</span>
+                  <span>${Number(order?.totalTaxMoney?.amount ?? 0n).toFixed(2)}</span>
                 </div>
                 <hr className="my-2 border-gray-200" />
                 <div className="flex justify-between font-semibold text-gray-900">
