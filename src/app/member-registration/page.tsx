@@ -15,6 +15,7 @@ import NationalMemberFields from "./NationalMemberFields";
 import ResumeUploadFields from "./ResumeUploadFields";
 import { submitToJotform } from "~/lib/submitToJotform";
 import PaymentSection from "./PaymentSection";
+import Link from "../_components/Link";
 
 function ucfEmailValidator() {
   return z
@@ -283,17 +284,19 @@ export default function MemberRegistrationPage() {
           <p>
             Got questions or need a hand? Our team is here to help! Drop us an
             email at{" "}
-            <a href="mailto:secretary@shpeucf.com">secretary@shpeucf.com</a> or
-            swing by during our office hours. Stay updated on dates and times
+            <Link href="mailto:secretary@shpeucf.com">
+              secretary@shpeucf.com
+            </Link>{" "}
+            or swing by during our office hours. Stay updated on dates and times
             through our{" "}
-            <a href="https://www.instagram.com/shpeucf/">Instagram</a>,{" "}
-            <a href="https://discord.com/channels/768494873866665984/768654225575772172">
+            <Link href="https://www.instagram.com/shpeucf/">Instagram</Link>,{" "}
+            <Link href="https://discord.com/channels/768494873866665984/768654225575772172">
               Discord
-            </a>
+            </Link>
             , and{" "}
-            <a href="https://www.linkedin.com/company/shpe-ucf/posts/?feedView=all">
+            <Link href="https://www.linkedin.com/company/shpe-ucf/posts/?feedView=all">
               LinkedIn.
-            </a>
+            </Link>
           </p>
           <p>Welcome to SHPE UCF: En la Florida Central, ¡Juntos sin parar!</p>
         </div>
