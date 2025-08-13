@@ -27,7 +27,7 @@ export default function SearchBar({ initialQuery, initialPageSize }: { initialQu
     return (
         <div className="flex items-center justify-between gap-4 p-4 mx-6"> 
             <div className="flex-grow max-w-md relative">
-                <div className="relative">
+                <div className="flex-gap-4">
 
             <input 
             className="w-full px-4 py-2 border-4 border-[var(--shpe-yellow)] rounded-full 
@@ -59,9 +59,9 @@ export default function SearchBar({ initialQuery, initialPageSize }: { initialQu
                     </button>
             </div>
             </div>
-            <div className = "flex-gap 2"> 
+            <div className = "flex space-x-4"> 
             <Dropdown>
-                <DropdownButton>Sort By: {sortBy === "first_name" ? "First Name" : sortBy === "last_name" ? "Last Name" : sortBy === "grad_year" ? "Graduation Year" : sortBy}</DropdownButton>
+                <DropdownButton> {sortBy === "first_name" ? "First Name" : sortBy === "last_name" ? "Last Name" : sortBy === "grad_year" ? "Graduation Year" : sortBy}</DropdownButton>
                 <DropdownItems>
                     {["grad_year", "first_name", "last_name", ...positionEnumValues].map(field => (
                         <DropdownItem key={field} onClick={() => {

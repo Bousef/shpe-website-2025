@@ -1,8 +1,5 @@
 import { type Member } from "~/app/_components/MemberCard";
 
-
-
-
 export const alumniList: Member[] = [
     {
         name: "Hernan Hernandez-Garcia",

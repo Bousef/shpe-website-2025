@@ -5,50 +5,42 @@ import { BsLinkedin } from "react-icons/bs";
 import type { Alumni } from "~/server/db/schema";
 
 export default function AlumniCard({ alumni }: { alumni: Alumni }) {
-    const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(alumni.first_name + " " + alumni.last_name)}&background=001f5b&color=ffffff&size=220`;
+    const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+        alumni.first_name + " " + alumni.last_name
+    )}&background=001f5b&color=ffffff&size=220`;
 
     return (
-        <div className="w-full max-w-[220px] bg-white shadow-xl rounded-xl overflow-hidden flex flex-col group">
-            {/* Image section with LinkedIn button */}
-            <div className="relative w-full aspect-[2/1]">
-                <a
-                    href={alumni.linkedIn ?? undefined}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block w-full h-full"
-                    onClick={!alumni.linkedIn ? (e) => e.preventDefault() : undefined}
-                >
-                    <img
-                        src={alumni.image ?? fallbackUrl}
-                        alt={alumni.first_name + " " + alumni.last_name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                            e.currentTarget.onerror = null; // Prevent infinite loop
-                            e.currentTarget.src = fallbackUrl;
-                        }}
-                    />
-                </a>
-
+        <div className="w-[220px] mx-auto flex flex-col items-center">
+            {/* Image Section */}
+            <div className="relative aspect-[3/4] w-full rounded-lg overflow-hidden shadow-md">
+                <img
+                    src={alumni.image ?? fallbackUrl}
+                    alt={`${alumni.first_name} ${alumni.last_name}`}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = fallbackUrl;
+                    }}
+                />
                 {alumni.linkedIn && (
                     <a
                         href={alumni.linkedIn}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="absolute bottom-2 right-2 w-7 h-7 rounded-full flex items-center justify-center 
- bg-white bg-opacity-70 group-hover:bg-blue-700 transition"
+                        className="absolute bottom-3 right-3 w-8 h-8 rounded-full flex items-center justify-center bg-white bg-opacity-80 shadow-md hover:bg-opacity-100 transition"
                     >
-                        <BsLinkedin className="w-4 h-4 text-blue-800 group-hover:text-white" />
+                        <BsLinkedin className="text-blue-600 w-5 h-5" />
                     </a>
                 )}
             </div>
 
-            {/* Name + Role */}
-            <div className="p-2 text-center">
-                <p className="text-[19px] font-semibold text-[#001f5b]">{alumni.first_name + " " + alumni.last_name}</p>
-                <p className="text-base font-bold text-[#001f5b] uppercase tracking-wide">
-                    {alumni.position}
-                </p>
-            </div>
+            {/* Name & Position directly on page background */}
+            <p className="mt-3 text-base font-semi-bold text-[#001f5b] font-helvetica uppercase text-center">
+                {alumni.first_name} {alumni.last_name}
+            </p>
+            <p className="text-sm font-bold text-[#001f5b] font-helvetica uppercase tracking-tight text-center">
+                {alumni.position}
+            </p>
         </div>
     );
 }

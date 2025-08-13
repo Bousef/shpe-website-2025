@@ -68,13 +68,13 @@ export default async function Alumni({ searchParams }: { searchParams: Promise<{
       <Navbar />
 
       <div className="text-center py-10">
-        <h1 className="text-4xl text-[var(--shpe-yellow)] font-helvetica">2024 - 2025</h1>
+        <h1 className="text-6xl text-[var(--shpe-yellow)] font-helvetica font-semi-bold uppercase">2024 - 2025</h1>
       </div>
 
       
       <SearchBar initialQuery="" initialPageSize={20} />
       
-      <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-6 px-6 pb-20 pt-10 justify-items-center">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8 px-8 py-10">
         {alumniList.map(async (member) => {
           return <AlumniCard key={member.id} alumni={member} />;
         })}
