@@ -4,6 +4,7 @@ import { api } from '~/trpc/react';
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "~/supabase-client";
+import Image from "next/image";
 
 export default function ProfileCard() {
 	const [sessionChecked, setSessionChecked] = useState(false);
@@ -43,8 +44,10 @@ export default function ProfileCard() {
 		orderId: string;
 	} | null>(null);
 
+	// Comment out orders functionality until TRPC routes are properly configured
+	/*
 	const { mutate: createTestOrder, isPending: creatingTestOrder } = api.orders.createTestOrder.useMutation({
-		onSuccess: (data) => {
+		onSuccess: (data: any) => {
 			console.log("Test order created:", data);
 			if (data.orderId) {
 				setCreatedData({
@@ -58,7 +61,7 @@ export default function ProfileCard() {
 				}
 			}
 		}, 
-		onError: (err) => {
+		onError: (err: any) => {
 			console.error("Failed to create test order:", err);
 			alert("Failed to create test order");
 		},
@@ -73,11 +76,18 @@ export default function ProfileCard() {
 	} = api.orders.getOrdersForMember.useQuery(
 		{ customerId: profile?.square_customer_id ?? "" },
 		{ enabled: !!profile?.square_customer_id, } // avoids calling with undefined
-	); 
-	
-	const orders = ordersData && !Array.isArray(ordersData) && 'orders' in ordersData
-		? ordersData.orders
-		: [];
+	);
+	*/
+
+	// Temporary placeholders until orders API is fixed
+	const createTestOrder = () => console.log("Orders API not configured");
+	const creatingTestOrder = false;
+	const ordersData = null;
+	const ordersLoading = false;
+	const ordersError = null;
+	const refetchOrders = () => console.log("Orders API not configured"); 
+	// Temporary: set orders to empty array until API is fixed
+	const orders: any[] = [];
 	
 	if (!sessionChecked || isLoading) return <p>Loading profile…</p>
 	if (!profile) return <p>No profile found for this user.</p>;
@@ -90,9 +100,11 @@ export default function ProfileCard() {
 					{/* LEFT */}
 					<div className="w-1/3 bg-[#b3cad6] rounded flex flex-col items-center">
 						{profile.image &&
-							<img 
+							<Image 
 								src={profile.image}
 								alt="Profile"
+								width={200}
+								height={200}
 								className="w-50 h-50 object-cover mt-5 mb-2"
 							/>
 						}
@@ -103,10 +115,10 @@ export default function ProfileCard() {
 						<div className="text-center space-y-1">
 							{/* <p className="font-mono font-bold text-xl">{profile.uuid}</p> */}
 							<p className="text-xs">Member ID</p>
-							<p className="font-mono font-bold text-xl>">{profile.ucf_id}</p>
+							<p className="font-mono font-bold text-xl">{profile.ucf_id}</p>
 							<p className="text-xs">UCF ID</p>
 						</div>
-						<img src="/assets/round_logo.png" alt="SHPE UCF Logo" className="h-30 w-30 mt-2" />
+						<Image src="/assets/round_logo.png" alt="SHPE UCF Logo" width={120} height={120} className="h-30 w-30 mt-2" />
 					</div>
 
 					{/* RIGHT */}
@@ -158,7 +170,7 @@ export default function ProfileCard() {
 									shadow-md hover:scale-105"
 							>
 								MEMBERSHIP
-								<img src="/assets/arrow.png" alt="→" className="ml-2 w-5 h-5" />
+								<Image src="/assets/arrow.png" alt="→" width={20} height={20} className="ml-2 w-5 h-5" />
 							</a>	
 						</div>					
 					</div>
@@ -194,7 +206,7 @@ export default function ProfileCard() {
 						<div className="max-h-[400px] overflow-y-auto pr-2 space-y-3 text-sm">
 							{orders && orders.length > 0 ? (
 								<ul className="space-y-3 text-sm">
-									{orders.map((order, i) => (
+									{orders.map((order: any, i: number) => (
 										<li key={i} className="bg-white rounded shadow p-4 text-black">
 											<p><strong>Order ID:</strong> {order.id}</p>
 											{order.createdAt && <p><strong>Date:</strong> {new Date(order.createdAt).toLocaleDateString()}</p>}
@@ -203,7 +215,7 @@ export default function ProfileCard() {
 												<div className="mt-2">
 													<p className="font-semibold">Items:</p>
 													<ul className="pl-4 space-y-1 text-sm">
-														{order.lineItems?.map((item, idx) => (
+														{order.lineItems?.map((item: any, idx: number) => (
 															<li key={idx} className="flex justify-between">
 																<div>
 																	<p>{item.name}</p>
@@ -222,14 +234,14 @@ export default function ProfileCard() {
 												<div className="mb-2">
 													<p className="text-gray-700 font-semibold">Taxes:</p>
 													<ul className="text-sm text-gray-600">
-														{order.taxes.map((tax, idx) => (
+														{order.taxes.map((tax: any, idx: number) => (
 															<li key={idx}>
 																{tax.name ?? "Tax"}: {tax.percentage ?? "N/A"}%
 															</li>
 														))}
 													</ul>
 													<p className="mt-1 text-sm">
-														<strong>Total Taxes Applied:</strong> ${((order.taxes ?? []).reduce((sum, tax) => sum + Number(tax.appliedMoney?.amount ?? 0), 0) / 100).toFixed(2)}
+														<strong>Total Taxes Applied:</strong> ${((order.taxes ?? []).reduce((sum: number, tax: any) => sum + Number(tax.appliedMoney?.amount ?? 0), 0) / 100).toFixed(2)}
 													</p>
 												</div>
 											) : null}
@@ -244,7 +256,7 @@ export default function ProfileCard() {
 												<div className="mt-2 text-sm">
 													<strong>Method(s):</strong>
 													<ul>
-														{order.tenders.map((tender, index) => (
+														{order.tenders.map((tender: any, index: number) => (
 															<li key={index}>
 																{tender.type} - Payment ID: {tender.paymentId ?? "N/A"}
 															</li>

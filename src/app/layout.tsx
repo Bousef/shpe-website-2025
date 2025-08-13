@@ -63,8 +63,6 @@ export default function RootLayout({
             {children}
           </main>
 
-          {/* always rendered at the bottom */}
-          <FooterSection />
           
         </TRPCReactProvider>
       </body>

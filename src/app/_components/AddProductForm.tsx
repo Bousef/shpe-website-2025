@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import { supabase } from "../../supabase-client";
 
 export interface Product {
@@ -291,10 +292,12 @@ export default function AddProductForm({
           {existingImages.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-2">
               {existingImages.map((url, idx) => (
-                <img
+                <Image
                   key={idx}
                   src={url}
                   alt={`Existing image ${idx + 1}`}
+                  width={80}
+                  height={80}
                   className="w-20 h-20 object-cover border rounded"
                 />
               ))}

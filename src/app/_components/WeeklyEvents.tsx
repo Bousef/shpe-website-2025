@@ -1,6 +1,7 @@
 "use client";
 import { supabaseMobile } from "../../supabase-client";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 
 export default function WeeklyEvents() {
@@ -61,9 +62,11 @@ useEffect(() => {
             className="flex-none snap-start w-72 lg:w-80 2xl:w-96 bg-[#EFB70E] rounded-md shadow-lg transform transition-transform duration-300 hover:scale-105"
           >
             <div className="aspect-square flex items-center justify-center rounded-md overflow-hidden">
-              <img
+              <Image
                 src={imgSrc}
                 alt={name}
+                width={400}
+                height={400}
                 className="w-10/11 h-10/11 object-cover object-center"
               />
             </div>

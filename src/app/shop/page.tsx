@@ -5,20 +5,28 @@ import Navbar from "../_components/NavBar";
 import Link from "next/link";
 import Image from "next/image";
 import { api } from "~/trpc/react";
-// removed: skipToken, useEffect
-// if you need types from Square, import them from the pkg root instead of a node_modules path
-// import type { CatalogObject } from "square"; // example
+import FooterSection from "../_components/FooterSection";
 
 export default function ShopPage() {
-  // 1) current member (for permission)
-  const { data: member } = api.user.getCurrentMember.useQuery();
+  // 1) current member (for permission) - cached for 5 minutes
+  const { data: member } = api.user.getCurrentMember.useQuery(undefined, {
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+  });
 
-  // 2) categories list
+  // 2) categories list - cached for 10 minutes with reduced refetching
   const {
     data: categoriesData,
     isLoading: isLoadingCategories,
     error: categoriesError,
-  } = api.square.catalog.listCatalog.useQuery({ types: "CATEGORY" });
+  } = api.square.catalog.listCatalog.useQuery(
+    { types: "CATEGORY" },
+    {
+      staleTime: 10 * 60 * 1000, // 10 minutes
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+    }
+  );
 
   // 3) raw categories array
   const rawCategories = useMemo(() => categoriesData ?? [], [categoriesData]);
@@ -41,15 +49,18 @@ export default function ShopPage() {
     [rawCategories]
   );
 
-  // 6) batch get FIRST image url per category (server should return array aligned to input order OR {objectId,url}[])
-  // this version assumes you're returning [{ objectId, url }] as discussed
+  // 6) batch get FIRST image url per category - cached and optimized
   const {
     data: categoryImagePairs = [],
     isLoading: isLoadingImages,
     error: imagesError,
   } = api.square.catalog.batchGetImages.useQuery(
     { objectIds: categoryIds, includeRelatedObjects: false },
-    { enabled: categoryIds.length > 0 }
+    { 
+      enabled: categoryIds.length > 0,
+      staleTime: 15 * 60 * 1000, // 15 minutes (images change less frequently)
+      refetchOnWindowFocus: false,
+    }
   );
 
   // 7) build id->url map so we never depend on array index ordering
@@ -75,9 +86,9 @@ export default function ShopPage() {
   // 9) permission
   const showEdit = member?.position === "Treasurer";
 
-  // 10) loading / error states (fixed variable names)
+  // 10) loading / error states with optimized loading
   if (isLoadingCategories || isLoadingImages) {
-    return <div>Loading categories...</div>;
+    return null; // Let loading.tsx handle this
   }
   if (categoriesError) {
     return <div>Error loading categories: {categoriesError.message}</div>;
@@ -94,7 +105,7 @@ export default function ShopPage() {
   //   return <div>Some categories are missing images</div>;
   // }
 
-  // 11) render
+  // 11) render with optimized critical rendering path
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-100">
       <Navbar />
@@ -117,10 +128,19 @@ export default function ShopPage() {
         </Link>
       </div>
 
-      {/* header */}
+      {/* header - Optimized for LCP with immediate rendering */}
       <main className="px-4 py-10 lg:px-48">
-        <div className="flex items-center mb-8">
-          <h1 className="flex-1 text-center text-5xl text-yellow-500 lg:text-6xl">
+        <div className="flex items-center mb-8" style={{ minHeight: '5rem' }}>
+          <h1 
+            className="flex-1 text-center text-yellow-500 lcp-heading"
+            style={{
+              fontSize: 'clamp(3rem, 5vw, 3.75rem)',
+              lineHeight: '1.1',
+              fontWeight: '900',
+              visibility: 'visible',
+              opacity: 1,
+            }}
+          >
             CATEGORIES
           </h1>
         </div>
@@ -142,15 +162,17 @@ export default function ShopPage() {
               className="block overflow-hidden text-center"
             >
               <div className="relative mb-4 aspect-[9/11] w-full max-w-[450px] lg:mb-8 mx-auto">
-                {/* guard src to avoid runtime crash if empty */}
+                {/* Optimized image with proper loading and formats */}
                 <Image
                   src={imageUrl || "/placeholder.png"}
                   alt={name}
                   fill
                   className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 450px"
-                  // optionally add priority to fold images
-                  // priority
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  priority={true} // Load above-the-fold images first
+                  quality={85} // Slightly reduce quality for better performance
+                  placeholder="blur"
+                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyejmmMYTC0t1YcgNfzUauZmkjlneG6eMB14KGP49bO6jHf0qKKPQPjLo0AyZL0r9v/2Q=="
                 />
               </div>
               <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-wider text-blue-900 uppercase">
@@ -160,6 +182,7 @@ export default function ShopPage() {
           ))}
         </div>
       </main>
+      <FooterSection />
     </div>
   );
 }

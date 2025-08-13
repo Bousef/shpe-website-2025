@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { VscAccount } from "react-icons/vsc";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
 import { api } from "~/trpc/react";
@@ -36,9 +37,11 @@ export default function Navbar() {
   <div className="flex items-center ">
     {/* Logo */}
     <Link href="/" className="flex-shrink-0.5">
-      <img
+      <Image
         src="/assets/NavLogo.png"
         alt="SHPE UCF logo"
+        width={320}
+        height={80}
         className="w-80 object-contain"
       />
     </Link>

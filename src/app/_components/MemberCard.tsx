@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export type Member = {
   name: string;
   role: string;
@@ -24,9 +26,11 @@ export default function MemberCard({ member, onSelect }: MemberCardProps) {
         className="block w-full focus:outline-none"
       >
 <div className="w-full aspect-[3/4] overflow-hidden rounded-md">
-  <img
+  <Image
     src={`/members/${member.picture}`}
     alt={member.name}
+    width={300}
+    height={400}
     className="w-full h-full object-cover cursor-pointer scale-[0.9]"
   />
 </div>

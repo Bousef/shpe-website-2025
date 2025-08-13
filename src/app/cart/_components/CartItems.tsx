@@ -1,5 +1,5 @@
-/* eslint-disable @next/next/no-img-element */
 import type { Order } from "node_modules/square/api";
+import Image from "next/image";
 import useEnrichedOrderItems from "~/hooks/useEnrichedOrderItems";
 import { api } from "~/trpc/react";
 
@@ -109,9 +109,11 @@ export default function CartItems({ order, refetch }: { order: Order, refetch: (
                     >
                         <div className="flex-shrink-0">
                             <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-gray-50 border border-gray-200">
-                                <img
+                                <Image
                                     src={item.imageUrl || "/assets/logo.svg"}
                                     alt={item.name ?? ""}
+                                    width={96}
+                                    height={96}
                                     className="w-full h-full object-cover"
                                 />
                             </div>

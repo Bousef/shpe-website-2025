@@ -1,4 +1,6 @@
 // components/EventsSection.tsx
+import Image from "next/image";
+
 const events = [
   {
     title: "Industry BBQ",
@@ -62,9 +64,11 @@ export default function EventsSection() {
             "
           >
             <div className="aspect-square flex items-center justify-center ">
-              <img
+              <Image
                 src={imgSrc}
                 alt={title}
+                width={400}
+                height={400}
                 className="w-10/11 h-10/11 object-cover object-center  "
               />
             </div>

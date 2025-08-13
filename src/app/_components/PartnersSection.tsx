@@ -1,4 +1,5 @@
 import "tailwindcss";
+import Image from "next/image";
 
 const logos = [
   "bloomberg",
@@ -18,9 +19,11 @@ export default function PartnersSection() {
             <div
               key={l}
               className="w-200 h-96 flex items-center justify-center">
-              <img
+              <Image
                 src={`assets/${l}.svg`}
                 alt={l}
+                width={200}
+                height={128}
                 className="max-h-32 w-auto"
               />
             </div>
