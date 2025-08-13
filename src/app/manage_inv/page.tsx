@@ -75,14 +75,15 @@ export default function InventoryManagement() {
         const name = item.itemData?.name ?? "Unnamed Item";
         const description = item.itemData?.description ?? "";
         
-        // Let's check all possible places where category could be stored
+        // Check all possible places where category could be stored
         console.log("Item structure for", name, ":", {
           categoryId: item.itemData?.categoryId,
           categories: item.itemData?.categories,
           fullItemData: item.itemData
         });
         
-        const categoryId = item.itemData?.categoryId ?? "";
+        // Try the new categories array first, fallback to deprecated categoryId
+        const categoryId = item.itemData?.categories?.[0]?.id ?? item.itemData?.categoryId ?? "";
         const category = categoryLookup[categoryId] ?? "";
         const url = imageByItemId.get(id) ?? "";
 

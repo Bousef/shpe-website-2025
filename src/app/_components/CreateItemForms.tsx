@@ -253,8 +253,12 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
                 sku: v.sku || undefined,
               },
             })),
-            // Only include categoryId if one is actually selected
-            ...(categoryId && categoryId.trim() !== "" ? { categoryId: categoryId } : {}),
+            // Use the new categories array format instead of deprecated categoryId
+            ...(categoryId && categoryId.trim() !== "" ? { 
+              categories: [{ 
+                id: categoryId 
+              }] 
+            } : {}),
           },
         },
       };

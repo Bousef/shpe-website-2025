@@ -34,7 +34,7 @@ export default function ItemPage() {
     data: itemRes,
     isLoading: itemLoading,
     error: itemError,
-  } = api.square.catalog.RetrieveCatalogObject.useQuery({
+  } = api.square.catalog.retrieveCatalogObject.useQuery({
     objectId: itemId,
     includeRelatedObjects: true,
   });
@@ -69,9 +69,22 @@ export default function ItemPage() {
   });
 
 
-  // 7. Build size/stock arrays
-  const stocks: number[] =
-    invRes?.result.counts?.map((c) => Number(c.quantity) || 0) ?? [];
+  // 7. Build size/stock arrays - handle Square API response structure
+  console.log("Inventory response:", invRes);
+  
+  // Handle different possible response structures from Square API
+  let stocks: number[] = [];
+  if (invRes) {
+    if (Array.isArray(invRes)) {
+      // If response is directly an array of inventory counts
+      stocks = invRes.map((count: any) => Number(count.quantity) || 0);
+    } else if ((invRes as any)?.counts && Array.isArray((invRes as any).counts)) {
+      // If response has a counts property
+      stocks = (invRes as any).counts.map((count: any) => Number(count.quantity) || 0);
+    } else {
+      console.warn("Unexpected inventory response structure:", invRes);
+    }
+  }
   const sizes = ["S", "M", "L", "XL", "XXL", "XXXL"];
   const sizeStockPairs = sizes.map((size, idx) => ({
     size,
