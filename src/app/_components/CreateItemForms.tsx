@@ -2,10 +2,8 @@
 
 import React, { useState, useMemo } from "react";
 import { api } from "~/trpc/react";
-import type { UpsertCatalogObjectRequest } from "node_modules/square/api/resources/catalog";
-import type { C } from "node_modules/drizzle-kit/index-BAUrj6Ib.mjs";
+import type { UpsertCatalogObjectRequest, CreateImagesRequest } from "node_modules/square/api/resources/catalog";
 import type { BatchChangeInventoryRequest, CatalogObject, CatalogItem, InventoryChange, InventoryState, } from "node_modules/square/api";
-import type { CatalogCategory, CatalogItemVariation } from "square/legacy";
 
 type CreateItemFormProps = {
   onSave?: () => void;
@@ -30,9 +28,6 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  const SIZE_KEYS = ["S", "M", "L", "XL", "XXL", "XXXL"] as const;
-  type SizeKey = (typeof SIZE_KEYS)[number];
-
   const [form, setForm] = useState<ItemForm>({
     name: "",
     description: "",
@@ -44,109 +39,17 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
   // tRPC mutations
   const upsertMutation = api.square.catalog.upsertCatalogObject.useMutation();
   const uploadImageMutation = api.square.catalog.createCatalogImage.useMutation();
-  const batchChangeInventoryMutation = api.square.inventory.batchChangeInventory.useMutation();
 
   // Fetch categories
   const { data: categoriesData } = api.square.catalog.listCatalog.useQuery({ types: "CATEGORY" });
   const categories = useMemo(() => categoriesData ?? [], [categoriesData]);
 
-  // Build id -> name map once
-  const categoryNameById = useMemo(() => {
-    const m = new Map<string, string>();
-    for (const c of categories) {
-      if (c.type === "CATEGORY" && c.id) {
-        m.set(c.id, c.categoryData?.name ?? "");
-      }
-    }
-    return m;
-  }, [categories]);
-
-  // Robust: check the selected categoryId's name
-  const isClothes = useMemo(() => {
-    const selectedName = categoryNameById.get(form.categoryId ?? "") ?? "";
-    return selectedName === "Clothes";
-  }, [categoryNameById, form.categoryId]);
 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
   };
-
-  // Build item variations based on form input
-  function buildVariations(
-    isClothes: boolean,
-    variationName: string | undefined,
-    variationPrice: string | undefined
-  ) {
-    const ts = Date.now();
-    const priceInCents = Math.round(parseFloat(variationPrice ?? "0") * 100);
-    const priceMoney = { amount: BigInt(priceInCents), currency: "USD" as const };
-
-    const makeVariation = (vName: string) => ({
-      id: `#variation-${vName}-${ts}`,
-      type: "ITEM_VARIATION" as const,
-      itemVariationData: {
-        name: vName,
-        priceMoney,
-      },
-    });
-
-    return isClothes
-      ? SIZE_KEYS.map(sz => makeVariation(sz))
-      : [makeVariation((variationName ?? "").trim() || "Default")];
-  }
-
-  // Map variation name -> variation id from CatalogObject[]
-  function indexVariationsByName(variations: CatalogObject[] | null | undefined) {
-    const m = new Map<string, string>();
-    for (const v of variations ?? []) {
-      if (v?.type !== "ITEM_VARIATION") continue;
-      const n = v.itemVariationData?.name?.trim();
-      if (v.id && n) m.set(n, v.id);
-    }
-    return m;
-  }
-
-function buildInventoryChanges(
-  isClothes: boolean,
-  createdVariations: CatalogObject[],
-  sizeStocks: Record<"S" | "M" | "L" | "XL" | "XXL" | "XXXL", number>,
-  singleStock: number,
-  locationId: string,
-  occurredAtISO: string, // optional but nice to include
-): NonNullable<BatchChangeInventoryRequest["changes"]> {
-
-  // Build a name->id map if names exist (works when response carries names)
-  const byName = new Map<string, string>();
-
-  for (const v of createdVariations) {
-    const name = (v as CatalogItemVariation).name?.trim?.();
-    if (name && v.id) byName.set(name, v.id);
-  }
-
-  const makeCount = (catalogObjectId: string, quantity: number): InventoryChange => ({
-    type: "PHYSICAL_COUNT",
-    physicalCount: {
-      catalogObjectId,
-      state: "IN_STOCK" as InventoryState,
-      locationId,
-      quantity: String(quantity ?? 0),
-      occurredAt: occurredAtISO, // optional
-    },
-  });
-
-  if (isClothes) {
-
-    const SIZES = ["S", "M", "L", "XL", "XXL", "XXXL"] as const;
-    return SIZES.map(size => makeCount(byName.get(size)!, sizeStocks[size]));
-
-  }
-
-  const onlyVarId = createdVariations[0]?.id;
-  if (!onlyVarId) throw new Error("Missing created variation ID for non-clothes item.");
-  return [makeCount(onlyVarId, singleStock)];
-}
 
 
   // replace your current handleSubmit with this
@@ -188,6 +91,20 @@ function buildInventoryChanges(
     }
   };
 
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        // Remove the data:image/...;base64, prefix
+        const base64 = result.split(',')[1] || '';
+        resolve(base64);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -198,9 +115,6 @@ function buildInventoryChanges(
 
       //  Create timestamp
       const ts = Date.now();
-
-      // Call buildVariations
-      // const variations = buildVariations(isClothes, variationName, variationPrice);
 
       //  Create item data
       const itemData: UpsertCatalogObjectRequest = {
@@ -236,37 +150,24 @@ function buildInventoryChanges(
 
       // upload image if file selected
       if (imageFile) {
+        const imageBase64 = await fileToBase64(imageFile);
         await uploadImageMutation.mutateAsync({
-          imageFile: new Blob([imageFile]),
+          imageBase64,
           request: {
             idempotencyKey: `image-${Date.now()}`,
             objectId: createdItemId,
             image: {
               type: "IMAGE",
-              id: `image-${Date.now()}`,
-            }
-          }
-        })
+              id: `#image-${Date.now()}`,
+              imageData: {
+                caption: `Image for ${form.name}`,
+              },
+            },
+          },
+        });
       }
 
-      // const occurredAtISO = new Date().toISOString();
 
-      // const changes = buildInventoryChanges(
-      //   isClothes,
-      //   createdVariations,
-      //   sizeStocks,
-      //   singleStock,
-      //   locationId,
-      //   occurredAtISO,
-      // );
-
-      // // Now the request is correctly shaped for Inventory API
-      // const changeInventoryData: BatchChangeInventoryRequest = {
-      //   idempotencyKey: `inventory-${ts}`,
-      //   changes,
-      // };
-
-      // await batchChangeInventoryMutation.mutateAsync({ body: changeInventoryData });
 
       onSave?.();
     } catch (error: any) {
@@ -281,10 +182,6 @@ function buildInventoryChanges(
     <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded shadow">
       <div>
         <label className="block mb-1 font-bold">ADD ITEM</label>
-        <select name="mode" onChange={handleInputChange} className="w-full border rounded px-3 py-2 mb-2">
-          <option value="CATEGORY">Category</option>
-          <option value="ITEM">Item</option>
-        </select>
 
         <input
           name="name"
@@ -302,7 +199,7 @@ function buildInventoryChanges(
           rows={3}
         />
 
-        {/* ITEM VARIATIOM(S) */}
+        {/* ITEM VARIATIONS */}
         <div>
           <h3 className="font-bold my-2">Variations</h3>
           {form.variations.map((variation, index) => (
@@ -356,29 +253,15 @@ function buildInventoryChanges(
           className="w-full border rounded px-3 py-2"
         >
           <option value="">Select Category</option>
-          {categories.map(c => (
-            <option key={c.id} value={c.id}>{(c as CatalogCategory).name ?? c.id}</option>
+          {categories
+            .filter(c => c.type === "CATEGORY")
+            .map(c => (
+            <option key={c.id} value={c.id}>{c.categoryData?.name ?? "Unnamed"}</option>
           ))}
         </select>
-        {/* {form.categoryId === clothesId && (
-          <div className="grid grid-cols-3 gap-4">
-            {Object.entries(sizes).map(([sz, qty]) => (
-              <div key={sz}>
-                <label className="block mb-1">{sz} Stock</label>
-                <input
-                  type="number"
-                  min={0}
-                  value={qty}
-                  onChange={e => setSizes(prev => ({ ...prev, [sz]: parseInt(e.target.value, 10) || 0 }))}
-                  className="w-full border rounded px-3 py-2"
-                />
-              </div>
-            ))}
-          </div>
-        )} */}
       </div>
 
-      {/* ISSUE W IMAGE UPLOADDDDD */}
+      {/* Image Upload */}
       <div>
         <label className="block mb-1 font-medium">Image</label>
         <input type="file" accept="image/*" onChange={handleFileChange} className="w-full" />

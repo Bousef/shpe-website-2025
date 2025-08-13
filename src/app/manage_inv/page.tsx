@@ -31,7 +31,7 @@ export default function InventoryManagement() {
   const categoryLookup = useMemo(() => {
     return rawCategories.reduce<Record<string, string>>((map, obj) => {
       const id = obj.id;
-      const name = (obj as CatalogCategory).name ?? "";
+      const name = obj.type === "CATEGORY" ? obj.categoryData?.name ?? "" : "";
       if (id) map[id] = name;
       return map;
     }, {});

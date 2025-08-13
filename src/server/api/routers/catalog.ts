@@ -96,10 +96,32 @@ export const catalogRouter = createTRPCRouter({
 
     createCatalogImage: publicProcedure
         .input(
-            z.custom<CreateImagesRequest>(),
+            z.object({
+                imageBase64: z.string(),
+                request: z.object({
+                    idempotencyKey: z.string(),
+                    objectId: z.string(),
+                    image: z.object({
+                        type: z.literal("IMAGE"),
+                        id: z.string(),
+                        imageData: z.object({
+                            caption: z.string().optional(),
+                        }).optional(),
+                    }),
+                }),
+            }),
         )
         .mutation(async ({ input }) => {
-            const response = await squareClient.catalog.images.create(input);
+            // Convert base64 string back to Buffer for Square API
+            const imageBuffer = Buffer.from(input.imageBase64, 'base64');
+            
+            // Create a Blob from the buffer
+            const imageBlob = new Blob([imageBuffer], { type: 'image/jpeg' });
+            
+            const response = await squareClient.catalog.images.create({
+                imageFile: imageBlob,
+                request: input.request,
+            });
 
             if (response.errors && response.errors?.length > 0) {
                 throw Error(response.errors.reduce((acc, val) => 
