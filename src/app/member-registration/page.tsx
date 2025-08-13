@@ -16,6 +16,7 @@ import ResumeUploadFields from "./ResumeUploadFields";
 import { submitToJotform } from "~/lib/submitToJotform";
 import PaymentSection from "./PaymentSection";
 import Link from "../_components/Link";
+import { api } from "~/trpc/react";
 
 function ucfEmailValidator() {
   return z
@@ -196,7 +197,8 @@ export type SubmitSchema = z.infer<
     typeof educationSchema &
     typeof experienceSchema &
     typeof nationalMemberSchema &
-    typeof resumeUploadSchema
+    typeof resumeUploadSchema &
+    typeof paymentSchema
 >;
 
 const paymentSchema = z.object({ paymentId: z.string("Payment is required") });
@@ -235,6 +237,7 @@ export default function MemberRegistrationPage() {
       phoneNumber: "",
     },
   });
+  const { data: member } = api.user.getCurrentMember.useQuery();
 
   async function submitTestData() {
     form.setValue("firstName", "John");
@@ -307,7 +310,10 @@ export default function MemberRegistrationPage() {
             className="space-y-4"
             onSubmit={form.handleSubmit(async () => {
               if (stepper.isLast) {
-                await submitToJotform(form.getValues());
+                await submitToJotform(form.getValues(), {
+                  memberId: member?.uuid,
+                  url: member?.resume,
+                });
               } else {
                 stepper.next();
               }

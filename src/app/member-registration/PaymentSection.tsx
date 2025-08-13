@@ -61,22 +61,25 @@ export default function PaymentSection() {
         phoneNumber: customerData.phoneNumber,
       });
       const order = await createOrder({
-        idempotencyKey: crypto.randomUUID(),
-        order: {
-          customerId: customer.id,
-          lineItems: [
-            {
-              catalogObjectId: env.NEXT_PUBLIC_SHPE_MEMBERSHIP_ITEM_ID,
-              quantity: "1",
-            },
-          ],
+        body: {
+          idempotencyKey: crypto.randomUUID(),
+          order: {
+            customerId: customer.id,
+            locationId: env.NEXT_PUBLIC_SQUARE_LOCATION_ID,
+            lineItems: [
+              {
+                catalogObjectId: env.NEXT_PUBLIC_SHPE_MEMBERSHIP_ITEM_ID,
+                quantity: "1",
+              },
+            ],
+          },
         },
       });
       const payment = await createPayment({
         idempotencyKey: crypto.randomUUID(),
         sourceId: token,
         amountMoney: { amount: 1000n, currency: "USD" },
-        orderId: order.id,
+        orderId: order.result.order?.id,
       });
       if (!payment.id) throw new Error("Payment ID is missing");
       setValue("paymentId", payment.id);
