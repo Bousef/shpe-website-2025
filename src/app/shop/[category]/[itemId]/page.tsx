@@ -248,7 +248,9 @@ export default function ItemPage() {
         {/* Mobile thumbnails - horizontal scroll */}
         <div className="lg:hidden mb-4">
           <div className="flex gap-2 overflow-x-auto pb-2">
-            {allImages.filter(url => url && url.trim() !== "").map((url, idx) => (
+            {allImages
+              .filter(url => url && typeof url === 'string' && url.trim() !== "")
+              .map((url, idx) => (
               <div
                 key={idx}
                 className={`relative flex-shrink-0 w-16 h-16 border cursor-pointer ${
@@ -272,7 +274,9 @@ export default function ItemPage() {
 
         {/* Desktop thumbnails */}
         <div className="hidden lg:flex flex-col gap-4 flex-shrink-0 w-24">
-          {allImages.filter(url => url && url.trim() !== "").map((url, idx) => (
+          {allImages
+            .filter(url => url && typeof url === 'string' && url.trim() !== "")
+            .map((url, idx) => (
             <div
               key={idx}
               className={`relative w-20 h-20 border cursor-pointer ${galleryImage === url ? "ring-2 ring-blue-600" : ""
@@ -296,7 +300,7 @@ export default function ItemPage() {
         <div className="mb-8 lg:mb-0 lg:w-2/3">
           <div className="relative w-full max-h-screen overflow-hidden">
             <NextImage
-              src={galleryImage && galleryImage.trim() !== "" ? galleryImage : "/assets/logo.svg"}
+              src={galleryImage && typeof galleryImage === 'string' && galleryImage.trim() !== "" ? galleryImage : "/assets/logo.svg"}
               alt={itemData?.name || "Product image"}
               width={1200}              // Increased for better quality on larger screens
               height={900}              // Maintain 4:3 aspect ratio

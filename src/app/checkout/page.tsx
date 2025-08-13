@@ -176,13 +176,19 @@ export default function CheckoutPage() {
                 ) : (
                   items.map((item) => (
                     <div key={item.uid} className="flex items-start gap-4">
-                      (
+                      {item.imageUrl && item.imageUrl.trim() !== "" ? (
                         <img
-                          src={item.imageUrl ?? ""}
+                          src={item.imageUrl}
                           alt={item.name ?? ""}
                           className="h-12 w-12 rounded object-contain bg-gray-100"
                         />
-                      )
+                      ) : (
+                        <div className="h-12 w-12 rounded bg-gray-200 flex items-center justify-center">
+                          <svg className="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                      )}
                       <div className="flex-1">
                         <p className="text-sm font-medium text-gray-800">{item.name}</p>
                         <p className="text-xs text-gray-500">Qty {item.quantity}</p>
