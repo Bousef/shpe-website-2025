@@ -5,45 +5,38 @@ import { api } from "~/trpc/react";
 import type { UpsertCatalogObjectRequest } from "node_modules/square/api/resources/catalog";
 import type { C } from "node_modules/drizzle-kit/index-BAUrj6Ib.mjs";
 import type { BatchChangeInventoryRequest, CatalogObject, CatalogItem, InventoryChange, InventoryState, } from "node_modules/square/api";
-import type { CatalogItemVariation } from "square/legacy";
+import type { CatalogCategory, CatalogItemVariation } from "square/legacy";
 
 type CreateItemFormProps = {
   onSave?: () => void;
 };
 
+type Variation = {
+  name: string;
+  price: string;
+  sku?: string;
+};
 
 type ItemForm = {
   name: string;
   description?: string;
-  variationName?: string;
-  variationPrice?: string;
+  variations: Variation[];
   categoryId?: string;
   locationId: string;            // <— required by Inventory API
 };
 
 export default function CreateItemForm({ onSave }: CreateItemFormProps) {
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
   const SIZE_KEYS = ["S", "M", "L", "XL", "XXL", "XXXL"] as const;
   type SizeKey = (typeof SIZE_KEYS)[number];
 
-  const [sizeStocks, setSizeStocks] = useState<Record<SizeKey, number>>({
-    S: 0,
-    M: 0,
-    L: 0,
-    XL: 0,
-    XXL: 0,
-    XXXL: 0,
-  });
-
-  const [singleStock, setSingleStock] = useState<number>(0);
-
   const [form, setForm] = useState<ItemForm>({
     name: "",
     description: "",
-    variationName: "",
-    variationPrice: "",
+    variations: [{ name: "", price: "", sku: "" }],
     categoryId: "",
     locationId: process.env.NEXT_PUBLIC_SQUARE_LOCATION_ID || "",
   });
@@ -75,14 +68,7 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
   }, [categoryNameById, form.categoryId]);
 
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      // Store the file in state if you need to use it later for upload
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
   };
@@ -164,51 +150,104 @@ function buildInventoryChanges(
 
 
   // replace your current handleSubmit with this
+  const handleVariationChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const name = e.target.name as keyof Variation; // keys: "name" | "price" | "sku"
+    const value = e.target.value || ""; // ensure value is always a string, not undefined
+
+    setForm(prev => {
+      const updatedVariations = [...prev.variations];
+
+      // copy existing variation but override the specific property with a string value
+      updatedVariations[index] = { 
+        ...updatedVariations[index], 
+        [name]: value 
+      } as Variation; // assert as Variation to satisfy TS
+
+      return { ...prev, variations: updatedVariations };
+    });
+  };
+
+  const addVariation = () => {
+    setForm(prev => ({
+      ...prev,
+      variations: [...prev.variations, { name: "", price: "", sku: "" }]
+    }));
+  };
+
+  const removeVariation = (index: number) => {
+    setForm(prev => ({
+      ...prev,
+      variations: prev.variations.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const img = e.target.files?.[0] ?? null; // ensure File or null only
+      setImageFile(img);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setErrorMsg("");
 
     try {
-      const { name, description, variationName, variationPrice, locationId, categoryId } = form;
-
-      // minimal validation
-      if (!name?.trim()) throw new Error("Please enter a name.");
-      if (!categoryId) throw new Error("Please select a category.");
-      if (!variationPrice || isNaN(Number(variationPrice))) {
-        throw new Error("Enter a valid price.");
-      }
-      if (!isClothes && !variationName?.trim()) {
-        throw new Error("Please enter a variation name.");
-      }
+      const { name, description, variations, categoryId } = form;
 
       //  Create timestamp
       const ts = Date.now();
 
       // Call buildVariations
-      const variations = buildVariations(isClothes, variationName, variationPrice);
+      // const variations = buildVariations(isClothes, variationName, variationPrice);
 
       //  Create item data
       const itemData: UpsertCatalogObjectRequest = {
         idempotencyKey: `item-${ts}`,
         object: {
-          id: `#item-${ts}`,
+          id: `#item-${Date.now()}`, // temporary id which square will replace with a real one once item is created
           type: "ITEM",
           itemData: {
             name,
             description,
-            categoryId: categoryId!,
-            variations,
+            variations: variations.map((v, idx) => ({
+              id: `#variation-${Date.now()}-${idx}`, // unique temporary id per variation
+              type: "ITEM_VARIATION",
+              itemVariationData: {
+                name: v.name,
+                priceMoney: {
+                  amount: BigInt(Math.round(parseFloat(v.price || "0") * 100)), // Convert to cents and to bigint
+                  currency: "USD",
+                },
+                sku: v.sku || undefined,
+              },
+            })),
+            categoryId: categoryId,
           },
         },
       };
 
-      // // Call the mutation to create the item
-      // const upsertRes = await upsertMutation.mutateAsync(itemData);
+      // upsert/create the item
+      const upsertResponse = await upsertMutation.mutateAsync(itemData);
 
-      // // pull the real variation IDs that Square just created
-      // const createdItem = upsertRes?.catalogObject;
-      // const createdVariations = (createdItem as CatalogItem).variations ?? [];
+      const createdItemId = upsertResponse.catalogObject.id;
+      if (!createdItemId) throw new Error("Item ID not found in upsert response.");
+
+      // upload image if file selected
+      if (imageFile) {
+        await uploadImageMutation.mutateAsync({
+          imageFile: new Blob([imageFile]),
+          request: {
+            idempotencyKey: `image-${Date.now()}`,
+            objectId: createdItemId,
+            image: {
+              type: "IMAGE",
+              id: `image-${Date.now()}`,
+            }
+          }
+        })
+      }
 
       // const occurredAtISO = new Date().toISOString();
 
@@ -239,96 +278,107 @@ function buildInventoryChanges(
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-lg p-4 border rounded shadow">
-      <input
-        name="name"
-        placeholder="Item Name"
-        value={form.name}
-        onChange={handleChange}
-        className="w-full border rounded px-3 py-2"
-      />
+    <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded shadow">
+      <div>
+        <label className="block mb-1 font-bold">ADD ITEM</label>
+        <select name="mode" onChange={handleInputChange} className="w-full border rounded px-3 py-2 mb-2">
+          <option value="CATEGORY">Category</option>
+          <option value="ITEM">Item</option>
+        </select>
 
-      <textarea
-        name="description"
-        placeholder="Description"
-        value={form.description}
-        onChange={handleChange}
-        className="w-full border rounded px-3 py-2"
-        rows={3}
-      />
+        <input
+          name="name"
+          placeholder="Item Name"
+          value={form.name}
+          onChange={handleInputChange}
+          className="w-full border rounded px-3 py-2 mb-2"
+        />
+        <textarea
+          name="description"
+          placeholder="Description"
+          value={form.description}
+          onChange={handleInputChange}
+          className="w-full border rounded px-3 py-2"
+          rows={3}
+        />
 
-      <input
-        name="variationName"
-        placeholder="Variation Name"
-        value={form.variationName}
-        onChange={handleChange}
-        className="w-full border rounded px-3 py-2"
-      />
-
-      <input
-        name="variationPrice"
-        placeholder="Variation Price"
-        value={form.variationPrice}
-        onChange={handleChange}
-        className="w-full border rounded px-3 py-2"
-      />
-
-      <select
-        name="categoryId"
-        value={form.categoryId}
-        onChange={handleChange}
-        className="w-full border rounded px-3 py-2"
-      >
-        <option value="">Select Category</option>
-        {categories
-          .filter(c => c.type === "CATEGORY")
-          .map(c => (
-            <option key={c.id} value={c.id}>
-              {c.categoryData?.name ?? ""}
-            </option>
-          ))}
-      </select>
-
-      {/* Stock inputs */}
-      {isClothes ? (
-        <div className="grid grid-cols-3 gap-4">
-          {SIZE_KEYS.map(sz => (
-            <div key={sz}>
-              <label className="block mb-1">{sz} Stock</label>
+        {/* ITEM VARIATIOM(S) */}
+        <div>
+          <h3 className="font-bold my-2">Variations</h3>
+          {form.variations.map((variation, index) => (
+            <div key={index} className="flex gap-2 items-center mb-2">
               <input
-                type="number"
-                min={0}
-                value={sizeStocks[sz]}
-                onChange={e =>
-                  setSizeStocks(prev => ({
-                    ...prev,
-                    [sz]: Number.isNaN(parseInt(e.target.value, 10))
-                      ? 0
-                      : parseInt(e.target.value, 10),
-                  }))
-                }
-                className="w-full border rounded px-3 py-2"
+                type="text"
+                name="name"
+                placeholder="Variation Name"
+                value={variation.name}
+                onChange={e => handleVariationChange(index, e)}
+                className="border rounded px-2 py-1"
               />
+              <input
+                type="text"
+                name="price"
+                placeholder="Variation Price"
+                value={variation.price}
+                onChange={e => handleVariationChange(index, e)}
+                className="border rounded px-2 py-1"
+              />
+              <input
+                type="text"
+                name="sku"
+                placeholder="SKU"
+                value={variation.sku}
+                onChange={e => handleVariationChange(index, e)}
+                className="border rounded px-2 py-1"
+              />
+              <button
+                type="button"
+                onClick={() => removeVariation(index)}
+                className="bg-red-500 text-white px-2 rounded"
+              >
+                Remove
+              </button>
             </div>
           ))}
+          <button
+            type="button"
+            onClick={addVariation}
+            className="bg-blue-500 text-white px-3 py-1 rounded mb-2"
+          >
+            + Add Variation
+          </button>
         </div>
-      ) : (
-        <div>
-          <label className="block mb-1">Stock</label>
-          <input
-            type="number"
-            min={0}
-            value={singleStock}
-            onChange={e =>
-              setSingleStock(Number.isNaN(parseInt(e.target.value, 10))
-                ? 0
-                : parseInt(e.target.value, 10))
-            }
-            className="w-full border rounded px-3 py-2"
-          />
-        </div>
-      )}
 
+        <select
+          name="categoryId"
+          value={form.categoryId}
+          onChange={handleInputChange}
+          className="w-full border rounded px-3 py-2"
+        >
+          <option value="">Select Category</option>
+          {categories.map(c => (
+            <option key={c.id} value={c.id}>{(c as CatalogCategory).name ?? c.id}</option>
+          ))}
+        </select>
+        {/* {form.categoryId === clothesId && (
+          <div className="grid grid-cols-3 gap-4">
+            {Object.entries(sizes).map(([sz, qty]) => (
+              <div key={sz}>
+                <label className="block mb-1">{sz} Stock</label>
+                <input
+                  type="number"
+                  min={0}
+                  value={qty}
+                  onChange={e => setSizes(prev => ({ ...prev, [sz]: parseInt(e.target.value, 10) || 0 }))}
+                  className="w-full border rounded px-3 py-2"
+                />
+              </div>
+            ))}
+          </div>
+        )} */}
+      </div>
+
+      {/* ISSUE W IMAGE UPLOADDDDD */}
       <div>
         <label className="block mb-1 font-medium">Image</label>
         <input type="file" accept="image/*" onChange={handleFileChange} className="w-full" />
@@ -336,11 +386,8 @@ function buildInventoryChanges(
 
       {errorMsg && <p className="text-red-600">{errorMsg}</p>}
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-      >
+      {/* SAVE ITEM BUTTON */}
+      <button type="submit" disabled={loading} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">
         {loading ? "Saving…" : "Save"}
       </button>
     </form>
