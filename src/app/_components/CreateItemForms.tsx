@@ -1,9 +1,12 @@
+// src/_components/CreateItemForm.tsx
 "use client";
 
-import React, { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import type { CatalogCategory } from "square/legacy";
 import { api } from "~/trpc/react";
 import type { UpsertCatalogObjectRequest, CreateImagesRequest } from "node_modules/square/api/resources/catalog";
 import type { BatchChangeInventoryRequest, CatalogObject, CatalogItem, InventoryChange, InventoryState, } from "node_modules/square/api";
+import { InventoryChangeType } from "node_modules/square/api";
 
 type CreateItemFormProps = {
   onSave?: () => void;
@@ -13,6 +16,7 @@ type Variation = {
   name: string;
   price: string;
   sku?: string;
+  quantity: string;
 };
 
 type ItemForm = {
@@ -20,7 +24,6 @@ type ItemForm = {
   description?: string;
   variations: Variation[];
   categoryId?: string;
-  locationId: string;            // <— required by Inventory API
 };
 
 export default function CreateItemForm({ onSave }: CreateItemFormProps) {
@@ -28,20 +31,21 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
   const [fileValidationMessage, setFileValidationMessage] = useState<string>("");
+  
+  const locationId = process.env.NEXT_PUBLIC_SQUARE_LOCATION_ID;
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-
   const [form, setForm] = useState<ItemForm>({
     name: "",
     description: "",
-    variations: [{ name: "", price: "", sku: "" }],
+    variations: [{ name: "", price: "", sku: "", quantity: "" }],
     categoryId: "",
-    locationId: process.env.NEXT_PUBLIC_SQUARE_LOCATION_ID || "",
   });
 
   // tRPC mutations
   const upsertMutation = api.square.catalog.upsertCatalogObject.useMutation();
   const uploadImageMutation = api.square.catalog.createCatalogImage.useMutation();
+  const updateInventoryMutation = api.square.inventory.batchChangeInventory.useMutation();
 
   // Fetch categories
   const { data: categoriesData } = api.square.catalog.listCatalog.useQuery({ types: "CATEGORY" });
@@ -51,7 +55,37 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
     return cats;
   }, [categoriesData]);
 
+///////////////////////////////////////////////////////////////////////////////
 
+  // CHECK IF INVENTORY IS WORKING FOR AN ITEM's VARIATION
+  // only for checking purposes, can be deleted later
+  const { data: retrievedItem, isLoading:itemLoading } = api.square.catalog.retrieveCatalogObject.useQuery({
+    objectId: "GKLZJB3APG4OYRAAUERWOQYK",
+  });
+
+  const varIds =retrievedItem?.object.type === "ITEM"
+    ? (retrievedItem.object.itemData?.variations || [])
+      .filter((v) => v.type === "ITEM_VARIATION")
+      .map((v) => v.id)
+    : [];
+
+  const {
+    data: inventoryCounts,
+    isLoading: inventoryLoading,
+  } = api.square.inventory.batchRetrieveInventoryCounts.useQuery(
+    { body: { catalogObjectIds: varIds } },
+    {
+      enabled: !!varIds.length, // only run when we have variation IDs
+    }
+  );
+
+  useEffect(() => {
+    if (!inventoryLoading && inventoryCounts) {
+      console.log("Inventory for variation", inventoryCounts);
+    }
+  }, [inventoryLoading, inventoryCounts]);
+
+///////////////////////////////////////////////////////////////////////////////
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -59,8 +93,6 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
-
-  // replace your current handleSubmit with this
   const handleVariationChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.name as keyof Variation; // keys: "name" | "price" | "sku"
     const value = e.target.value || ""; // ensure value is always a string, not undefined
@@ -81,7 +113,7 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
   const addVariation = () => {
     setForm(prev => ({
       ...prev,
-      variations: [...prev.variations, { name: "", price: "", sku: "" }]
+      variations: [...prev.variations, { name: "", price: "", sku: "", quantity: "" }]
     }));
   };
 
@@ -234,7 +266,7 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
 
       //  Create item data
       const itemData: UpsertCatalogObjectRequest = {
-        idempotencyKey: `item-${ts}`,
+        idempotencyKey: `item-${Date.now()}`,
         object: {
           id: `#item-${Date.now()}`, // temporary id which square will replace with a real one once item is created
           type: "ITEM",
@@ -251,6 +283,7 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
                   currency: "USD",
                 },
                 sku: v.sku || undefined,
+                //trackInventory: true,
               },
             })),
             // Use the new categories array format instead of deprecated categoryId
@@ -260,7 +293,7 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
               }] 
             } : {}),
           },
-        },
+        }
       };
 
       console.log("Creating item with data:", itemData);
@@ -296,12 +329,35 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
         }
       }
 
+      // check if type is ITEM before checking if there's variations
+      if (upsertResponse.catalogObject.type === "ITEM") {
+        const variationsList = (upsertResponse.catalogObject.itemData?.variations)?.filter(v => v.type === "ITEM_VARIATION") || [];
+        const now = new Date().toISOString();
 
+        const inventoryChanges = variationsList.map((v, idx) => ({
+          type: InventoryChangeType.PhysicalCount,
+          physicalCount: {
+            catalogObjectId: v.id,
+            quantity: form.variations[idx]?.quantity || "0",
+            locationId: locationId,
+            state: "IN_STOCK" as const,
+            occurredAt: now,
+          },
+        }));
+
+        // update inventory since square defaults to 0
+        await updateInventoryMutation.mutateAsync({
+          body: {
+            idempotencyKey: `inv-${Date.now()}`,
+            changes: inventoryChanges,
+          }
+        })
+      }
 
       onSave?.();
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error saving item:", error);
-      setErrorMsg(error?.message ?? "Failed to save item. Please try again.");
+      setErrorMsg("Failed to save item. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -356,6 +412,15 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
                 value={variation.sku}
                 onChange={e => handleVariationChange(index, e)}
                 className="border rounded px-2 py-1"
+              />
+              <input
+                type="number"
+                name="quantity"
+                placeholder="Qty"
+                value={variation.quantity}
+                onChange={(e) => handleVariationChange(index, e)}
+                className="w-20 border rounded px-2 py-1"
+                min="0"
               />
               <button
                 type="button"

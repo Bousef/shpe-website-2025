@@ -272,9 +272,9 @@ export const catalogRouter = createTRPCRouter({
                 throw Error("RetrieveCatalogObject returned undefined deleted at. This should not happen.");
             }
 
-            if (response.relatedObjects === undefined) {
-                throw Error("RetrieveCatalogObject returned undefined deleted object ids. This should not happen.");
-            }
+            // if (response.relatedObjects === undefined) {
+            //     throw Error("RetrieveCatalogObject returned undefined deleted object ids. This should not happen.");
+            // }
 
             // reconstruct to remove errors variable from object
             return {
