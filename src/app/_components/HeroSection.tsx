@@ -1,7 +1,5 @@
 "use client";
 
-import Image from "next/image";
-
 export default function HeroSection() {
   return (
     <main className="w-full flex justify-center py-16 sm:py-20 px-6 bg-white">
@@ -47,7 +45,7 @@ export default function HeroSection() {
               shadow-md hover:scale-105"
           >
             JOIN SHPEUCF
-            <Image src="/assets/arrow.png" alt="→" width={20} height={20} className="ml-2 w-5 h-5" />
+            <img src="/assets/arrow.png" alt="→" className="ml-2 w-5 h-5" />
           </a>
         </div>
       </div>

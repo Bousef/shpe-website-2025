@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import { DevBioPopup, type Member } from "./DevBioPopup";
 
 type ProfileCardProps = {
@@ -17,11 +16,9 @@ export function DevProfileCard({ member }: ProfileCardProps) {
       <div className="group bg-white overflow-hidden shadow-lg flex flex-col">
         {/* image + hover overlay + arrow */}
         <div className="relative w-full h-96">
-          <Image
+          <img
             src={member.pfp}
             alt={member.name}
-            width={400}
-            height={384}
             className="w-full h-full object-cover"
           />
         
@@ -34,11 +31,9 @@ export function DevProfileCard({ member }: ProfileCardProps) {
             className="absolute bottom-3 right-3 w-8 h-8 rounded-full flex items-center justify-center
               bg-white bg-opacity-70 group-hover:bg-yellow-400 group-hover:bg-opacity-100 transition cursor-pointer"
           >
-            <Image
+            <img
               src={"/assets/arrow.png"}
               alt={member.name + "'s Biography"}
-              width={24}
-              height={24}
               className="w-6 h-6"
             />
           </button>

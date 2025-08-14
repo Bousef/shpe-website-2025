@@ -4,7 +4,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 
 import Navbar from "../../../_components/NavBar";
 import { supabase } from "../../../../supabase-client";
@@ -126,12 +125,10 @@ const qtyOptions = Array.from({ length: Math.max(availableQty, 1) }, (_, i) => i
       <main className="max-w-6xl mx-auto py-10 px-4 lg:px-0 flex flex-col lg:flex-row lg:space-x-8">
         <div className="hidden lg:flex flex-col gap-4 flex-shrink-0 w-24">
           {thumbs.map((src, idx) => (
-            <Image
+            <img
               key={idx}
               src={src}
               alt={`${product.name} thumbnail ${idx + 1}`}
-              width={80}
-              height={80}
               className="w-20 h-20 object-cover border cursor-pointer"
               onClick={() => setGalleryImage(src)}
             />
@@ -139,11 +136,9 @@ const qtyOptions = Array.from({ length: Math.max(availableQty, 1) }, (_, i) => i
         </div>
 
         <div className="mb-8 lg:mb-0 lg:w-2/3">
-          <Image
+          <img
             src={galleryImage}
             alt={product.name}
-            width={800}
-            height={600}
             className="w-full h-auto object-cover shadow"
           />
         </div>

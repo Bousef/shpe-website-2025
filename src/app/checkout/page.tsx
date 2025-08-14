@@ -1,7 +1,7 @@
+/* eslint-disable @next/next/no-img-element */
 "use client"
 
 import { Afterpay, ApplePay, CashAppPay, CreditCard, Divider, GooglePay, PaymentForm } from "react-square-web-payments-sdk";
-import Image from "next/image";
 import Navbar from "~/app/_components/NavBar";
 import useEnrichedOrderItems from "~/hooks/useEnrichedOrderItems";
 import { api } from "~/trpc/react";
@@ -286,11 +286,9 @@ export default function CheckoutPage() {
                   items.map((item) => (
                     <div key={item.uid} className="flex items-start gap-4">
                       {item.imageUrl && item.imageUrl.trim() !== "" ? (
-                        <Image
+                        <img
                           src={item.imageUrl}
                           alt={item.name ?? ""}
-                          width={48}
-                          height={48}
                           className="h-12 w-12 rounded object-contain bg-gray-100"
                         />
                       ) : (

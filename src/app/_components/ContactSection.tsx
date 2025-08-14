@@ -1,5 +1,4 @@
 import { FaEnvelope, FaDiscord, FaInstagram, FaWhatsapp } from "react-icons/fa";
-import Image from "next/image";
 
 const channels = [
   { name: "Email", icon: FaEnvelope, url: "mailto:contact@shpeucf.com" },
@@ -11,10 +10,9 @@ const channels = [
 export default function ContactSection() {
   return (
     <main id="contact" className="relative">
-  <Image
+  <img
     src="/assets/pattern.204798be.svg"   /* make sure this lives in public/assets */
     alt=""
-    fill
     className="
       absolute
       inset-0

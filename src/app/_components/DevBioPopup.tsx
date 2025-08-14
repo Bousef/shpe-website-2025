@@ -1,5 +1,4 @@
 import {BsLinkedin} from "react-icons/bs"
-import Image from "next/image";
 
 export type Member = {
 	name: string;
@@ -35,11 +34,9 @@ export function DevBioPopup ({ member, onClose }: BioPopupsProps) {
 				<div className="flex flex-col md:flex-row gap-4">
 					{/* profile image */}
 					<div className="w-full md:w-1/3 h-60 overflow-hidden flex-shrink-0">
-						<Image
+						<img
 							src={member.pfp}
 							alt={member.name}
-							width={300}
-							height={240}
 							className="w-full h-full object-cover rounded-sm"
 						/>
 					</div>

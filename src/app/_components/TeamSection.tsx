@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 const members = [
   {
     name: "Hernan Hernandez‑Garcia",
@@ -12,11 +10,9 @@ const members = [
 export default function TeamSection() {
   return (
     <main id="team" className="relative">
-      <Image
+      <img
         src="/_next/static/media/wave2.6d75af1d.svg"
         alt=""
-        width={1920}
-        height={400}
         className="w-full"
       />
 
@@ -35,11 +31,9 @@ export default function TeamSection() {
                          w-56 h-[22rem] 2xl:w-80 2xl:h-[27rem] p-4"
             >
               <div className="flex flex-col items-start w-full">
-                <Image
+                <img
                   src={img}
                   alt={name}
-                  width={160}
-                  height={160}
                   className="rounded-md m-auto w-40 h-40 2xl:w-36 2xl:h-36"
                 />
                 <h3 className="font-bold text-black text-lg 2xl:text-[1.6rem] mt-4 ml-4">

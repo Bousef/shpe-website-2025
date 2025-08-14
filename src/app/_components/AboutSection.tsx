@@ -1,6 +1,4 @@
 // components/AboutSection.tsx
-import Image from "next/image";
-
 const aboutCards = [
   {
     img: "mission.png",
@@ -70,11 +68,9 @@ export default function AboutSection() {
           >
             {/* Icon */}
 <div className="mb-6">
-  <Image
+  <img
     src={`/assets/${img}`}
     alt={title}
-    width={128}
-    height={128}
     className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 object-contain"
   />
 </div>
