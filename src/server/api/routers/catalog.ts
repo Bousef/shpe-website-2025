@@ -283,7 +283,7 @@ export const catalogRouter = createTRPCRouter({
                 relatedObjects: response.relatedObjects,
             };
         }),
-
+        
     getImages: publicProcedure
         .input(
             z.object({

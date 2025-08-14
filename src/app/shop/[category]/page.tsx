@@ -92,7 +92,7 @@ export default function CategoryPage() {
     isPending: imagesLoading,
     error: imagesError,
   } = api.square.catalog.batchRetrieveCatalogObjects.useMutation();
-
+  
   useEffect(() => {
     console.log("Image fetch effect triggered:", {
       itemsLoading,

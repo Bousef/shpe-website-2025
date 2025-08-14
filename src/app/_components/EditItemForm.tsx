@@ -16,9 +16,10 @@ type Variation = {
 type EditItemFormProps = {
     itemId: string | "";
     onClose: () => void;
+    isModal?: boolean; // Add this prop to control modal behavior
 };
 
-export default function EditItemForm({ itemId, onClose }: EditItemFormProps) {
+export default function EditItemForm({ itemId, onClose, isModal = true }: EditItemFormProps) {
     const locationId = process.env.NEXT_PUBLIC_SQUARE_LOCATION_ID;
 
     
@@ -187,12 +188,11 @@ export default function EditItemForm({ itemId, onClose }: EditItemFormProps) {
     if (!itemId) return null;
     if (isLoading) return <div>Loading...</div>;
 
-    return (
-        <div className="fixed inset-0 z-50 backdrop-blur-sm flex items-center justify-center">
-            <div className="relative bg-white p-8 gap-4 rounded-xl shadow-lg w-full sm:max-w-2xl md:max-w-3xl flex flex-col">
-                <h2 className="text-xl font-bold">EDIT ITEM</h2>
+    const formContent = (
+        <div className={`relative bg-white p-8 gap-4 rounded-xl shadow-lg w-full ${isModal ? 'sm:max-w-2xl md:max-w-3xl' : ''} flex flex-col`}>
+            <h2 className="text-xl font-bold">EDIT ITEM</h2>
 
-                <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit}>
                     <label className="block mb-2">
                         <strong>Item Name</strong>
                         <input
@@ -298,6 +298,13 @@ export default function EditItemForm({ itemId, onClose }: EditItemFormProps) {
                     </div>
                 </form>
             </div>
+    );
+
+    return isModal ? (
+        <div className="fixed inset-0 z-50 backdrop-blur-sm flex items-center justify-center">
+            {formContent}
         </div>
+    ) : (
+        formContent
     );
 }
