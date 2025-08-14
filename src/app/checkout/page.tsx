@@ -15,6 +15,8 @@ export default function CheckoutPage() {
   const { data: member } = api.user.getCurrentMember.useQuery();
   const createPayment = api.square.payments.createPayment.useMutation();
 
+  const placeholderImage = "/images/placeholderCatalog.jpg";
+
   // SQUARE ENV
   const appId = process.env.NEXT_PUBLIC_SQUARE_SANDBOX_APPLICATION_ID ?? "";
   const locationId = process.env.NEXT_PUBLIC_SQUARE_LOCATION_ID ?? "";
@@ -178,7 +180,7 @@ export default function CheckoutPage() {
                     <div key={item.uid} className="flex items-start gap-4">
                       (
                         <img
-                          src={item.imageUrl ?? ""}
+                          src={item.imageUrl || placeholderImage}
                           alt={item.name ?? ""}
                           className="h-12 w-12 rounded object-contain bg-gray-100"
                         />

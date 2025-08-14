@@ -11,13 +11,13 @@ import { skipToken } from "@tanstack/react-query";
 
 export default function CategoryPage() {
   /**
-   * 1. Read the `category` slug from the URL parameters
-   */
+ * 1. Read the `category` slug from the URL parameters
+ */
   const { category } = useParams<{ category: string }>();
 
   /**
-   * 2. Fetch all ITEM catalog objects from Square
-   */
+ * 2. Fetch all ITEM catalog objects from Square
+ */
   const {
     data: itemsData,
     isLoading: itemsLoading,
@@ -25,15 +25,15 @@ export default function CategoryPage() {
   } = api.square.catalog.listCatalog.useQuery({ types: "ITEM" });
 
   /**
-   * 3. Fetch all CATEGORY catalog objects from Square
-   */
+ * 3. Fetch all CATEGORY catalog objects from Square
+ */
   const {
     data: categoriesData,
   } = api.square.catalog.listCatalog.useQuery({ types: "CATEGORY" });
 
   /**
-   * 4. Identify the matching category object by its `name` field
-   */
+ * 4. Identify the matching category object by its `name` field
+ */
   const matchedCategory = categoriesData?.find(
     (c) => c.type === "CATEGORY" && c.categoryData?.name === category
   );
@@ -41,16 +41,16 @@ export default function CategoryPage() {
   const categoryId = matchedCategory?.id;
 
   /**
-   * 5. Normalize items array, defaulting to empty if data is unavailable
-   */
+ * 5. Normalize items array, defaulting to empty if data is unavailable
+ */
   const rawItems = useMemo(
     () => itemsData ?? [],
     [itemsData]
   );
 
   /**
-   * 6. Filter items whose `categoryId` matches the selected category
-   */
+ * 6. Filter items whose `categoryId` matches the selected category
+ */
   const itemsList = useMemo(() => {
     return rawItems.filter((item) => {
       if (item.type !== "ITEM") return false;
@@ -61,9 +61,9 @@ export default function CategoryPage() {
   }, [rawItems, categoryId]);
 
   /**
-   * 7. Extract primary image IDs for each item
-   */
-  
+ * 7. Extract primary image IDs for each item
+ */
+
   const itemImageIds = useMemo((): string[] => {
     return itemsList.map((item) => {
       if (item.type === "ITEM" && item.itemData && Array.isArray(item.itemData.imageIds)) {
@@ -74,11 +74,12 @@ export default function CategoryPage() {
   }, [itemsList]);
 
   /**
-   * 8. Conditionally fetch image objects: skip if there are no valid IDs
-   */
+ * 8. Conditionally fetch image objects: skip if there are no valid IDs
+ */
   const imagesQueryInput = useMemo(() => {
-    return itemImageIds.every((id) => id) // ensure non-empty strings
-      ? { body: { objectIds: itemImageIds } }
+    const validIds = itemImageIds.filter((id) => !!id) // ensure non-empty strings  //(before) return itemImageIds.every((id) => id)
+    return validIds.length > 0
+      ? { body: { objectIds: validIds } }
       : skipToken;
   }, [itemImageIds]);
 
@@ -96,16 +97,16 @@ export default function CategoryPage() {
   }, [batchRetrieveCatalogObjects, imagesQueryInput, itemsLoading]);
 
   /**
-   * 9. Normalize image objects array
-   */
+ * 9. Normalize image objects array
+ */
   const rawImages = useMemo(
     () => imagesData?.objects ?? [],
     [imagesData]
   );
 
   /**
-   * 10. Combine item and image data into a render-friendly format
-   */
+ * 10. Combine item and image data into a render-friendly format
+ */
 
   const items = useMemo(() => {
     return itemsList.map((item) => {
@@ -146,8 +147,8 @@ export default function CategoryPage() {
   }, [itemsList, rawImages]);
 
   /**
-   * 11. Early returns for loading and error states
-   */
+ * 11. Early returns for loading and error states
+ */
   if (itemsLoading || imagesLoading) {
     return <div>Loading…</div>;
   }
@@ -166,8 +167,8 @@ export default function CategoryPage() {
   }
 
   /**
-   * 12. Render the category page: header and item grid
-   */
+ * 12. Render the category page: header and item grid
+ */
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
@@ -187,18 +188,29 @@ export default function CategoryPage() {
       </header>
       <main className="px-4 py-10 lg:px-96 grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
         {items.map(({ id, name, description, url, price }) => {
+
+          const placeholderImage = "/images/placeholderCatalog.jpg";
+
           console.log("item: ", { id, name, description, url, price });
           return (
             <Link key={id} href={`/shop/${category}/${id}`} className="block">
               <div className="relative mb-2 aspect-[3/4] bg-gray-200">
-                {url && <Image src={url} alt={name} fill className="object-cover" />}
+
+                {/*url && <Image src={url} alt={name} fill className="object-cover" />*/}
+
+                <Image
+                  src={url || placeholderImage}
+                  alt={name}
+                  fill
+                  className="object-cover"
+                />
               </div>
               <p className="text-lg font-semibold text-blue-900">{name}</p>
-            {description && <p className="text-blue-900 mb-1">{description}</p>}
-            <p className="text-xl text-blue-900">${price}</p>
-          </Link>
-        );
-      })}
+              {description && <p className="text-blue-900 mb-1">{description}</p>}
+              <p className="text-xl text-blue-900">${price}</p>
+            </Link>
+          );
+        })}
       </main>
     </div>
   );

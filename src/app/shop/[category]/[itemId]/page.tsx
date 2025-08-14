@@ -19,12 +19,15 @@ export default function ItemPage() {
   const [quantity, setQuantity] = useState<number>(1);
   const [galleryImage, setGalleryImage] = useState<string>("");
 
-    const {
+  const {
     data: imageData,
     isLoading: imageLoading,
     error: imageError, }
     = api.square.catalog.getImages.useQuery({ objectId: itemId, includeRelatedObjects: true });
 
+
+
+  //const forcedImages: string[] = [];
 
   // 3. Current member (for customerId)
   const { data: member } = api.user.getCurrentMember.useQuery();
@@ -78,8 +81,11 @@ export default function ItemPage() {
     stock: stocks[idx] ?? 0,
   }));
 
-  const allImages = imageData ?? [];
-  const firstImage = allImages[0] ?? "";
+  // 8. Handle images
+
+  const placeholderImage = "/images/placeholderCatalog.jpg"; // Fallback image
+  const allImages = imageData && imageData.length > 0 ? imageData : [placeholderImage];  //imageData && imageData.length > 0 ? imageData : [placeholderImage]
+  //const firstImage = allImages[0];    //allImages[0] ?? ""
 
   // 9. Derived hooks & helpers (all unconditionally here)
   const stockBySize = useMemo(
@@ -122,10 +128,10 @@ export default function ItemPage() {
 
   // 11. Side‐effect: set initial gallery image
   useEffect(() => {
-    if (firstImage && !galleryImage) {
-      setGalleryImage(firstImage);
+    if (imageData && imageData.length > 0) {
+      setGalleryImage(imageData[0] ?? "");
     }
-  }, [firstImage, galleryImage]);
+  }, [imageData]);
 
   // 12. Early returns
   if (itemLoading || invLoading) return <div>Loading...</div>;
@@ -133,10 +139,10 @@ export default function ItemPage() {
   if (invError) return <div>Error loading stock</div>;
   if (!obj || obj.type !== "ITEM") return <div>Not an item</div>;
   if (!variationData) return <div>No variations available</div>;
-    if (imageData === undefined) {
-      console.error(imageError);
-      return <div>Error: No images found for this item.</div>;
-    }
+  if (imageData === undefined) {
+    console.error(imageError);
+    return <div>Error: No images found for this item.</div>;
+  }
   // 13. Final render
   return (
     <div className="min-h-screen bg-white">
@@ -163,7 +169,7 @@ export default function ItemPage() {
               onClick={() => setGalleryImage(url)}
             >
               <Image
-                src={url}
+                src={url || placeholderImage}
                 alt={`${itemData?.name} thumbnail ${idx + 1}`}
                 fill
                 sizes="80px"
@@ -176,10 +182,10 @@ export default function ItemPage() {
         {/* Main image */}
         <div className="mb-8 lg:mb-0 lg:w-2/3">
           <NextImage
-            src={galleryImage}
-            alt={itemData!.name!}
-            width={800}               // intrinsic width
-            height={600}              // intrinsic height
+            src={galleryImage || placeholderImage}
+            alt={itemData?.name ?? "Productt Image"}
+            width={800}               // intrinsic width
+            height={600}              // intrinsic height
             sizes="(min-width:1024px) 66vw, 100vw"
             className="w-full h-auto object-cover shadow rounded"
           />
@@ -213,10 +219,9 @@ export default function ItemPage() {
                       key={size}
                       onClick={() => !disabled && setSelectedSize(size)}
                       disabled={disabled}
-                      className={`
-                        w-10 h-10 border flex items-center justify-center
-                        ${getSizeButtonClass(size, stock)}
-                      `}
+                      className={` w-10 h-10 border flex items-center justify-center
+                        ${getSizeButtonClass(size, stock)}
+                              rounded cursor-pointer`}
                     >
                       {size} {disabled ? "(OOS)" : `(${stock})`}
                     </button>
