@@ -216,9 +216,10 @@ export const catalogRouter = createTRPCRouter({
                 throw Error("upsertCatalogObject returned undefined catalog object. This should not happen.");
             }
 
-            if (response.idMappings === undefined) {
-                throw Error("upsertCatalogObject returned undefined id mappings. This should not happen.");
-            }
+            // will start throwing error when upserting existing item since temporary #id are for new catalogObject only
+            // if (response.idMappings === undefined) {
+            //     throw Error("upsertCatalogObject returned undefined id mappings. This should not happen.");
+            // }
 
             // reconstruct to remove errors variable from object
             return {

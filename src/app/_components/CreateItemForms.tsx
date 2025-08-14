@@ -2,7 +2,6 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import type { CatalogCategory } from "square/legacy";
 import { api } from "~/trpc/react";
 import type { UpsertCatalogObjectRequest, CreateImagesRequest } from "node_modules/square/api/resources/catalog";
 import type { BatchChangeInventoryRequest, CatalogObject, CatalogItem, InventoryChange, InventoryState, } from "node_modules/square/api";
@@ -27,12 +26,13 @@ type ItemForm = {
 };
 
 export default function CreateItemForm({ onSave }: CreateItemFormProps) {
+  const locationId = process.env.NEXT_PUBLIC_SQUARE_LOCATION_ID;
+
   // state for handling image files
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
   const [fileValidationMessage, setFileValidationMessage] = useState<string>("");
   
-  const locationId = process.env.NEXT_PUBLIC_SQUARE_LOCATION_ID;
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [form, setForm] = useState<ItemForm>({
@@ -60,10 +60,10 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
   // CHECK IF INVENTORY IS WORKING FOR AN ITEM's VARIATION
   // only for checking purposes, can be deleted later
   const { data: retrievedItem, isLoading:itemLoading } = api.square.catalog.retrieveCatalogObject.useQuery({
-    objectId: "GKLZJB3APG4OYRAAUERWOQYK",
+    objectId: "PXQJSFHR4NGHO2EV2YGCA2DR",
   });
 
-  const varIds =retrievedItem?.object.type === "ITEM"
+  const varIds = retrievedItem?.object.type === "ITEM"
     ? (retrievedItem.object.itemData?.variations || [])
       .filter((v) => v.type === "ITEM_VARIATION")
       .map((v) => v.id)
@@ -266,15 +266,15 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
 
       //  Create item data
       const itemData: UpsertCatalogObjectRequest = {
-        idempotencyKey: `item-${Date.now()}`,
+        idempotencyKey: `item-${ts}`,
         object: {
-          id: `#item-${Date.now()}`, // temporary id which square will replace with a real one once item is created
+          id: `#item-${ts}`, // temporary id which square will replace with a real one once item is created
           type: "ITEM",
           itemData: {
             name,
             description,
             variations: variations.map((v, idx) => ({
-              id: `#variation-${Date.now()}-${idx}`, // unique temporary id per variation
+              id: `#variation-${ts}-${idx}`, // unique temporary id per variation
               type: "ITEM_VARIATION",
               itemVariationData: {
                 name: v.name,
@@ -314,11 +314,11 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
             await uploadImageMutation.mutateAsync({
               imageBase64,
               request: {
-                idempotencyKey: `image-${Date.now()}-${i}`,
+                idempotencyKey: `image-${ts}-${i}`,
                 objectId: createdItemId,
                 image: {
                   type: "IMAGE",
-                  id: `#image-${Date.now()}-${i}`,
+                  id: `#image-${ts}-${i}`,
                   imageData: {
                     caption: `Image ${i + 1} for ${form.name}`,
                   },
@@ -348,7 +348,7 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
         // update inventory since square defaults to 0
         await updateInventoryMutation.mutateAsync({
           body: {
-            idempotencyKey: `inv-${Date.now()}`,
+            idempotencyKey: `inv-${ts}`,
             changes: inventoryChanges,
           }
         })
@@ -366,7 +366,7 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded shadow">
       <div>
-        <label className="block mb-1 font-bold">ADD ITEM</label>
+        <label className="block text-xl font-bold mb-3">ADD ITEM</label>
 
         <input
           name="name"
@@ -386,7 +386,7 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
 
         {/* ITEM VARIATIONS */}
         <div>
-          <h3 className="font-bold my-2">Variations</h3>
+          <h3 className="text-lg font-semibold text-gray-700 my-2">Variations</h3>
           {form.variations.map((variation, index) => (
             <div key={index} className="flex gap-2 items-center mb-2">
               <input
@@ -450,8 +450,8 @@ export default function CreateItemForm({ onSave }: CreateItemFormProps) {
           {categories
             .filter(c => c.type === "CATEGORY")
             .map(c => (
-            <option key={c.id} value={c.id}>{c.categoryData?.name ?? "Unnamed"}</option>
-          ))}
+              <option key={c.id} value={c.id}>{c.categoryData?.name ?? "Unnamed"}</option>
+            ))}
         </select>
       </div>
 

@@ -3,17 +3,17 @@
 import React, { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import Navbar from "../_components/NavBar";
+import EditItemForm from "../_components/EditItemForm";
 import { api } from "~/trpc/react";
-import { PlusCircleIcon, XMarkIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { PlusCircleIcon, XMarkIcon, TrashIcon, PencilIcon } from "@heroicons/react/24/outline";
 import { useQueryClient } from "@tanstack/react-query";
 import CreateItemForm from "../_components/CreateItemForms";
-import type { CatalogCategory } from "node_modules/square/api";
-import { is } from "drizzle-orm";
 
 export default function InventoryManagement() {
   const [showAdd, setShowAdd] = useState(false);
   const queryClient = useQueryClient();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [editingItem, setEditingItem] = useState<null | { id: string; name: string }>(null);
 
   // 1) Items
   const { data: itemsRes } = api.square.catalog.listCatalog.useQuery({ types: "ITEM" });
@@ -104,6 +104,14 @@ export default function InventoryManagement() {
     },
   });
 
+  const handleEdit = (id: string, name: string) => {
+    setEditingItem({ id, name });
+  };
+
+  const handleCloseEditForm = () => {
+    setEditingItem(null);
+  };
+
   const handleDelete = async (id: string, name: string) => {
     const ok = window.confirm(`Delete "${name}"? This cannot be undone.`);
     if (!ok) return;
@@ -130,7 +138,7 @@ export default function InventoryManagement() {
           <h1 className="text-3xl font-bold text-blue-900">Inventory</h1>
           <button
             onClick={() => setShowAdd((prev) => !prev)}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 cursor-pointer"
           >
             {showAdd ? (
               <><XMarkIcon className="h-5 w-5" /> Cancel</>
@@ -141,14 +149,16 @@ export default function InventoryManagement() {
         </div>
 
         {/* Add Item Form */}
-        {showAdd && (
-          <CreateItemForm
-            onSave={() => {
-              void queryClient.invalidateQueries({ queryKey: ["catalog"] });
-              setShowAdd(false);
-            }}
-          />
-        )}
+        <div className="mb-10">
+          {showAdd && (
+            <CreateItemForm
+              onSave={() => {
+                void queryClient.invalidateQueries({ queryKey: ["catalog"] });
+                setShowAdd(false);
+              }}
+            />
+          )}
+        </div>
 
         {/* Inventory Table */}
         <div className="overflow-x-auto">
@@ -161,7 +171,6 @@ export default function InventoryManagement() {
                 <th className="py-3 px-4 border-b">Category</th>
                 <th className="py-3 px-4 border-b">Price</th>
                 <th className="py-3 px-4 border-b w-32">Actions</th>
-
               </tr>
             </thead>
             <tbody>
@@ -191,9 +200,19 @@ export default function InventoryManagement() {
                     <td className="px-4 border-b text-sm">${item.price}</td>
                     <td className="px-4 border-b text-sm">
                       <button
+                        onClick={() => handleEdit(item.id, item.name)}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-green-200 text-green-600 hover:bg-green-50 disabled:opacity-50 cursor-pointer"
+                        title="Edit item"
+                      >
+                        <PencilIcon className="h-4 w-4" />
+                        {isDeleting ? "Editing..." : "Edit"}
+                      </button>
+                    </td>
+                    <td className="px-4 border-b text-sm">
+                      <button
                         onClick={() => handleDelete(item.id, item.name)}
                         disabled={isDeleting}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-50"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-50 cursor-pointer"
                         title="Delete item"
                       >
                         <TrashIcon className="h-4 w-4" />
@@ -206,6 +225,13 @@ export default function InventoryManagement() {
             </tbody>
           </table>
         </div>
+
+        {editingItem && (
+          <EditItemForm
+            itemId={editingItem.id}
+            onClose={handleCloseEditForm}
+          />
+        )}
       </div>
     </>
   );
