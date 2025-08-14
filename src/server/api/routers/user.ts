@@ -30,7 +30,7 @@ export const userRouter = createTRPCRouter({
           console.log("currentMember: ", currentMember);
 
           const currentOrder = await squareClient.orders.search({
-            locationIds: [process.env.SQUARE_LOCATION_ID!], 
+            locationIds: [process.env.SQUARE_SANDBOX_LOCATION_ID!], 
             query:{
               filter:{
                 stateFilter:{
@@ -110,7 +110,7 @@ export const userRouter = createTRPCRouter({
         throw new Error("Customer ID not found");
       }
 
-      const locationId = process.env.SQUARE_LOCATION_ID!;
+      const locationId = process.env.SQUARE_SANDBOX_LOCATION_ID!;
 
       // Check for existing draft order
       const existingOrderResponse = await squareClient.orders.search({
