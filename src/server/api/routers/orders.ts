@@ -20,7 +20,7 @@ export const ordersRouter = createTRPCRouter ({
             }
             try {
                 const response = await squareClient.orders.search({
-                    locationIds: [process.env.SQUARE_LOCATION_ID!],
+                    locationIds: [process.env.SQUARE_SANDBOX_LOCATION_ID!],
                     query: {
                         filter: {
                             customerFilter: {
@@ -90,7 +90,7 @@ export const ordersRouter = createTRPCRouter ({
                     idempotencyKey: randomUUID(), // ensures new order everytime
                     order: {
                         referenceId: "my-order-002",
-                        locationId: process.env.SQUARE_LOCATION_ID!,
+                        locationId: process.env.SQUARE_SANDBOX_LOCATION_ID!,
                         customerId,
                         taxes: [
                             {

@@ -65,21 +65,24 @@ export default function CategoryPage() {
  */
 
   const itemImageIds = useMemo((): string[] => {
-    return itemsList.map((item) => {
+    const imageIds = itemsList.map((item) => {
       if (item.type === "ITEM" && item.itemData && Array.isArray(item.itemData.imageIds)) {
         return item.itemData.imageIds[0] ?? "";
       }
       return "";
     });
+    
+    console.log("Extracted image IDs:", imageIds);
+    return imageIds;
   }, [itemsList]);
 
   /**
  * 8. Conditionally fetch image objects: skip if there are no valid IDs
  */
   const imagesQueryInput = useMemo(() => {
-    const validIds = itemImageIds.filter((id) => !!id) // ensure non-empty strings  //(before) return itemImageIds.every((id) => id)
-    return validIds.length > 0
-      ? { body: { objectIds: validIds } }
+    const validImageIds = itemImageIds.filter((id) => id && id.trim() !== "");
+    return validImageIds.length > 0
+      ? { body: { objectIds: validImageIds } }
       : skipToken;
   }, [itemImageIds]);
 
@@ -89,9 +92,16 @@ export default function CategoryPage() {
     isPending: imagesLoading,
     error: imagesError,
   } = api.square.catalog.batchRetrieveCatalogObjects.useMutation();
-
+  
   useEffect(() => {
-    if (!itemsLoading && imagesQueryInput !== skipToken && imagesQueryInput.body.objectIds.length !== 0) {
+    console.log("Image fetch effect triggered:", {
+      itemsLoading,
+      imagesQueryInput: imagesQueryInput !== skipToken ? imagesQueryInput : "skipToken",
+      objectIdsLength: imagesQueryInput !== skipToken ? imagesQueryInput.body.objectIds.length : 0
+    });
+    
+    if (!itemsLoading && imagesQueryInput !== skipToken && imagesQueryInput.body.objectIds.length > 0) {
+      console.log("Calling batchRetrieveCatalogObjects with:", imagesQueryInput.body);
       batchRetrieveCatalogObjects(imagesQueryInput.body);
     }
   }, [batchRetrieveCatalogObjects, imagesQueryInput, itemsLoading]);
@@ -124,11 +134,24 @@ export default function CategoryPage() {
       const name = item.itemData.name ?? "Unnamed Item";
       const description = item.itemData.description ?? "";
       const imageId = item.itemData.imageIds?.[0];
+      
+      console.log("Looking for image with ID:", imageId);
+      console.log("Available images:", rawImages.map(img => ({ id: img.id, type: img.type })));
+      
       const imageObj = rawImages.find((img) => img.id === imageId);
-      const url =
-        imageObj && imageObj.type === "IMAGE" && "imageData" in imageObj && imageObj.imageData && "url" in imageObj.imageData
-          ? (imageObj.imageData as { url?: string }).url ?? ""
-          : "";
+      console.log("Found image object:", imageObj);
+      
+      let url = "";
+      if (imageObj && imageObj.type === "IMAGE") {
+        // Check if imageData exists and has url
+        if ("imageData" in imageObj && imageObj.imageData) {
+          if (typeof imageObj.imageData === "object" && imageObj.imageData !== null && "url" in imageObj.imageData) {
+            url = (imageObj.imageData as { url?: string }).url ?? "";
+          }
+        }
+      }
+      
+      console.log("Final image URL for", name, ":", url);
 
       let priceCents = 0n;
       const firstVariation = item.itemData.variations?.[0];

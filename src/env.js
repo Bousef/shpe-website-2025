@@ -32,6 +32,14 @@ export const env = createEnv({
       process.env.NODE_ENV === "production"
       ? z.string()
       : z.string().optional(),
+    NEXT_PUBLIC_SUPABASE_MOBILE_URL:
+      process.env.NODE_ENV === "production"
+      ? z.string()
+      : z.string().optional(),
+    NEXT_PUBLIC_SUPABASE_MOBILE_ANON_KEY:
+      process.env.NODE_ENV === "production"
+      ? z.string()
+      : z.string().optional(),
   },
 
   /**
@@ -42,6 +50,8 @@ export const env = createEnv({
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    NEXT_PUBLIC_SUPABASE_MOBILE_URL: process.env.NEXT_PUBLIC_SUPABASE_MOBILE_URL,
+    NEXT_PUBLIC_SUPABASE_MOBILE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_MOBILE_ANON_KEY,
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
   },
