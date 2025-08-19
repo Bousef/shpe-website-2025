@@ -18,6 +18,7 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
+    GOOGLE_API_KEY: z.string(),
   },
   /**
    * Specify your client-side environment variables schema here.
@@ -34,6 +35,7 @@ export const env = createEnv({
     NEXT_PUBLIC_SQUARE_APPLICATION_ID: z.string(),
     NEXT_PUBLIC_SHPE_MEMBERSHIP_ITEM_ID: z.string(),
     NEXT_PUBLIC_SQUARE_LOCATION_ID: z.string(),
+
   },
 
   /**
@@ -51,6 +53,7 @@ export const env = createEnv({
     NEXT_PUBLIC_SQUARE_LOCATION_ID: process.env.NEXT_PUBLIC_SQUARE_LOCATION_ID,
     NEXT_PUBLIC_SHPE_MEMBERSHIP_ITEM_ID:
       process.env.NEXT_PUBLIC_SHPE_MEMBERSHIP_ITEM_ID,
+    GOOGLE_API_KEY: process.env.GOOGLE_API_KEY,
   },
 
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,

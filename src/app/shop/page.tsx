@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { getCatalog, getObjectURL, wipeCatalog } from "./actions/actions";
-import Navbar from "../_components/NavBar";
 import Link from "next/link";
 import { api } from "~/trpc/react";
 import Image from "next/image";
@@ -100,8 +99,6 @@ const categoryImages: CategoryImage[] = await Promise.all(
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-100">
-      <Navbar />
-
       <div className="flex justify-end px-4 lg:px-48 mt-4">
         {showEdit && (
           <Link

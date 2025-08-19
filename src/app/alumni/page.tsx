@@ -1,6 +1,5 @@
 "use server";
 
-import Navbar from "../_components/NavBar";
 import AlumniCard from "../_components/AlumniCard";
 import SearchBar from "./_components/search-bar";
 import { api } from "~/trpc/server";
@@ -8,6 +7,7 @@ import { DEFAULT_PAGE_SIZE } from "./_components/constants";
 import Link from "next/link";
 import { positionEnumValues, type Position } from "~/server/db/schema";
 import type { Alumni } from "~/server/db/schema";
+import tailwindConfig from "tailwind.config.cjs";
 
 type SortByType = "first_name" | "last_name" | "grad_year" | Position;
 const sortByWhitelist: SortByType[] = ["first_name", "last_name", "grad_year", ...positionEnumValues];
@@ -64,15 +64,14 @@ export default async function Alumni({ searchParams }: { searchParams: Promise<{
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-100">
-      <Navbar />
-
       <div className="text-center py-10">
-        <h1 className="text-4xl text-blue-800">2024 - 2025</h1>
+        <h1 className="text-6xl text-[var(--shpe-yellow)] font-helvetica font-semi-bold uppercase">2024 - 2025</h1>
       </div>
 
+      
       <SearchBar initialQuery="" initialPageSize={20} />
-
-      <div className="grid grid-cols-0 sm:grid-cols-3 md:grid-cols-4 gap-6 px-6 pb-20 pt-10 justify-items-center">
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8 px-8 py-10">
         {alumniList.map(async (member) => {
           return <AlumniCard key={member.id} alumni={member} />;
         })}
@@ -80,13 +79,13 @@ export default async function Alumni({ searchParams }: { searchParams: Promise<{
 
       <div className="flex justify-between items-center px-6">
         <Link href={search(page - 1)}>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 cursor-pointer disabled:opacity-50 disabled:cursor-default"
+          <button className="bg-[var(--shpe-yellow)] text-black px-4 py-2 rounded-lg hover:bg-[var(--shpe-orange)]cursor-pointer disabled:opacity-50 disabled:cursor-default"
             disabled={page <= 0}>
             &lt;
           </button>
         </Link>
         <Link href={search(page + 1)}>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 cursor-pointer disabled:opacity-50 disabled:cursor-default"
+          <button className="bg-[var(--shpe-yellow)] text-black px-4 py-2 rounded-lg hover:bg-[var(--shpe-orange)]cursor-pointer disabled:opacity-50 disabled:cursor-default"
             disabled={page + 1 >= totalPages}>
             &gt;
           </button>

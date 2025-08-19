@@ -4,7 +4,6 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import Navbar from "../../_components/NavBar";
 import { getCatalog, getObjectURL } from "../../shop/actions/actions";
 import type { Square } from "square";
 
@@ -98,8 +97,6 @@ export default function CategoryPage({ params }: { params: Promise<{ category: s
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Top nav */}
-      <Navbar />
       <header className="flex justify-between items-center px-4 lg:px-48 mt-4">
         <Link href="/shop" className="text-blue-600 hover:underline">
           ← Back

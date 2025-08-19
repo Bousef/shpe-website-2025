@@ -1,0 +1,79 @@
+.rbc-toolbar {
+  flex-direction: row-reverse;
+}
+
+.rbc-toolbar .rbc-toolbar-label {
+  font-size: 4rem;
+  text-align: start;
+  text-transform: uppercase;
+  color: darkblue;
+}
+
+.rbc-toolbar .rbc-btn-group:last-child {
+  display: none;
+}
+
+.rbc-toolbar button {
+  border: 2px solid darkblue;
+  text-transform: uppercase;
+  color: darkblue;
+  transition-property: background-color;
+  transition-timing-function: var(--default-transition-timing-function);
+  transition-duration: var(--default-transition-duration);
+}
+
+.rbc-toolbar button:nth-child(2) {
+  border-inline: none;
+}
+
+.rbc-toolbar button:hover {
+  border: 2px solid darkblue;
+  background-color: var(--color-yellow-500);
+}
+
+.rbc-toolbar button:hover:nth-child(2) {
+  border-inline: none;
+}
+
+.rbc-header {
+  font-size: 1.2rem;
+  text-transform: uppercase;
+}
+
+.rbc-header + .rbc-header,
+.rbc-day-bg + .rbc-day-bg,
+.rbc-month-row + .rbc-month-row {
+  border: none;
+}
+
+.rbc-month-view {
+  border: none;
+  gap: 1rem;
+}
+
+.rbc-day-bg.rbc-today {
+  background-color: orange;
+}
+
+.rbc-row-bg {
+  gap: 2rem;
+}
+
+.rbc-row:has(.rbc-date-cell) {
+  gap: 2rem;
+}
+
+.rbc-day-bg {
+  background-color: white;
+}
+
+.rbc-date-cell {
+  text-align: start;
+  font-weight: bold;
+  margin-left: 0.5rem;
+}
+
+.rbc-event {
+  width: calc(100% - 2.75rem);
+  margin-left: 1.05rem;
+}

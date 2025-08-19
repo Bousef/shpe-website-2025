@@ -57,6 +57,8 @@ export const members = createTable(
     is_member: boolean().default(false),
     position: positionEnum("position").default("Member"),
     square_customer_id: d.varchar({ length: 100 }),
+    phone_number: d.varchar({ length: 20 }),
+    major: d.varchar({ length: 100 }),
   })
 );
 

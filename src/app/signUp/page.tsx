@@ -1,6 +1,5 @@
 "use client";
 import { useActionState } from "react";
-import Navbar from "../_components/NavBar";
 import { signup } from "./actions";
 import InputBox, { InputField, PasswordInputField } from "../_components/InputBox";
 
@@ -12,8 +11,6 @@ export default function SignUp() {
 
   return(
     <div>
-      <Navbar />
-
       <h1 className="h2 text-center text-5xl text-[var(--shpe-orange)] font-medium py-3">
         SIGN UP
       </h1>

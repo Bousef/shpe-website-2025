@@ -1,7 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import Navbar from "../_components/NavBar";
 import { createPayment } from "./actions/actions";
 import {
   CreditCard,
@@ -58,8 +57,6 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-brand">
-      <Navbar />
-
       <main className="flex-grow w-full px-4 py-8 lg:px-12">
         <div className="mx-auto max-w-6xl">
           <button

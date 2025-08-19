@@ -48,7 +48,7 @@ export function DropdownButton({ children }: { children: React.ReactNode }) {
   return (
     <button
       onClick={toggle}
-      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 cursor-pointer"
+      className="bg-[var(--shpe-yellow)] text-black font-semi-bold font-helvetica uppercase px-4 py-2 rounded-full shadow hover:bg-[var(--shpe-orange)] cursor-pointer transition-colors"
     >
       {children}
     </button>

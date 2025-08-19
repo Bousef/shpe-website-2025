@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { ArrowRightCircle } from "lucide-react";
 import { api } from "~/trpc/react";
-import Navbar from "~/app/_components/NavBar";
 import SquareCheckoutPopup from "~/app/_components/SquareCheckout";
 
 const ITEM_ID = "2VJ3PNTMTHIVOROECMOCNO2X"; // outreach item ID 
@@ -66,11 +65,10 @@ export default function OutreachPage() {
   
     return (
         <div>
-            <Navbar />
             <main className="min-h-screen bg-white py-12 px-4 flex justify-center">
                 <div className="max-w-3xl w-full rounded-3xl shadow-xl p-15">
                     <h1 className="text-4xl sm:text-5xl font-semibold text-center text-[var(--shpe-yellow)] mb-6 drop-shadow-md">
-                        {itemObject?.result.object?.itemData?.name  || ""}
+                        {itemObject?.result.object?.itemData?.name || "SHPE Jr. Outreach Program"}
                     </h1>
 
                     <p className="text-md leading-normal mb-8">
@@ -151,7 +149,7 @@ export default function OutreachPage() {
                     <div className="flex justify-center">
                         <button
                             type="submit"
-                            className="bg-[var(--shpe-yellow)] text-white font-bold px-20 py-4 rounded-full shadow-lg hover:bg-black hover:text-white transition text-xl flex items-center gap-2"
+                            className="bg-[var(--shpe-yellow)] text-white font-bold px-20 py-4 rounded-full shadow-lg hover:bg-black hover:text-white transition text-xl flex items-center gap-2 cursor-pointer"
                             onClick={handleSubmit}
                         >
                             Donate <ArrowRightCircle className="w-5 h-5" />
@@ -162,7 +160,7 @@ export default function OutreachPage() {
 
             {showPaymentModal && selectedVariationId && (
                 <SquareCheckoutPopup
-                    itemName={itemObject?.result.object?.itemData?.name ?? "SHPE UCF Sponsorship"}
+                    itemName={itemObject?.result.object?.itemData?.name ?? "SHPE Jr. Outreach Program"}
                     amount={Math.round(Number(customAmount) * 100)} // convert to cents
                     variationId={selectedVariationId}
                     onClose={() => setShowPaymentModal(false)}

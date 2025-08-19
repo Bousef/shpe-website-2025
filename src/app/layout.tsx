@@ -1,10 +1,13 @@
 import "~/styles/globals.css";
+import "~/styles/react-calendar.css";
 import { type Metadata } from "next";
 import { Geist } from "next/font/google";
 import FooterSection from "./_components/FooterSection";
 import { TRPCReactProvider } from "~/trpc/react";
 import { env } from "~/env";
 import Script from "next/script";
+import Navbar from "./_components/NavBar";
+
 
 export const metadata: Metadata = {
   title: "SHPE UCF",
@@ -67,11 +70,16 @@ export default function RootLayout({
         - min-h-screen: at least viewport height 
         - flex flex-col: stack header/main/footer vertically 
       */}
+
       <head>
         <script src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
       </head>
       <body className="flex min-h-screen flex-col">
         <TRPCReactProvider>
+
+          {/* always rendered at the top */}
+          <Navbar />
+
           {/*
             - flex-grow: takes up leftover space so footer is pushed down on short pages
           */}

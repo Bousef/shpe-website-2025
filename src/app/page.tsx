@@ -17,15 +17,15 @@ export default function HomePage() {
   return (
     <>
       {/* full page */}
-      <div className="flex flex-col overflow-x-hidden bg-[#F7F8F9] text-black">
-        <Navbar />
-        <HeroSection />
-        <AboutSection />
+      <div className="bg-[#F7F8F9] text-black overflow-x-hidden flex flex-col">
+        <HeroSection />   
+         {/* <AboutSection /> */}
         <WeeklyEvents />
 
-        <Slideshow />
-        {/*<SquareConnectionTest />*/}
-        <JotformTester />
+        {/* <Slideshow /> */}
+
+        {/* <SquareConnectionTest />    */}     
+
       </div>
     </>
   );
