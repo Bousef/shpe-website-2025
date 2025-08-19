@@ -1,4 +1,5 @@
 import "~/styles/globals.css";
+import "~/styles/react-calendar.css";
 import { type Metadata } from "next";
 import { Geist } from "next/font/google";
 import FooterSection from "./_components/FooterSection";
@@ -22,39 +23,13 @@ const geist = Geist({
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const warnings: string[] = [];
-
-  if (!env.SUPABASE_URL) {
-    warnings.push("Missing SUPABASE_URL! Server auth features will be disabled.");
-  }
-
-  if (!env.SUPABASE_ANON_KEY) {
-    warnings.push("Missing SUPABASE_ANON_KEY! Server auth features will be disabled.");
-  }
-
-  if (!env.NEXT_PUBLIC_SUPABASE_URL) {
-    warnings.push("Missing NEXT_PUBLIC_SUPABASE_URL! Client auth features will be disabled.");
-  }
-  if (!env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    warnings.push("Missing NEXT_PUBLIC_SUPABASE_ANON_KEY! Client auth features will be disabled.");
-  }
-
-  if (warnings.length > 0) {
-    console.warn("\x1b[33m Environment variable warnings:\n", warnings.join("\n "));
-  }
-
-  console.warn("\x1b[0m");
-
   return (
     <html lang="en" className={`${geist.variable}`}>
       {/* 
         - min-h-screen: at least viewport height 
         - flex flex-col: stack header/main/footer vertically 
       */}
-      <head>
-        <script src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
-      </head>
-      <body className="min-h-screen flex flex-col">
+      <body className="flex min-h-screen flex-col">
         <TRPCReactProvider>
 
           {/* always rendered at the top */}
@@ -63,9 +38,7 @@ export default function RootLayout({
           {/*
             - flex-grow: takes up leftover space so footer is pushed down on short pages
           */}
-          <main className="flex-grow">
-            {children}
-          </main>
+          <main className="flex-grow">{children}</main>
 
           {/* always rendered at the bottom */}
           <FooterSection />
@@ -75,4 +48,3 @@ export default function RootLayout({
     </html>
   );
 }
-

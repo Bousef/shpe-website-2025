@@ -1,7 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@400;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-
 @import "tailwindcss";
+@import "react-big-calendar/lib/css/react-big-calendar.css";
+
+@theme {
+  --font-sans:
+    var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 
 @layer utilities {
   .font-condensed {
@@ -40,9 +43,4 @@
   --shpe-yellow:#F7A800;
   --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --font-roboto: 'Roboto', sans-serif;
-}
-.partner-logo {
-  mix-blend-mode: multiply;
-  background: transparent !important;
-  filter: drop-shadow(0 0 1px rgba(0,0,0,0.1));
 }
