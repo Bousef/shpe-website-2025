@@ -18,8 +18,6 @@ export default async function CalendarPage() {
 
   return (
     <div>
-      <Navbar />
-      <p className="my-16 text-center text-6xl text-yellow-400">CALENDAR</p>
       <div className="mx-5 bg-slate-200 p-24">
         <Calendar events={events} />
       </div>
