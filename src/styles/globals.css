@@ -5,4 +5,42 @@
   --font-sans:
     var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+@layer utilities {
+  .font-condensed {
+    font-stretch: condensed;
+  }
+}
+
+  .bg-gradient-brand {
+    @apply bg-gradient-to-r from-[#006FCE] via-[#6CB3C8] to-[#E6451B];
+  }
+  .btn-gradient-brand {
+    @apply bg-gradient-to-r from-[#006FCE] to-[#E6451B];
+  }
+  .card-glass {
+    @apply bg-white/90 border border-white/20 backdrop-blur-sm;
+  }
+
+.hero-title {
+  font-size: 233px;
+  font-weight: 600;
+  line-height: 1;
+  text-shadow: rgba(0, 0, 0, 0.467) 0px 4.98941px 29.6371px;
+  opacity: 1;
+  display: inline-block;      /* needed so transform only affects text */
+  transform: scaleX(1.2);     /* stretch to 120% width; tweak as needed */
+  transform-origin: left;     /* scale out from left edge */
+
+}
+:root{
+  --shpe-dark-orange: #D33A02;
+  --shpe-orange: #FD652F;
+  --shpe-navy-blue:#001F5B;
+  --shpe-blue:#0070C0;
+  --shpe-light-blue:#72A9BE;
+  --shpe-gray:#626366;
+  --shpe-yellow:#F7A800;
+  --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-roboto: 'Roboto', sans-serif;
 }

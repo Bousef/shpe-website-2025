@@ -34,7 +34,6 @@ useEffect(() => {
 
   loadEvents();
 }, []);
-
   return (
     <section
       id="events"

@@ -8,7 +8,13 @@ import { env } from "./src/env.js";
 /** @type {import("next").NextConfig} */
 const config = {
   images: {
-    remotePatterns: [],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "items-images-sandbox.s3.us-west-2.amazonaws.com",
+        pathname: "/**",
+      }
+    ],
   },
 };
 

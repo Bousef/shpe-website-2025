@@ -1,51 +1,48 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { BsLinkedin } from "react-icons/bs";
 import type { Alumni } from "~/server/db/schema";
 
 export default function AlumniCard({ alumni }: { alumni: Alumni }) {
-    const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(alumni.first_name + " " + alumni.last_name)}&background=001f5b&color=ffffff&size=220`;
+    const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+        alumni.first_name + " " + alumni.last_name
+    )}&background=001f5b&color=ffffff&size=500`;
 
     return (
-        <div className="w-full max-w-[220px] bg-white shadow-xl rounded-xl overflow-hidden flex flex-col group">
-            {/* Image section with LinkedIn button */}
-            <div className="relative w-full aspect-[2/1]">
-                <a
-                    href={alumni.linkedIn ?? undefined}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block w-full h-full"
-                    onClick={!alumni.linkedIn ? (e) => e.preventDefault() : undefined}
-                >
-                    <img
-                        src={alumni.image ?? fallbackUrl}
-                        alt={alumni.first_name + " " + alumni.last_name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                            e.currentTarget.onerror = null; // Prevent infinite loop
-                            e.currentTarget.src = fallbackUrl;
-                        }}
-                    />
-                </a>
-
+        <div className="flex flex-col items-center gap-4 mx-auto w-[280px]">
+            {/* Centered Portrait Rectangle */}
+            <div className="w-full aspect-[3/4] max-h-[373px] relative shadow-lg hover:shadow-xl transition-shadow overflow-hidden">
+                <img
+                    src={alumni.image ?? fallbackUrl}
+                    alt={`${alumni.first_name} ${alumni.last_name}`}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = fallbackUrl;
+                    }}
+                />
+                
+                {/* LinkedIn Icon */}
                 {alumni.linkedIn && (
-                    <a
-                        href={alumni.linkedIn}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="absolute bottom-2 right-2 w-7 h-7 rounded-full flex items-center justify-center 
- bg-white bg-opacity-70 group-hover:bg-blue-700 transition"
-                    >
-                        <BsLinkedin className="w-4 h-4 text-blue-800 group-hover:text-white" />
-                    </a>
+                    <div className="absolute bottom-4 right-4 bg-white p-2 rounded-full shadow-md hover:scale-110 transition-transform">
+                        <a 
+                            href={alumni.linkedIn} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-800 block"
+                        >
+                            <BsLinkedin size={24} />
+                        </a>
+                    </div>
                 )}
             </div>
 
-            {/* Name + Role */}
-            <div className="p-2 text-center">
-                <p className="text-[19px] font-semibold text-[#001f5b]">{alumni.first_name + " " + alumni.last_name}</p>
-                <p className="text-base font-bold text-[#001f5b] uppercase tracking-wide">
+            {/* Centered Text */}
+            <div className="text-center w-full px-2">
+                <p className="text-xl font-semi-bold font-helvetica text-[#001f5b] tracking-tight">
+                    {alumni.first_name} {alumni.last_name}
+                </p>
+                <p className="text-base font-bold font-helvetica text-[#001f5b] uppercase tracking-wider mt-1">
                     {alumni.position}
                 </p>
             </div>

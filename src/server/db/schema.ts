@@ -56,6 +56,9 @@ export const members = createTable(
     resume: varchar({ length: 2048 }), //url
     is_member: boolean().default(false),
     position: positionEnum("position").default("Member"),
+    square_customer_id: d.varchar({ length: 100 }),
+    phone_number: d.varchar({ length: 20 }),
+    major: d.varchar({ length: 100 }),
   })
 );
 
@@ -117,6 +120,18 @@ export const cart = createTable(
     unique().on(table.member_uuid, table.product_id),
     unique("cart_member_product_unique").on(table.member_uuid, table.created_at),
   ]
+);
+
+export const reset_codes = createTable(
+  "reset_codes",
+  (d) => ({
+    id: d.uuid().primaryKey().defaultRandom(),
+    email: d.varchar({ length: 100 }).notNull().unique(),
+    code: d.varchar({ length: 6 }).notNull(),
+    created_at: d.timestamp({ withTimezone: true }).defaultNow(),
+    expires_at: d.timestamp({ withTimezone: true }).notNull(),
+    used: d.boolean().default(false),
+  })
 );
 
 /*

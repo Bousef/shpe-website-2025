@@ -4,6 +4,8 @@ import { type Metadata } from "next";
 import { Geist } from "next/font/google";
 import FooterSection from "./_components/FooterSection";
 import { TRPCReactProvider } from "~/trpc/react";
+import { env } from "~/env";
+import Navbar from "./_components/NavBar";
 
 export const metadata: Metadata = {
   title: "SHPE UCF",
@@ -29,6 +31,10 @@ export default function RootLayout({
       */}
       <body className="flex min-h-screen flex-col">
         <TRPCReactProvider>
+
+          {/* always rendered at the top */}
+          <Navbar />
+
           {/*
             - flex-grow: takes up leftover space so footer is pushed down on short pages
           */}
@@ -36,6 +42,7 @@ export default function RootLayout({
 
           {/* always rendered at the bottom */}
           <FooterSection />
+          
         </TRPCReactProvider>
       </body>
     </html>

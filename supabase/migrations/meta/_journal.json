@@ -36,6 +36,27 @@
       "when": 1752023155893,
       "tag": "0004_glossy_shadowcat",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1752775209598,
+      "tag": "0005_married_blink",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1753213741059,
+      "tag": "0006_cheerful_starhawk",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1754504617067,
+      "tag": "0007_ambiguous_triathlon",
+      "breakpoints": true
     }
   ]
 }
