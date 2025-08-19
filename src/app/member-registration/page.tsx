@@ -12,6 +12,10 @@ import { useRef } from "react";
 import KnightConnectSection from "./KnightConnectSection";
 import NationalMemberFields from "./NationalMemberFields";
 import ResumeUploadFields from "./ResumeUploadFields";
+import { submitToJotform } from "~/lib/submitToJotform";
+import PaymentSection from "./PaymentSection";
+import Link from "../_components/Link";
+import { api } from "~/trpc/react";
 
 function ucfEmailValidator() {
   return z
@@ -21,6 +25,8 @@ function ucfEmailValidator() {
     });
 }
 
+const phoneRegex = new RegExp(/^\+[1-9]\d{1,14}$/);
+
 const generalSchema = z
   .object({
     memberStatus: z.enum(["new", "returning"]),
@@ -28,7 +34,7 @@ const generalSchema = z
     lastName: z.string().min(1, "Last name is required"),
     email: ucfEmailValidator(),
     confirmEmail: ucfEmailValidator(),
-    phoneNumber: z.string().min(10, "Phone number is required"),
+    phoneNumber: z.string().regex(phoneRegex, "Invalid phone number"),
     dateOfBirth: z.preprocess(
       (val) => {
         if (typeof val === "string") {
@@ -159,41 +165,45 @@ const nationalMemberSchema = z.object({
 export type NationalMemberSchema = z.infer<typeof nationalMemberSchema>;
 
 const resumeUploadSchema = z.object({
-  resume: z
-    .instanceof(File)
-    .check((ctx) => {
-      const file = ctx.value;
-      if (!file) {
-        return;
-      }
-      const namePattern = /^[a-zA-Z]+_[a-zA-Z]+_Resume\.(pdf|doc|docx)$/;
-      if (!namePattern.test(file.name)) {
-        ctx.issues.push({
-          code: "custom",
-          input: file,
-          message:
-            "File name must be in the format LastName_FirstName_Resume and have a valid extension (pdf, doc, docx)",
-        });
-      }
-      if (
-        ![
-          "application/pdf",
-          "application/msword",
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        ].includes(file.type)
-      ) {
-        ctx.issues.push({
-          code: "custom",
-          input: file,
-          message: "File must be a PDF, DOC, or DOCX",
-        });
-      }
-    })
-    .optional(),
+  resume: z.preprocess(
+    (val: File | FileList) => {
+      if ("name" in val && "size" in val && "type" in val) {
+        return val;
+      } else return undefined;
+    },
+    z
+      .file()
+      .mime([
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      ])
+      .optional()
+      .refine((file) => {
+        if (!file) {
+          return true;
+        }
+        const namePattern = /^[a-zA-Z]+_[a-zA-Z]+_Resume\.(pdf|doc|docx)$/;
+        return namePattern.test(file.name);
+      }, "Resume must be named in the format 'FirstName_LastName_Resume.pdf'"),
+  ),
 });
 export type ResumeUploadSchema = z.infer<typeof resumeUploadSchema>;
 
-const { useStepper, steps, utils } = defineStepper(
+export type SubmitSchema = z.infer<
+  typeof generalSchema &
+    typeof demographicSchema &
+    typeof educationSchema &
+    typeof experienceSchema &
+    typeof nationalMemberSchema &
+    typeof resumeUploadSchema &
+    typeof paymentSchema
+>;
+
+const paymentSchema = z.object({ paymentId: z.string("Payment is required") });
+export type PaymentSchema = z.infer<typeof paymentSchema>;
+
+const { useStepper } = defineStepper(
   { id: "general", title: "General", schema: generalSchema },
   { id: "demographic", title: "Demographic", schema: demographicSchema },
   { id: "education", title: "Education", schema: educationSchema },
@@ -209,6 +219,11 @@ const { useStepper, steps, utils } = defineStepper(
     title: "Resume Upload",
     schema: resumeUploadSchema,
   },
+  {
+    id: "payment",
+    title: "Payment",
+    schema: paymentSchema,
+  },
 );
 
 export default function MemberRegistrationPage() {
@@ -217,7 +232,36 @@ export default function MemberRegistrationPage() {
   const form = useForm({
     mode: "onTouched",
     resolver: zodResolver(stepper.current.schema),
+    defaultValues: {
+      phoneNumber: "",
+    },
   });
+  const { data: member } = api.user.getCurrentMember.useQuery();
+
+  async function submitTestData() {
+    form.setValue("firstName", "John");
+    form.setValue("lastName", "Doe");
+    form.setValue("email", "johndoe@ucf.edu");
+    form.setValue("confirmEmail", "johndoe@ucf.edu");
+    form.setValue("phoneNumber", "1234567890");
+    form.setValue("dateOfBirth", new Date("2000-01-01"));
+    form.setValue("discord", "johndoe#1234");
+    form.setValue("memberStatus", "new");
+    form.setValue("race", "White");
+    form.setValue("ucfId", 1234567);
+    form.setValue("academicYear", "Senior");
+    form.setValue("major", "Computer Science");
+    form.setValue("projectedGraduation", new Date().getFullYear() + 1);
+    form.setValue("studentStatus", "undergraduate");
+    form.setValue("gender", "male");
+    form.setValue("country", "USA");
+    form.setValue("legalStatus", "citizen");
+    form.setValue("ethnicity", "Non-Hispanic");
+    form.setValue("memberId", 1234567);
+    form.setValue("invoiceNumber", 1234567);
+
+    form.handleSubmit(async () => await submitToJotform(form.getValues()))();
+  }
 
   return (
     <>
@@ -241,27 +285,37 @@ export default function MemberRegistrationPage() {
           <p>
             Got questions or need a hand? Our team is here to help! Drop us an
             email at{" "}
-            <a href="mailto:secretary@shpeucf.com">secretary@shpeucf.com</a> or
-            swing by during our office hours. Stay updated on dates and times
+            <Link href="mailto:secretary@shpeucf.com">
+              secretary@shpeucf.com
+            </Link>{" "}
+            or swing by during our office hours. Stay updated on dates and times
             through our{" "}
-            <a href="https://www.instagram.com/shpeucf/">Instagram</a>,{" "}
-            <a href="https://discord.com/channels/768494873866665984/768654225575772172">
+            <Link href="https://www.instagram.com/shpeucf/">Instagram</Link>,{" "}
+            <Link href="https://discord.com/channels/768494873866665984/768654225575772172">
               Discord
-            </a>
+            </Link>
             , and{" "}
-            <a href="https://www.linkedin.com/company/shpe-ucf/posts/?feedView=all">
+            <Link href="https://www.linkedin.com/company/shpe-ucf/posts/?feedView=all">
               LinkedIn.
-            </a>
+            </Link>
           </p>
           <p>Welcome to SHPE UCF: En la Florida Central, ¡Juntos sin parar!</p>
         </div>
         <div ref={internshipPortalRef}></div>
+        <button onClick={submitTestData}>submit test data</button>
         <FormProvider {...form}>
           <form
             className="space-y-4"
-            onSubmit={form.handleSubmit(
-              stepper.isLast ? stepper.reset : stepper.next,
-            )}
+            onSubmit={form.handleSubmit(async () => {
+              if (stepper.isLast) {
+                await submitToJotform(form.getValues(), {
+                  memberId: member?.uuid,
+                  url: member?.resume,
+                });
+              } else {
+                stepper.next();
+              }
+            })}
           >
             {stepper.switch({
               general: () => <GeneralFields />,
@@ -271,6 +325,7 @@ export default function MemberRegistrationPage() {
               "knight-connect": () => <KnightConnectSection />,
               "national-member": () => <NationalMemberFields />,
               "resume-upload": () => <ResumeUploadFields />,
+              payment: () => <PaymentSection />,
             })}
             <div className="float-right flex items-center gap-2">
               <button

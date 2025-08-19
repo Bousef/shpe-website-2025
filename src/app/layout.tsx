@@ -5,7 +5,9 @@ import { Geist } from "next/font/google";
 import FooterSection from "./_components/FooterSection";
 import { TRPCReactProvider } from "~/trpc/react";
 import { env } from "~/env";
+import Script from "next/script";
 import Navbar from "./_components/NavBar";
+
 
 export const metadata: Metadata = {
   title: "SHPE UCF",
@@ -23,12 +25,55 @@ const geist = Geist({
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const warnings: string[] = [];
+
+  if (!env.SUPABASE_URL) {
+    warnings.push(
+      "Missing SUPABASE_URL! Server auth features will be disabled.",
+    );
+  }
+
+  if (!env.SUPABASE_ANON_KEY) {
+    warnings.push(
+      "Missing SUPABASE_ANON_KEY! Server auth features will be disabled.",
+    );
+  }
+
+  if (!env.NEXT_PUBLIC_SUPABASE_URL) {
+    warnings.push(
+      "Missing NEXT_PUBLIC_SUPABASE_URL! Client auth features will be disabled.",
+    );
+  }
+  if (!env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    warnings.push(
+      "Missing NEXT_PUBLIC_SUPABASE_ANON_KEY! Client auth features will be disabled.",
+    );
+  }
+
+  if (warnings.length > 0) {
+    console.warn(
+      "\x1b[33m Environment variable warnings:\n",
+      warnings.join("\n "),
+    );
+  }
+
+  console.warn("\x1b[0m");
+
   return (
     <html lang="en" className={`${geist.variable}`}>
+      {env.NODE_ENV === "production" ? (
+        <Script src="https://web.squarecdn.com/v1/square.js"></Script>
+      ) : (
+        <Script src="https://sandbox.web.squarecdn.com/v1/square.js"></Script>
+      )}
       {/* 
         - min-h-screen: at least viewport height 
         - flex flex-col: stack header/main/footer vertically 
       */}
+
+      <head>
+        <script src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
+      </head>
       <body className="flex min-h-screen flex-col">
         <TRPCReactProvider>
 
@@ -42,7 +87,6 @@ export default function RootLayout({
 
           {/* always rendered at the bottom */}
           <FooterSection />
-          
         </TRPCReactProvider>
       </body>
     </html>
