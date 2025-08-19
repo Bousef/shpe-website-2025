@@ -127,10 +127,14 @@ export default function ItemPage() {
   }));
 
   // 8. Handle images
+const placeholderImage = "/images/placeholderCatalog.jpg"; // Fallback image
 
-  const placeholderImage = "/images/placeholderCatalog.jpg"; // Fallback image
-  const allImages = imageData && imageData.length > 0 ? imageData : [placeholderImage];  //imageData && imageData.length > 0 ? imageData : [placeholderImage]
-  const firstImage = allImages[0];    //allImages[0] ?? ""
+// Use imageData if it's a non-empty array, otherwise leave it empty
+const allImages = Array.isArray(imageData) && imageData.length > 0 ? imageData : [];
+
+// Get the first real image (if it exists), otherwise empty string
+const firstImage = allImages[0] ?? "";
+
 
   // 9. Derived hooks & helpers (all unconditionally here)
   const stockBySize = useMemo(
@@ -306,7 +310,7 @@ export default function ItemPage() {
         <div className="mb-8 lg:mb-0 lg:w-2/3">
           <div className="relative w-full max-h-screen overflow-hidden">
             <NextImage
-              src={galleryImage && typeof galleryImage === 'string' && galleryImage.trim() !== "" ? galleryImage : "/assets/logo.svg"}
+              src={galleryImage}
               alt={itemData?.name || "Product image"}
               width={1200}              // Increased for better quality on larger screens
               height={900}              // Maintain 4:3 aspect ratio
