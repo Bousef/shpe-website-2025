@@ -26,6 +26,18 @@ const members: Member[] = [
       linkedin: "",
     },
   },
+    {
+    name: "Reyjay Collazo",
+    role: "Mobile",
+    pfp: "/dev-team/reyjay.jpg",
+    bio: {
+      major: "Computer Science",
+      industryFocus: "Full‐stack Development, Machine Learning",
+      biotext: ``,
+      hobbies: "Gym, Video games, Coding, Home Labbing & watching anime",
+      linkedin: "https://www.linkedin.com/in/reyjayc/",
+    },
+  },
   {
     name: "Gabriela Cardenas",
     role: "UI/UX Designer",
@@ -64,7 +76,7 @@ const members: Member[] = [
   },
   {
     name: "Santiago Aguilar",
-    role: "Mobile",
+    role: "Web",
     pfp: "/dev-team/santiago.jpg",
     bio: {
       major: "Computer Science",
