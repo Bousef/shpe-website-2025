@@ -32,8 +32,6 @@ export default function HeroSection() {
         <div className="flex justify-center">
           <a
             href="/signUp"
-            target="_blank"
-            rel="noopener noreferrer"
             className="inline-flex items-center justify-center
               bg-[#f2ac02] hover:bg-[#e0a200]
               text-black font-helvetica

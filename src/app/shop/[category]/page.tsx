@@ -194,7 +194,6 @@ export default function CategoryPage() {
  */
   return (
     <div className="min-h-screen bg-white">
-      <Navbar />
       <header className="flex justify-between items-center px-4 lg:px-48 mt-4">
         <Link href="/shop" className="text-blue-600 hover:underline">
           ← Back

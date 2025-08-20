@@ -5,9 +5,7 @@ import Navbar from "../_components/NavBar";
 import Link from "next/link";
 import Image from "next/image";
 import { api } from "~/trpc/react";
-// removed: skipToken, useEffect
-// if you need types from Square, import them from the pkg root instead of a node_modules path
-// import type { CatalogObject } from "square"; // example
+
 
 export default function ShopPage() {
   // 1) current member (for permission)

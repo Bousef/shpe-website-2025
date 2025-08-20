@@ -4,30 +4,30 @@ import { squareClient } from "~/lib/square/client";
 import type { CheckoutOptions, Currency, Order, PaymentLink, PrePopulatedData, QuickPay } from "node_modules/square/api";
 
 export const checkoutRouter = createTRPCRouter({
-        retrieveLocationSettings: publicProcedure
-            .input(
-                z.object({
-                    locationId: z.string(),
-                })
-            ).query(async ({ input }) => {
-                const response = await squareClient.checkout.retrieveLocationSettings({
-                    locationId: input.locationId
-                });
-    
-                // in case of an error, we accumulate all errors into one string and throw them
-                // this should probably be handled better...
-                if (response.errors && response.errors?.length > 0) {
-                    throw Error(response.errors.reduce((acc, val) => 
-                        acc + val.detail + "\n"
-                    , ""))
-                }
-    
-                if (response.locationSettings === undefined) {
-                    throw Error("retrieveLocationSettings returned an undefined locationSettings. This should not happen.");
-                }
+    retrieveLocationSettings: publicProcedure
+        .input(
+            z.object({
+                locationId: z.string(),
+            })
+        ).query(async ({ input }) => {
+            const response = await squareClient.checkout.retrieveLocationSettings({
+                locationId: input.locationId
+            });
 
-                return response.locationSettings;
-            }),
+            // in case of an error, we accumulate all errors into one string and throw them
+            // this should probably be handled better...
+            if (response.errors && response.errors?.length > 0) {
+                throw Error(response.errors.reduce((acc, val) => 
+                    acc + val.detail + "\n"
+                , ""))
+            }
+
+            if (response.locationSettings === undefined) {
+                throw Error("retrieveLocationSettings returned an undefined locationSettings. This should not happen.");
+            }
+
+            return response.locationSettings;
+        }),
 
         updateLocationSettings: publicProcedure
             .input(
@@ -83,23 +83,23 @@ export const checkoutRouter = createTRPCRouter({
                     throw Error("retrieveLocationSettings returned an undefined locationSettings. This should not happen.");
                 }
 
-                return response.locationSettings;
-            }),
+            return response.locationSettings;
+        }),
 
-        retrieveMerchantSettings: publicProcedure.query(async () => {
-                const response = await squareClient.checkout.retrieveMerchantSettings();
-    
-                // in case of an error, we accumulate all errors into one string and throw them
-                // this should probably be handled better...
-                if (response.errors && response.errors?.length > 0) {
-                    throw Error(response.errors.reduce((acc, val) => 
-                        acc + val.detail + "\n"
-                    , ""))
-                }
-    
-                if (response.merchantSettings === undefined) {
-                    throw Error("retrieveMerchantSettings returned an undefined merchantSettings. This should not happen.");
-                }
+    retrieveMerchantSettings: publicProcedure.query(async () => {
+            const response = await squareClient.checkout.retrieveMerchantSettings();
+
+            // in case of an error, we accumulate all errors into one string and throw them
+            // this should probably be handled better...
+            if (response.errors && response.errors?.length > 0) {
+                throw Error(response.errors.reduce((acc, val) => 
+                    acc + val.detail + "\n"
+                , ""))
+            }
+
+            if (response.merchantSettings === undefined) {
+                throw Error("retrieveMerchantSettings returned an undefined merchantSettings. This should not happen.");
+            }
 
                 return response.merchantSettings;
             }),
@@ -164,135 +164,135 @@ export const checkoutRouter = createTRPCRouter({
                     throw Error("retrieveMerchantSettings returned an undefined merchantSettings. This should not happen.");
                 }
 
-                return response.merchantSettings;
-            }),
+            return response.merchantSettings;
+        }),
 
-        listPaymentLinks: publicProcedure
-            .input(
-                z.object({
-                    cursor: z.string().optional(),
-                    limit: z.number().max(100).default(100).optional(),
-                })
-            ).query(async ({ input }) => {
-                const response = await squareClient.checkout.paymentLinks.list({
-                    cursor: input.cursor,
-                    limit: input.limit,
-                });
+    listPaymentLinks: publicProcedure
+        .input(
+            z.object({
+                cursor: z.string().optional(),
+                limit: z.number().max(100).default(100).optional(),
+            })
+        ).query(async ({ input }) => {
+            const response = await squareClient.checkout.paymentLinks.list({
+                cursor: input.cursor,
+                limit: input.limit,
+            });
 
-                return response;
-            }),
+            return response;
+        }),
 
-        createPaymentLinks: publicProcedure
-            .input(
-                z.object({
-                    idempotencyKey: z.string().max(192).optional(),
-                    description: z.string().max(4096).optional(),
-                    quickPay: z.custom<QuickPay>().optional(),
-                    order: z.custom<Order>().optional(),
-                    checkoutOptions: z.custom<CheckoutOptions>().optional(),
-                    prePopulatedData: z.custom<PrePopulatedData>().optional(),
-                    paymentNote: z.string().max(500).optional(),
-                })
-            ).mutation(async ({ input }) => {
-                const response = await squareClient.checkout.paymentLinks.create({
-                    idempotencyKey: input.idempotencyKey,
-                    description: input.description,
-                    quickPay: input.quickPay,
-                    order: input.order,
-                    checkoutOptions: input.checkoutOptions,
-                    prePopulatedData: input.prePopulatedData,
-                    paymentNote: input.paymentNote,
-                });
+    createPaymentLinks: publicProcedure
+        .input(
+            z.object({
+                idempotencyKey: z.string().max(192).optional(),
+                description: z.string().max(4096).optional(),
+                quickPay: z.custom<QuickPay>().optional(),
+                order: z.custom<Order>().optional(),
+                checkoutOptions: z.custom<CheckoutOptions>().optional(),
+                prePopulatedData: z.custom<PrePopulatedData>().optional(),
+                paymentNote: z.string().max(500).optional(),
+            })
+        ).mutation(async ({ input }) => {
+            const response = await squareClient.checkout.paymentLinks.create({
+                idempotencyKey: input.idempotencyKey,
+                description: input.description,
+                quickPay: input.quickPay,
+                order: input.order,
+                checkoutOptions: input.checkoutOptions,
+                prePopulatedData: input.prePopulatedData,
+                paymentNote: input.paymentNote,
+            });
 
-                // in case of an error, we accumulate all errors into one string and throw them
-                // this should probably be handled better...
-                if (response.errors && response.errors?.length > 0) {
-                    throw Error(response.errors.reduce((acc, val) => 
-                        acc + val.detail + "\n"
-                    , ""))
-                }
-    
-                if (response.paymentLink === undefined) {
-                    throw Error("createPaymentLinks returned an undefined paymentLink. This should not happen.");
-                }
+            // in case of an error, we accumulate all errors into one string and throw them
+            // this should probably be handled better...
+            if (response.errors && response.errors?.length > 0) {
+                throw Error(response.errors.reduce((acc, val) => 
+                    acc + val.detail + "\n"
+                , ""))
+            }
 
-                return response.paymentLink;
-            }),
+            if (response.paymentLink === undefined) {
+                throw Error("createPaymentLinks returned an undefined paymentLink. This should not happen.");
+            }
 
-        deletePaymentLinks: publicProcedure
-            .input(
-                z.object({
-                    id: z.string(),
-                })
-            ).mutation(async ({ input }) => {
-                const response = await squareClient.checkout.paymentLinks.delete({
-                    id: input.id,
-                });
+            return response.paymentLink;
+        }),
 
-                // in case of an error, we accumulate all errors into one string and throw them
-                // this should probably be handled better...
-                if (response.errors && response.errors?.length > 0) {
-                    throw Error(response.errors.reduce((acc, val) => 
-                        acc + val.detail + "\n"
-                    , ""))
-                }
-    
-                if (response.cancelledOrderId === undefined) {
-                    throw Error("deletePaymentLinks returned an undefined cancelledOrderId. This should not happen.");
-                }
+    deletePaymentLinks: publicProcedure
+        .input(
+            z.object({
+                id: z.string(),
+            })
+        ).mutation(async ({ input }) => {
+            const response = await squareClient.checkout.paymentLinks.delete({
+                id: input.id,
+            });
 
-                return response.cancelledOrderId;
-            }),
+            // in case of an error, we accumulate all errors into one string and throw them
+            // this should probably be handled better...
+            if (response.errors && response.errors?.length > 0) {
+                throw Error(response.errors.reduce((acc, val) => 
+                    acc + val.detail + "\n"
+                , ""))
+            }
 
-        retrievePaymentLinks: publicProcedure
-            .input(
-                z.object({
-                    id: z.string(),
-                })
-            ).query(async ({ input }) => {
-                const response = await squareClient.checkout.paymentLinks.get({
-                    id: input.id
-                });
+            if (response.cancelledOrderId === undefined) {
+                throw Error("deletePaymentLinks returned an undefined cancelledOrderId. This should not happen.");
+            }
 
-                // in case of an error, we accumulate all errors into one string and throw them
-                // this should probably be handled better...
-                if (response.errors && response.errors?.length > 0) {
-                    throw Error(response.errors.reduce((acc, val) => 
-                        acc + val.detail + "\n"
-                    , ""))
-                }
+            return response.cancelledOrderId;
+        }),
 
-                if (response.paymentLink === undefined) {
-                    throw Error("retrievePaymentLinks returned an undefined paymentLink. This should not happen.");
-                }
+    retrievePaymentLinks: publicProcedure
+        .input(
+            z.object({
+                id: z.string(),
+            })
+        ).query(async ({ input }) => {
+            const response = await squareClient.checkout.paymentLinks.get({
+                id: input.id
+            });
 
-                return response.paymentLink;
-            }),
+            // in case of an error, we accumulate all errors into one string and throw them
+            // this should probably be handled better...
+            if (response.errors && response.errors?.length > 0) {
+                throw Error(response.errors.reduce((acc, val) => 
+                    acc + val.detail + "\n"
+                , ""))
+            }
 
-        updatePaymentLinks: publicProcedure
-            .input(
-                z.object({
-                    id: z.string(),
-                    paymentLink: z.custom<PaymentLink>(),
-                })
-            ).mutation(async ({ input }) => {
-                const response = await squareClient.checkout.paymentLinks.update({
-                    id: input.id,
-                    paymentLink: input.paymentLink,
-                });
+            if (response.paymentLink === undefined) {
+                throw Error("retrievePaymentLinks returned an undefined paymentLink. This should not happen.");
+            }
 
-                // in case of an error, we accumulate all errors into one string and throw them
-                // this should probably be handled better...
-                if (response.errors && response.errors?.length > 0) {
-                    throw Error(response.errors.reduce((acc, val) => 
-                        acc + val.detail + "\n"
-                    , ""))
-                }
+            return response.paymentLink;
+        }),
 
-                if (response.paymentLink === undefined) {
-                    throw Error("retrievePaymentLinks returned an undefined paymentLink. This should not happen.");
-                }
+    updatePaymentLinks: publicProcedure
+        .input(
+            z.object({
+                id: z.string(),
+                paymentLink: z.custom<PaymentLink>(),
+            })
+        ).mutation(async ({ input }) => {
+            const response = await squareClient.checkout.paymentLinks.update({
+                id: input.id,
+                paymentLink: input.paymentLink,
+            });
 
-                return response.paymentLink;
-            }),
+            // in case of an error, we accumulate all errors into one string and throw them
+            // this should probably be handled better...
+            if (response.errors && response.errors?.length > 0) {
+                throw Error(response.errors.reduce((acc, val) => 
+                    acc + val.detail + "\n"
+                , ""))
+            }
+
+            if (response.paymentLink === undefined) {
+                throw Error("retrievePaymentLinks returned an undefined paymentLink. This should not happen.");
+            }
+
+            return response.paymentLink;
+        }),
 });

@@ -1,10 +1,10 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
+// import { revalidatePath } from 'next/cache'
+// import { redirect } from 'next/navigation'
 import { createClient } from '~/server/auth/server'
 
-export async function login(prevState: unknown, formData: FormData): Promise<{error: string, formData?: {email?: string}}> {
+export async function login(prevState: unknown, formData: FormData): Promise<{error?: string; session?: any; formData?: {email?: string}}> {
   const supabase = await createClient();
 
   if (!supabase) {
@@ -23,7 +23,7 @@ export async function login(prevState: unknown, formData: FormData): Promise<{er
     password: formData.get('password') as string,
   };
 
-  const { error } = await supabase.auth.signInWithPassword(data);
+  const { data: authData, error } = await supabase.auth.signInWithPassword(data);
 
   if (error) {
     console.error('Login error:', error);
@@ -34,7 +34,10 @@ export async function login(prevState: unknown, formData: FormData): Promise<{er
       }
     };
   }
-
-  revalidatePath('/', 'layout');
-  redirect('/');
+  
+  // revalidatePath('/', 'layout');
+  // redirect('/?refetchUser=1');
+  return{
+    session: authData.session,
+  };
 }

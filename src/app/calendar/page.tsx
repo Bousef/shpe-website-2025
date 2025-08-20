@@ -1,18 +1,26 @@
+
+import { env } from "~/env";
+import Calendar from "../_components/Calendar";
 import Navbar from "../_components/NavBar";
+import moment from "moment";
 
-export default function Calendar() {
+export default async function CalendarPage() {
+  const lastMonth = moment().subtract(1, "month").toISOString();
+  const response = await fetch(
+    `https://www.googleapis.com/calendar/v3/calendars/shpe.ucf.chapter@gmail.com/events?key=${env.GOOGLE_API_KEY}&timeMin=${lastMonth}`,
+  );
+  const data = await response.json();
+  const events = data.items.map((event: any) => ({
+    title: event.summary,
+    start: new Date(event.start.dateTime || event.start.date),
+    end: new Date(event.end.dateTime || event.end.date),
+  }));
 
-    return (
-        <div>
-            <Navbar />
-            <div className = "flex flex-col items-center">
-                <iframe
-                    id="calendar"
-                    title="SHPE Calendar"
-                    src="https://calendar.google.com/calendar/embed?src=shpe.ucf.chapter%40gmail.com&ctz=America/New_York"
-                    className="pt-10 w-[85vw] lg:w-[75vw] h-[45vh] lg:h-[80vh]"
-                />
-            </div>
-        </div>
-    );
+  return (
+    <div>
+      <div className="mx-5 bg-slate-200 p-24">
+        <Calendar events={events} />
+      </div>
+    </div>
+  );
 }

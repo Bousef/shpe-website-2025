@@ -13,6 +13,7 @@ import {
 import type { BatchGetCatalogObjectsRequest, CreateImagesRequest, DeleteObjectRequest, GetObjectRequest, ListCatalogRequest, UpdateImagesRequest, UpsertCatalogObjectRequest } from "node_modules/square/api/resources/catalog";
 
 export const catalogRouter = createTRPCRouter({
+
     batchDeleteCatalogObjects: publicProcedure
         .input(
             z.custom<BatchDeleteCatalogObjectsRequest>(),
@@ -454,6 +455,7 @@ export const catalogRouter = createTRPCRouter({
                 relatedObjects: response.relatedObjects,
             };
         }),
+
 
     //-- This endpoint is used to search for catalog items.
     searchCatalogItems: publicProcedure

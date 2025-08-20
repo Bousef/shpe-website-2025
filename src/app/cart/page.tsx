@@ -1,4 +1,3 @@
-import Navbar from "../_components/NavBar";
 import { api } from "~/trpc/server";
 import CartItemsContainer from "./_components/CartItemsContainer";
 import { redirect } from "next/navigation";

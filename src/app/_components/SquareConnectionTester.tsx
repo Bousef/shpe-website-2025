@@ -1,3 +1,4 @@
+
 /* Testing Purposes Only! Delete Later :P */
 
 "use client";
@@ -51,6 +52,14 @@ export default function SquareConnectionTester() {
               <div key={item.id}>
                 <p><strong>Name:</strong> {"itemData" in item && item.itemData?.name}</p>
                 <p><strong>ID:</strong> {item.id}</p>
+
+                {item.itemData?.variations?.map((variation) => (
+                  <div key={variation.id} className="ml-4 mt-2 border-l pl-3">
+                    <p><strong>Variation Name:</strong> {variation.itemVariationData?.name}</p>
+                    <p><strong>Variation ID:</strong> {variation.id}</p>
+                  </div>
+                ))}
+                
               </div>
             ))}
         </div>
@@ -58,3 +67,4 @@ export default function SquareConnectionTester() {
     </div>
   );
 }
+
