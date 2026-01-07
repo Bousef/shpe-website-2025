@@ -3,6 +3,21 @@ import "tailwindcss";
 const logos = [
   "bloomberg",
   "blueorigin",
+  "adobe",
+  "nasa",
+  "accen",
+  "bny_mellon",
+  "boa",
+  "disney",
+  "intel",
+  "micron",
+  "microsoft",
+  "nasa",
+  "northrop",
+  "nvidia",
+  "qorvo",
+  "tesla",
+  "verizon"
 ];
 
 export default function PartnersSection() {
@@ -13,15 +28,15 @@ export default function PartnersSection() {
           THANK YOU TO OUR SPONSORS!
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 place-items-center mt-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 place-items-center mt-8">
           {logos.map((l) => (
             <div
               key={l}
-              className="w-200 h-96 flex items-center justify-center">
+              className="flex items-center justify-center w-80 h-80 p-4">
               <img
-                src={`assets/${l}.svg`}
+                src={`assets/sponsors/${l}.svg`}
                 alt={l}
-                className="max-h-32 w-auto"
+                className="w-full h-full object-contain"
               />
             </div>
           ))}
