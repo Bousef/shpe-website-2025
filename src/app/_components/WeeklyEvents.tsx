@@ -60,6 +60,7 @@ useEffect(() => {
             key={name}
             href={imgSrc}
             target="_blank"
+            rel="noopener noreferrer"
             className="flex-none w-72 lg:w-80 2xl:w-96 bg-[#EFB70E] rounded-3xl shadow-lg"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}

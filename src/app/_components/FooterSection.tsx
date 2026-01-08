@@ -4,7 +4,7 @@ import { PiYoutubeLogoLight, PiInstagramLogoLight, PiTiktokLogoThin } from "reac
 
 export default function FooterSection() {
   return (
-    <footer className="relative flex flex-col items-center justify-center bg-[url(/assets/homebg.png)] h-[15rem] w-full bg-cover mt-6">
+    <footer className="relative flex flex-col items-center justify-center  h-[15rem] w-full mt-6">
       <div className="absolute inset-0 bg-gradient-to-b from-white via-white/40 to-transparent backdrop-blur-[5px] pointer-events-none"></div>
 
       {/* Hollow social icons */}

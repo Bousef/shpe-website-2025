@@ -32,7 +32,7 @@ The Society of Hispanic Professional Engineers (SHPE) at UCF is dedicated to emp
 
 1. Clone the repository
 ```bash
-git clone https://github.com/shpe-ucf/website-2025.git
+git clone https://github.com/jaysprogram/shpe-website-2025
 cd shpe-website-2025
 ```
 

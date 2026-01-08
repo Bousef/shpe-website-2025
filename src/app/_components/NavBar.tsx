@@ -6,19 +6,18 @@ import Link from "next/link";
 import { VscAccount } from "react-icons/vsc";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
 import { api } from "~/trpc/react";
-import router from "next/router";
+import { useRouter } from "next/navigation";
 
 const navItems = [
   { href: "/board", label: "Board" },
   { href: "/dev-team", label: "Dev team" },
-  // {/*{ href: "/alumni", label: "Alumni" },*/} 
   { href: "/sponsors", label: "Sponsors" },
   { href: "/calendar", label: "Calendar" },
-  // {/*{ href: "/shop", label: "Shop", external: true },*/}
 ];
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const router = useRouter();
 
   // Fetch current member; null if not signed in
   const { data: member, isLoading } = api.user.getCurrentMember.useQuery();
@@ -56,28 +55,7 @@ export default function Navbar() {
     {/* Desktop Nav */}
 
     <div className="hidden md:flex justify-between items-center w-full text-sm lg:text-xl mt-4 md:mt-0 px-6 font-extralight">
-      {navItems.map(({ href, label }) =>
-        external ? (
-          <motion.a
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1 }}
-            whileHover="hover"
-            key={href}
-            href={href}
-            className="px-3 py-1 text-[#001f5b] hover:text-[#001133] rounded-3xl relative inline-block"
-          >
-            {label.toUpperCase()}
-            <motion.div 
-              className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#001f5b]" 
-              initial={{ scaleX: 0 }}
-              variants={{
-                hover: { scaleX: 0.8 }
-              }}
-              transition={{ duration: 0.3 }}
-            />
-          </motion.a>
-        ) : (
+      {navItems.map(({ href, label }) => (
           <motion.div
             key={href}
             className="px-3 py-1 relative inline-block"
@@ -134,16 +112,7 @@ export default function Navbar() {
   {/* Mobile Nav */}
   {mobileOpen && (
     <div className="md:hidden mt-4 space-y-3 flex flex-col items-start text-lg sm:text-xl">
-      {navItems.map(({ href, label }) =>
-        external ? (
-          <a
-            key={href}
-            href={href}
-            className="block w-full px-4 py-2 text-[#001f5b] hover:text-[#001133] hover:scale-105 transition-transform duration-150 bg-white/90 rounded-xl"
-          >
-            {label}
-          </a>
-        ) : (
+      {navItems.map(({ href, label }) => (
           <Link
             key={href}
             href={href}
