@@ -20,7 +20,7 @@ export default function HomePage() {
 
         <AboutSection />
 
-        <WeeklyEvents />
+        {/* <WeeklyEvents /> */}
   
       </div>
     </>

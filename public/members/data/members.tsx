@@ -62,30 +62,6 @@ export const remainingMembers: Member[] = [
     picture: "justin.jpeg"
   },
   {
-    name: "Denice Garcia",
-    role: "Outreach Chair",
-    major: "Computer Science",
-    future_ind: "Technology/Robotics",
-    bio: "Hello! My name is Denice Garcia, I am a third-year computer science major with a minor in intelligent robotics systems. I love taking on challenges and solving puzzles, which is what sparked my interest in computer science. I am a proud Mexican and a first-generation college student, and I hope to extend my passion for STEM to those around me. I am looking forward to collaborating with and learning from you all! Fun Fact: I love making niche pop culture references!",
-    hobbies: "visiting museums, ballet, watching video essays, pilates!",
-    country: "",
-    linkedin: "linkedin.com/in/denice-garcia",
-    email: "denice.garcia1230@gmail.com",
-    picture: "denice.jpg"
-  },
-  {
-    name: "Catalina Ocampo",
-    role: "Technology Co-Chair",
-    major: "Computer Science",
-    future_ind: "Software Engineering/Cloud Development",
-    bio: "Hola! My name is Catalina, a fourth-year Computer Science major. I was raised in South Florida, and I’m proudly Colombia. A fun fact about me: I’ve traveled to about nine countries in the past year! I’m excited to support aspiring developers in pursuing their dreams!",
-    hobbies: "Running, Soccer, Board Games, Cooking, Reading, Playing Nintendo Switch, Creating Random Websites for Events I Host",
-    country: "",
-    linkedin: "https://www.linkedin.com/in/catalinaocampo03/",
-    email: "",
-    picture: "cata.png"
-  },
-  {
     name: "Gabriela A. Cárdenas Sánchez",
     role: "Socials Co-Chair",
     major: "Industrial Engineering",
@@ -98,27 +74,27 @@ export const remainingMembers: Member[] = [
     picture: "gaby.jpeg"
   },
   {
-    name: "Vilanys Rivera Caceres",
+    name: "Salma Petrov",
     role: "SHPEtinas Chair",
-    major: "Mechanical Engineering",
-    future_ind: "Manufacturing, Space, Energy",
-    bio: "Hellooo! My name is Vilanys and I’m from Puerto Rico 🇵🇷 I’m a junior majoring in Mechanical Engineering, and I’m currently working at GE Vernova as a Steam Turbine Engineering Intern. I’m so excited for an amazing year ahead as your SHPEtinas Chair :)",
-    hobbies: "Concerts, Video Games, Going out to eat",
-    country: "Puerto Rico",
-    linkedin: "https://www.linkedin.com/in/vilanys-rivera-caceres-8b4000291?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app",
-    email: "vilanysc@gmail.com",
-    picture: "vila.jpg"
-  },
-  {
-    name: "Yousef Osman",
-    role: "Technology Co-Chair",
-    major: "Information Technology",
-    future_ind: "Full Stack Developer",
-    bio: "Hi! My name is Yousef and I am a junior Information Technology major! I'm Egyptian and Puerto Rican Currently in an internship at Lockheed Martin working as a software engineer, I look forward to working with all of you guys!",
-    hobbies: "Kickboxing, Gaming, Traveling, Finding Cool Food Places",
-    country: "",
-    linkedin: "https://www.linkedin.com/in/youosman/",
+    major: "Computer Science",
+    future_ind: "Software Engineer or Game Development",
+    bio: "Hey!! I'm Salma, this year's SHPEtinas Chair! I'm very dedicated to making engineering feel like an open road for anyone interested in their respective fields. I love talking to new people so please don't hesitate to come up to me to chat! I love to play video games, draw, sing, and listening to all kinds of music. I'm so looking forward to uplifting our girlies in engineering and so excited to see what this year for SHPE will bring! Much love 🫶",
+    hobbies: "Watching Youtube gameplays, listening to music, drawing, singing, and playing video games",
+    country: "Cuba",
+    linkedin: "https://www.linkedin.com/in/salma-petrov",
     email: "",
-    picture: "yousef.png"
+    picture: "salma.jpg"
+  },
+    {
+    name: "Reyjay Collazo",
+    role: "Tech Chair",
+    major: "Computer Science",
+    future_ind: "Software Engineering, Robotics or Firmware",
+    bio: "I suck at making bios",
+    hobbies: "Listening to music, salsa, gym, playing video games and watching anime",
+    country: "Puerto Rico",
+    linkedin: "https://www.linkedin.com/in/reyjayc/",
+    email: "",
+    picture: "reyjay.jpeg"
   }
 ];

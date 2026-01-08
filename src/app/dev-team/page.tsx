@@ -9,21 +9,6 @@ import { DevBioPopup } from "./_components/DevBioPopup";
 
 const members: Member[] = [
   {
-    name: "Yousef Osman",
-    role: "Tech Chair",
-    picture: "yousef.png",
-    hobbies:
-      "Sports, Modeling, F1, Sewing, Amusement parks, Music, Traveling, Concerts, trying new things, etc.",
-    linkedin: "",
-  },
-  {
-    name: "Catalina Ocampo",
-    role: "Tech Chair",
-    picture: "cata.png",
-    hobbies: "Painting, Photography, Board games, Hiking.",
-    linkedin: "",
-  },
-  {
     name: "Gabriela Cardenas",
     role: "UI/UX Designer",
     picture: "gaby.jpeg",
@@ -46,7 +31,7 @@ const members: Member[] = [
   },
   {
     name: "Santiago Aguilar",
-    role: "Mobile Developer",
+    role: "Web Developer",
     picture: "santiago.jpg",
     hobbies: "Video games, gym, Volleyball, Tennis",
     linkedin: "http://www.linkedin.com/in/santiago-aguilar-b2a99b169",
@@ -115,6 +100,13 @@ const members: Member[] = [
     hobbies:
       "Doodling/drawing, games, watching cdramas, kdramas, horror movies, etc. Trying to learn how to crochet right now :)",
     linkedin: "https://linkedin.com/in/anna-zheng000",
+  },
+    {
+    name: "Reyjay Collazo",
+    role: "Tech Chair",
+    picture: "reyjay.jpeg",
+    hobbies: "Listening to music, salsa, gym, playing video games and watching anime",
+    linkedin: "https://www.linkedin.com/in/reyjayc/",
   },
 ];
 
