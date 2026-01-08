@@ -21,7 +21,7 @@ const members: Member[] = [
     bio: {
       major: "Computer Science",
       industryFocus: "Full‐stack Development, UI/UX Design",
-      biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
+      biotext: ``,
       hobbies: "Painting, Photography, Board games, Hiking.",
       linkedin: "",
     },
@@ -33,7 +33,7 @@ const members: Member[] = [
     bio: {
       major: "Computer Science",
       industryFocus: "Full‐stack Development, UI/UX Design",
-      biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
+      biotext: ``,
       hobbies: "Painting, Photography, Board games, Hiking.",
       linkedin: "",
     },
@@ -45,7 +45,7 @@ const members: Member[] = [
     bio: {
       major: "Computer Science",
       industryFocus: "Full‐stack Development, UI/UX Design",
-      biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
+      biotext: ``,
       hobbies: "Reading, junk journaling, watching movies",
       linkedin: "https://www.linkedin.com/in/nicole-esp",
     },
@@ -57,7 +57,7 @@ const members: Member[] = [
     bio: {
       major: "Computer Science",
       industryFocus: "Full‐stack Development, UI/UX Design",
-      biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
+      biotext: ``,
       hobbies: "Visiting museums, ballet, watching video essays, pilates",
       linkedin: "http://linkedin.com/in/denice-garcia",
     },
@@ -69,7 +69,7 @@ const members: Member[] = [
     bio: {
       major: "Computer Science",
       industryFocus: "Full‐stack Development, UI/UX Design",
-      biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
+      biotext: ``,
       hobbies: "Video games, gym, Vollyball, Tennis",
       linkedin: "http://www.linkedin.com/in/santiago-aguilar-b2a99b169",
     },
@@ -81,7 +81,7 @@ const members: Member[] = [
     bio: {
       major: "Digital Media",
       industryFocus: "Full‐stack Development, UI/UX Design",
-      biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
+      biotext: ``,
       hobbies: "Drawing, reading, playing open-world video games",
       linkedin: "https://www.linkedin.com/in/camille-alarcon-fernandez",
     },
@@ -93,7 +93,7 @@ const members: Member[] = [
     bio: {
       major: "Computer Science",
       industryFocus: "Full‐stack Development, UI/UX Design",
-      biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
+      biotext: ``,
       hobbies: "Playing Soccer and learning about Cyber Security",
       linkedin: "https://www.linkedin.com/in/sebastianchacon1/",
     },
@@ -105,7 +105,7 @@ const members: Member[] = [
     bio: {
       major: "Computer Science",
       industryFocus: "Full‐stack Development, UI/UX Design",
-      biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
+      biotext: ``,
       hobbies: "Programming Language Design, Systems Programming",
       linkedin: "https://www.linkedin.com/in/luciano-paredes-701300191/",
     },
@@ -117,7 +117,7 @@ const members: Member[] = [
     bio: {
       major: "Computer Science",
       industryFocus: "Full‐stack Development, UI/UX Design",
-      biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
+      biotext: ``,
       hobbies: "I like playing video games and playing video games",
       linkedin: "https://www.linkedin.com/in/fernando-ailon/",
     },
@@ -141,7 +141,7 @@ const members: Member[] = [
     bio: {
       major: "Computer Science",
       industryFocus: "Full‐stack Development, UI/UX Design",
-      biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
+      biotext: ``,
       hobbies: "Painting, Photography, Board games, Hiking.",
       linkedin: "https://www.linkedin.com/in/mary-bauta-a76753292/",
     },
@@ -153,7 +153,7 @@ const members: Member[] = [
     bio: {
       major: "Computer Science",
       industryFocus: "Full‐stack Development, UI/UX Design",
-      biotext: `Hi, I'm Cata. I love building elegant UIs, prototyping in Figma, and learning new JS frameworks. Fun fact: I also paint in watercolor on the weekends.`,
+      biotext: ``,
       hobbies: "Doodling/drawing, games, watching cdramas, kdramas, horror movies, etc. Trying to learn how to crochet right now :)",
       linkedin: "https://linkedin.com/in/anna-zheng000",
     },
@@ -173,7 +173,7 @@ export default function DevSection() {
 
         {/* header */}
         <div className="container mx-auto px-4 text-center mb-12 text-black">
-          <h2 className="text-blue-800 text-5xl text-[var(--shpe-orange)]">GET TO KNOW OUR TEAM</h2>
+          <h2 className="text-blue-800 text-5xl font-bold">GET TO KNOW OUR TEAM</h2>
         </div>
 
         {/* grid for the tech chairs profile cards */}
