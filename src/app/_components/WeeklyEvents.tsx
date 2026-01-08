@@ -1,4 +1,5 @@
 "use client";
+import { motion } from "motion/react";
 import { supabaseMobile } from "../../supabase-client";
 import { useEffect, useState } from "react";
 
@@ -43,22 +44,29 @@ useEffect(() => {
       {/* Header */}
       {/* Section Header */}
       <div className="text-center mb-12 px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-helvetica text-blue-800">
-          CATCH US THIS WEEK
+        <h2 className="text-3xl sm:text-4xl lg:text-6xl font-helvetica text-blue-800 font-bold">
+          CATCH OUR WEEKLY EVENTS
         </h2>
+        <p className="mt-8 text-base sm:text-lg lg:text-xl text-[#001f5b]/70 mx-auto font-helvetica ">
+          Every activity we have going on this week, all in one place.
+        </p>
 
       </div>
 
-
       {/* Horizontal Scrollable Slider */}
-      <div className="flex justify-center overflow-x-auto space-x-6 px-2 scrollbar-thin scrollbar-thumb-blue-700 scrollbar-track-blue-100 snap-x snap-mandatory">
+      <div className="flex overflow-x-auto overflow-y-hidden space-x-6 px-4 lg:px-8 scrollbar-thin scrollbar-thumb-blue-700 scrollbar-track-blue-100 snap-x snap-mandatory"> 
         {events.map(({ name, imgSrc }) => (
-          <a
+          <motion.a
             key={name}
             href={imgSrc}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-none snap-start w-72 lg:w-80 2xl:w-96 bg-[#EFB70E] rounded-md shadow-lg transform transition-transform duration-300 hover:scale-105"
+            className="flex-none w-72 lg:w-80 2xl:w-96 bg-[#EFB70E] rounded-3xl shadow-lg"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+            whileHover={{ scale: 0.95 }}
+
           >
             <div className="aspect-square flex items-center justify-center rounded-md overflow-hidden">
               <img
@@ -72,7 +80,7 @@ useEffect(() => {
                 {name.toUpperCase()}
               </h3>
             </div>
-          </a>
+          </motion.a>
         ))}
       </div>
     </section>
