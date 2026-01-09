@@ -24,16 +24,16 @@ useEffect(() => {
       return;
     }
 
-    const events = (data ?? []).map((event) => ({
+    const events = (data ?? []).map((event: { name: string; description: string; image_url: string | null }) => ({
       name: event.name,
       description: event.description,
-      imgSrc: event.image_url?.split(";")[0] || "/placeholder.jpg",
+      imgSrc: event.image_url?.split(";")[0] ?? "/placeholder.jpg",
     }));
 
     setEvents(events);
   }
 
-  loadEvents();
+  void loadEvents();
 }, []);
 
   return (

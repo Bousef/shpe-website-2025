@@ -1,9 +1,9 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation"
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, Suspense } from "react"
 
-export default function ResetPassword() {
+function ResetPasswordContent() {
     const router = useRouter()
     const searchParams = useSearchParams();
 
@@ -23,7 +23,10 @@ export default function ResetPassword() {
     // 	}
     // }, [email, token])
 
-    const handleSubmit = async (e: React.FormEvent) => {}
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        // TODO: Implement password reset logic
+    }
 
     return (
         <section className="flex flex-col items-center justify-center pb-[6rem] py-[2rem] px-4 min-w-[280px]">
@@ -67,5 +70,13 @@ export default function ResetPassword() {
                 </button>
             </form>
         </section>
+    )
+}
+
+export default function ResetPassword() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <ResetPasswordContent />
+        </Suspense>
     )
 }
