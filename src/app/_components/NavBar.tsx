@@ -55,7 +55,7 @@ export default function Navbar() {
 
     {/* Desktop Nav */}
 
-    <div className="hidden md:flex justify-between items-center w-full text-sm lg:text-xl mt-4 md:mt-0 px-6 font-extralight">
+    <div className="hidden md:flex justify-between items-center w-full text-sm lg:text-xl mt-4 md:mt-0 px-6 font-helvetica font-bold">
       {navItems.map(({ href, label }) =>
         external ? (
           <motion.a
