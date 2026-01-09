@@ -47,7 +47,7 @@ export default function HeroMask({
                             fontFamily="Impact, Helvetica, Arial, sans-serif"
                             fontSize="258"
                             letterSpacing="-0.02em"
-                            transform="translate(600, 220) scale(1.38, 1.78) translate(-603, -210)"
+                            transform="translate(600, 220) scale(1.29, 1.78) translate(-603, -210)"
                         >
                             {text}
                         </text>
