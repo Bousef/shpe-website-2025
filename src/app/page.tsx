@@ -17,8 +17,11 @@ export default function HomePage() {
         <Navbar />
         <HeroMask />
         <HeroSection />   
+
         <AboutSection />
-        <WeeklyEvents />
+
+        {/* <WeeklyEvents /> */}
+  
       </div>
     </>
   );

@@ -24,16 +24,16 @@ useEffect(() => {
       return;
     }
 
-    const events = (data ?? []).map((event) => ({
+    const events = (data ?? []).map((event: { name: string; description: string; image_url: string | null }) => ({
       name: event.name,
       description: event.description,
-      imgSrc: event.image_url?.split(";")[0] || "/placeholder.jpg",
+      imgSrc: event.image_url?.split(";")[0] ?? "/placeholder.jpg",
     }));
 
     setEvents(events);
   }
 
-  loadEvents();
+  void loadEvents();
 }, []);
 
   return (
@@ -60,6 +60,7 @@ useEffect(() => {
             key={name}
             href={imgSrc}
             target="_blank"
+            rel="noopener noreferrer"
             className="flex-none w-72 lg:w-80 2xl:w-96 bg-[#EFB70E] rounded-3xl shadow-lg"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}

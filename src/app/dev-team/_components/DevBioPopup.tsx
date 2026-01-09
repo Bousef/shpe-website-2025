@@ -1,17 +1,5 @@
 import {BsLinkedin} from "react-icons/bs"
-
-export type Member = {
-	name: string;
-	role: string;
-	pfp: string;
-	bio : {
-		major: string;
-		industryFocus: string;
-		biotext: string;
-		hobbies: string;
-		linkedin: string;
-	};
-};
+import type { Member } from "../../_components/MemberCard";
 
 type BioPopupsProps = {
 	member: Member;
@@ -35,7 +23,7 @@ export function DevBioPopup ({ member, onClose }: BioPopupsProps) {
 					{/* profile image */}
 					<div className="w-full md:w-1/3 h-60 overflow-hidden flex-shrink-0">
 						<img
-							src={member.pfp}
+							src={`/members/${member.picture}`}
 							alt={member.name}
 							className="w-full h-full object-cover rounded-sm"
 						/>
@@ -47,25 +35,26 @@ export function DevBioPopup ({ member, onClose }: BioPopupsProps) {
 						<p className="text-lg font-semibold uppercase text-blue-900">{member.role}</p>
 
 						<div className="space-y-2 text-md text-gray-700">
-							<p>
-								<span className="font-semibold">Major:</span> {member.bio.major}
-							</p>
-							<p>
-								<span className="font-semibold">Hobbies:</span> {member.bio.hobbies}
-							</p>
+							{member.hobbies && (
+								<p>
+									<span className="font-semibold">Hobbies:</span> {member.hobbies}
+								</p>
+							)}
 						</div>
 
 						{/* contact icons row (email, LinkedIn, etc.) */}
-						<div className="flex flex-row gap-5 mt-2 bottom-3 right-3 absolute items-center">
-							<a
-                href={member.bio.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className=" bg-[#0077b5] rounded flex items-center justify-center hover:opacity-90 transition-opacity"
-              >
-								<BsLinkedin className="w-10 h-10 text-white" />
-							</a>
-						</div>
+						{member.linkedin && (
+							<div className="flex flex-row gap-5 mt-2 bottom-3 right-3 absolute items-center">
+								<a
+									href={member.linkedin}
+									target="_blank"
+									rel="noopener noreferrer"
+									className=" bg-[#0077b5] rounded flex items-center justify-center hover:opacity-90 transition-opacity"
+								>
+									<BsLinkedin className="w-10 h-10 text-white" />
+								</a>
+							</div>
+						)}
 					</div>
 				</div>
 				
