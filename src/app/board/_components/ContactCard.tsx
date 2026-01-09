@@ -1,6 +1,6 @@
 import Flag from "react-world-flags";
 import iso from "iso-3166-1";
-import { BsEnvelope, BsLinkedin } from "react-icons/bs";
+import { BsLinkedin } from "react-icons/bs";
 import { type Member } from "../../_components/MemberCard";
 import Image from "next/image";
 
@@ -79,7 +79,7 @@ export default function ContactCard({ member, onClose }: ContactCardProps) {
           >
             <Flag
               className="h-10"
-              code={iso.whereCountry(member.country ?? "")?.alpha3 || ""}
+              code={iso.whereCountry(member.country ?? "")?.alpha3 ?? ""}
             />
             <a
               href={member.linkedin}

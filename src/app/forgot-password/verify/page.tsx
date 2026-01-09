@@ -1,8 +1,8 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation"
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, Suspense } from "react"
 
-export default function CodeVerification() {
+function CodeVerificationContent() {
     const router = useRouter()
     const searchParams = useSearchParams();
 
@@ -20,7 +20,10 @@ export default function CodeVerification() {
     // 	}
     // }, [email, router])
 
-    const handleSubmit = async (e: React.FormEvent) => {}
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        // TODO: Implement verification logic
+    }
 
     return (
         <section className="flex flex-col items-center justify-center pb-[6rem] py-[2rem] px-4 min-w-[280px]">
@@ -61,5 +64,13 @@ export default function CodeVerification() {
         </div>
             </form>
         </section>
+    )
+}
+
+export default function CodeVerification() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <CodeVerificationContent />
+        </Suspense>
     )
 }

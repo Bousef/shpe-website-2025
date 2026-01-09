@@ -9,7 +9,8 @@ export default function ForgotPassword() {
 	const [loading, setLoading] = useState(false)
 	
 	const handleSubmit = async (e: React.FormEvent) => {
-
+		e.preventDefault();
+		// TODO: Implement password reset logic
 	}
 
 	return (

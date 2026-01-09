@@ -51,10 +51,11 @@ export default function Shop() {
 
       // pick first image per category
       const map: Record<string, string> = {};
-      (data ?? []).forEach(({ category, image }) => {
+      (data ?? []).forEach((row: { category: string; image: string }) => {
+        const { category, image } = row;
         if (!map[category]) {
           // image is already a semicolon-delimited list of URLs
-          const firstUrl = image.split(";")[0] || "";
+          const firstUrl = image?.split(";")[0] ?? "";
           map[category] = firstUrl;
         }
       });
@@ -66,7 +67,7 @@ export default function Shop() {
       setCategories(list);
     }
 
-    loadCategories();
+    void loadCategories();
   }, []);
 
 

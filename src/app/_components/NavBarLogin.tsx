@@ -15,7 +15,7 @@ const navItems = [
   { href: "/calendar", label: "Calendar" },
 ];
 
-export default function Navbar() {
+export default function NavbarLogin() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const router = useRouter();
 
