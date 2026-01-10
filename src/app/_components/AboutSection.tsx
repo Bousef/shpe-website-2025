@@ -49,7 +49,7 @@ export default function AboutSection() {
       <h2 className="text-3xl sm:text-4xl lg:text-6xl font-helvetica text-blue-800 font-bold">
         ABOUT US  
         </h2>
-        <p className="mt-8 text-base sm:text-lg lg:text-xl text-[#001f5b]/70 mx-auto font-helvetica ">
+        <p className="mt-8 text-base sm:text-lg lg:text-xl text-[#001f5b]/70 mx-auto font-helvetica">
           We bring professionalism, culture, and a Hispanic touch! Learn more about SHPE UCF's core values and what drives our mission.
         </p>
       </div>

@@ -1,12 +1,8 @@
 "use client";
-
-import HeroMask from "../_components/HeroMask";
+import HistorySection from "../_components/HistorySection";
 
 export default function TestRoutePage() {
     return (
-    
-    <HeroMask/>
+        <HistorySection />
     );
 }
-
-  
