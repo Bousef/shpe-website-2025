@@ -62,14 +62,35 @@ export default function HeroMask({
                     </mask>
                 </defs>
 
-                {/* Background image with mask applied */}
-                <image
-                    href="/assets/homebg.png" // Path to your background image
-                    width="100%"
-                    height="100%"
-                    preserveAspectRatio="xMidYMid slice"
-                    mask="url(#hero-mask)"
-                />
+                {/* Background video with mask applied */}
+                <foreignObject x="0" y="0" width="1200" height="600" mask="url(#hero-mask)">
+                    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+                        <video
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        >   
+                            <source src="/assets/shpevideo.mp4" type="video/mp4" />
+                        </video>
+                        <img
+                            src="/assets/homebg.png"
+                            alt=""
+                            style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                opacity: 0.8,
+                                pointerEvents: 'none',
+                            }}
+                        />
+                    </div>
+                </foreignObject>
+                
 
                 {/* White gradient overlay on top - fades the bottom to white */}
                 <rect
