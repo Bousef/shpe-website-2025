@@ -56,6 +56,7 @@ export default function HeroMask2() {
     const isTablet = windowSize.width >= 768 && windowSize.width < 1024;
     
     return (
+        
         <motion.div
             ref={containerRef}
             className="relative w-full min-h-[100vh] overflow-hidden bg-gradient-to-br from-blue-700 via-white to-orange-500 flex items-center justify-center"
@@ -66,6 +67,21 @@ export default function HeroMask2() {
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}
         >
+            <motion.div
+                className="absolute top-0 left-0 w-full h-24 bg-gradient-to-t from-transparent z-10 to-white"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1 }}
+            />
+            <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="absolute inset-0 w-full h-full object-cover z-0 opacity-20"
+            >
+                <source src="/assets/shpevideo.mp4" type="video/mp4" />
+            </video>
             {/* Animated gradient orbs */}
             <motion.div
                 className="absolute w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full blur-[100px]"
@@ -106,25 +122,25 @@ export default function HeroMask2() {
             
             {/* Floating geometric shapes */}
             <motion.div
-                className="absolute top-[15%] left-[10%] w-16 h-16 md:w-24 md:h-24 border border-orange-500/30 rounded-lg"
+                className="absolute top-[15%] left-[10%] w-16 h-16 md:w-24 md:h-24 border border-orange-500/50 rounded-lg"
                 style={{ x: floatX1, y: floatY1 }}
                 animate={{ rotate: 360 }}
                 transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
             />
             <motion.div
-                className="absolute bottom-[20%] right-[15%] w-20 h-20 md:w-32 md:h-32 border border-blue-500/20 rounded-full"
+                className="absolute bottom-[20%] right-[15%] w-20 h-20 md:w-32 md:h-32 border border-blue-500/50 rounded-full"
                 style={{ x: floatX2, y: floatY2 }}
                 animate={{ rotate: -360 }}
                 transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
             />
             <motion.div
-                className="absolute top-[60%] left-[5%] w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-orange-500/10 to-transparent rounded-lg rotate-45"
+                className="absolute top-[60%] left-[5%] w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-orange-500/30 to-transparent rounded-lg rotate-45"
                 style={{ x: floatX2, y: floatY1 }}
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ duration: 4, repeat: Infinity }}
             />
             <motion.div
-                className="absolute top-[25%] right-[8%] w-8 h-8 md:w-12 md:h-12 bg-orange-500/20 rounded-full"
+                className="absolute top-[25%] right-[8%] w-8 h-8 md:w-12 md:h-12 bg-orange-500/30 rounded-full"
                 style={{ x: floatX1, y: floatY2 }}
                 animate={{ y: [-10, 10, -10] }}
                 transition={{ duration: 3, repeat: Infinity }}
@@ -132,7 +148,7 @@ export default function HeroMask2() {
             
             {/* Main content container with 3D effect */}
             <motion.div
-                className="relative z-10 text-center px-4"
+                className="relative z-20 text-center px-4"
                 style={{
                     rotateX: isMobile ? 0 : rotateX,
                     rotateY: isMobile ? 0 : rotateY,
@@ -151,7 +167,7 @@ export default function HeroMask2() {
                 
                 {/* Main SHPEUCF text with gradient and glow */}
                 <motion.div
-                    className="relative"
+                    className="relative z-20"
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.5, duration: 0.8, type: "spring" }}
@@ -166,7 +182,7 @@ export default function HeroMask2() {
                     
                     {/* Main text */}
                     <motion.h1 
-                        className="relative text-[7rem] sm:text-[9rem] md:text-[11rem] lg:text-[13rem] xl:text-[15rem] tracking-tight bg-gradient-to-r from-orange-800 via-orange-700 to-yellow-600 bg-clip-text text-transparent cursor-default"
+                        className="relative text-[7rem] sm:text-[9rem] md:text-[11rem] lg:text-[13rem] xl:text-[15rem] tracking-tight bg-gradient-to-r from-orange-400 via-orange-700 to-blue-800 bg-clip-text text-transparent cursor-default"
                         whileHover={{ scale: 1.02 }}
                         transition={{ type: "spring", stiffness: 300 }}
                         style={{
@@ -178,7 +194,7 @@ export default function HeroMask2() {
                     
                     {/* Animated underline */}
                     <motion.div
-                        className="absolute -bottom-2 left-1/2 h-1 md:h-1.5 bg-gradient-to-r from-transparent via-orange-500 to-transparent rounded-full"
+                        className="absolute -bottom-2 left-1/2 h-1 md:h-1.5 bg-gradient-to-r from-transparent via-orange-400 to-transparent rounded-full z-10"
                         initial={{ width: 0, x: "-50%" }}
                         animate={{ width: isHovered ? "80%" : "40%", x: "-50%" }}
                         transition={{ duration: 0.5 }}
@@ -187,7 +203,7 @@ export default function HeroMask2() {
                 
                 {/* Subtitle */}
                 <motion.p
-                    className="mt-6 md:mt-8 text-black/50 text-base md:text-xl lg:text-2xl font-light max-w-2xl mx-auto"
+                    className="mt-6 md:mt-8 text-black/50 text-base md:text-xl lg:text-2xl font-light max-w-2xl mx-auto z-10"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.7, duration: 0.8 }}
@@ -256,13 +272,17 @@ export default function HeroMask2() {
             </motion.div>*/}
             {/* Gradient fade at bottom */}
             <motion.div
-                className="absolute bottom-0 left-0 w-full h-36 z-0 bg-gradient-to-t from-white to-transparent">
+                className="absolute bottom-0 left-0 w-full h-36 z-10 bg-gradient-to-t from-white to-transparent"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1 }}
+            >
 
             </motion.div>
             
             {/* Corner accents */}
-            <div className="absolute top-0 left-0 w-32 h-32 md:w-48 md:h-48 rounded-tl-3xl" />
-            <div className="absolute bottom-0 right-0 w-32 h-32 md:w-48 md:h-48 rounded-br-3xl" />
+            <div className="absolute top-0 left-0 w-32 h-32 md:w-48 md:h-48 rounded-tl-3xl z-10" />
+            <div className="absolute bottom-0 right-0 w-32 h-32 md:w-48 md:h-48 rounded-br-3xl z-10" />
         </motion.div>
     );
 }

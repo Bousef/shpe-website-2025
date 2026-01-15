@@ -505,7 +505,7 @@ export default function HeroMask({
                                         fontFamily="Impact, Helvetica, Arial, sans-serif"
                                         fontSize={xlFontSize}
                                         letterSpacing="-0.02em"
-                                        transform="translate(800, 280) scale(1.1, 1.2) translate(-800, -240)"
+                                        transform="translate(800, 280) scale(1.2, 1.3) translate(-800, -240)"
                                     >
                                         {text}
                                     </text>
