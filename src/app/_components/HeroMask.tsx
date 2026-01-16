@@ -19,8 +19,6 @@ export default function HeroMask({
     const [isXXL, setIsXXL] = useState(false);
     const [isXL, setIsXL] = useState(false);
     const [isMedium, setIsMedium] = useState(false);
-    const [isSmall, setIsSmall] = useState(false);
-    const [isXS, setIsXS] = useState(false);
     const [isLoaded, setIsLoaded] = useState(false);
     const [windowWidth, setWindowWidth] = useState(1200);
     const [windowHeight, setWindowHeight] = useState(800);
@@ -30,8 +28,6 @@ export default function HeroMask({
             setIsXXL(window.innerWidth > 2560);
             setIsXL(window.innerWidth > 1600 && window.innerWidth <= 2560);
             setIsMedium(window.innerWidth <= 1024 && window.innerWidth > 768);
-            setIsSmall(window.innerWidth <= 768 && window.innerWidth > 400);
-            setIsXS(window.innerWidth <= 400);
             setWindowWidth(window.innerWidth);
             setWindowHeight(window.innerHeight);
         };
@@ -44,11 +40,6 @@ export default function HeroMask({
         window.addEventListener('resize', checkScreenSize);
         return () => window.removeEventListener('resize', checkScreenSize);
     }, []);
-
-    // Responsive calculations
-    const smallFontSize = Math.max(60, Math.min(100, windowWidth * 0.18));
-    const smallTaglineSize = Math.max(10, Math.min(16, windowWidth * 0.025));
-    const smallSubtitleSize = Math.max(12, Math.min(20, windowWidth * 0.035));
     
     const mediumFontSize = Math.max(150, Math.min(300, windowWidth * 0.22));
     const mediumTaglineSize = Math.max(18, Math.min(28, windowWidth * 0.025));
@@ -67,18 +58,13 @@ export default function HeroMask({
     const xxlFontSize = Math.max(380, Math.min(600, windowWidth * 0.15));
     const xxlTaglineSize = Math.max(32, Math.min(48, windowWidth * 0.014));
     const xxlSubtitleSize = Math.max(40, Math.min(60, windowWidth * 0.018));
-    
-    // XS screens (<= 400px) - Very small phones
-    const xsFontSize = Math.max(45, Math.min(70, windowWidth * 0.16));
-    const xsTaglineSize = Math.max(8, Math.min(12, windowWidth * 0.025));
-    const xsSubtitleSize = Math.max(10, Math.min(14, windowWidth * 0.03));
 
     // Don't render until we know the screen size to prevent flash
     if (!isLoaded) {
         return <div className="w-full h-[300px] sm:h-[400px] lg:h-[500px] bg-white" />;
     }
 
-    // XS/Extra Small version (<= 400px) - Very small phones
+    {/*// XS/Extra Small version (<= 400px) - Very small phones
     if (isXS) {
         return (
             <motion.div
@@ -90,7 +76,7 @@ export default function HeroMask({
             >
                 <div className="relative w-full">
                     <div className="relative w-full h-[30vh] min-h-[180px] overflow-hidden">
-                        {/* Video layer - bottom */}
+                        {/* Video layer - bottom
                         <video
                             autoPlay
                             loop
@@ -101,14 +87,14 @@ export default function HeroMask({
                             <source src="/assets/shpevideo.mp4" type="video/mp4" />
                         </video>
                         
-                        {/* Gradient overlay on video */}
+                        {/* Gradient overlay on video
                         <img
                             src="/assets/homebg.png"
                             alt=""
                             className="absolute inset-0 w-full h-full object-cover opacity-80 pointer-events-none"
                         />
                         
-                        {/* SVG white overlay with text and banner cutout mask */}
+                        {/* SVG white overlay with text and banner cutout mask
                         <svg
                             className="absolute inset-0 w-full h-full"
                             viewBox="0 0 400 300"
@@ -123,7 +109,7 @@ export default function HeroMask({
                                 </linearGradient>
                                 
                                 <mask id="xs-text-mask">
-                                    {/* White = visible, Black = transparent cutout */}
+                                    {/* White = visible, Black = transparent cutout
                                     <rect width="100%" height="100%" fill="white" />
                                     <text
                                         x="200"
@@ -138,7 +124,7 @@ export default function HeroMask({
                                     >
                                         {text}
                                     </text>
-                                    {/* Banner rectangle cutout */}
+                                    {/* Banner rectangle cutout
                                     <rect
                                         x="0"
                                         y="160"
@@ -149,7 +135,7 @@ export default function HeroMask({
                                 </mask>
                             </defs>
                             
-                            {/* White overlay with text and banner cutout */}
+                            {/* White overlay with text and banner cutout 
                             <rect 
                                 width="100%" 
                                 height="100%" 
@@ -157,7 +143,7 @@ export default function HeroMask({
                                 mask="url(#xs-text-mask)" 
                             />
                             
-                            {/* White gradient overlay - fades to white at bottom */}
+                            {/* White gradient overlay - fades to white at bottom
                             <rect
                                 x="0"
                                 y="0"
@@ -166,7 +152,7 @@ export default function HeroMask({
                                 fill="url(#xs-white-fade-overlay)"
                             />
                             
-                            {/* Tagline text inside banner */}
+                            {/* Tagline text inside banner
                             <text
                                 x="200"
                                 y="210"
@@ -180,7 +166,7 @@ export default function HeroMask({
                             >
                                 {tagline}
                             </text>
-                            {/* Subtitle text inside banner */}
+                            {/* Subtitle text inside banner
                             <text
                                 x="200"
                                 y="230"
@@ -212,9 +198,9 @@ export default function HeroMask({
                 transition={{ duration: 0.6, type: "spring", stiffness: 50 }}
             >
                 <div className="relative w-full">
-                    {/* Video and text mask section */}
+                    {/* Video and text mask section
                     <div className="relative w-full h-[35vh] sm:h-[50vh] overflow-hidden">
-                        {/* Video layer - bottom */}
+                        {/* Video layer - bottom
                         <video
                             autoPlay
                             loop
@@ -225,14 +211,31 @@ export default function HeroMask({
                             <source src="/assets/shpevideo.mp4" type="video/mp4" />
                         </video>
                         
-                        {/* Gradient overlay on video */}
+                        {/* Gradient overlay on video
                         <img
                             src="/assets/homebg.png"
                             alt=""
                             className="absolute inset-0 w-full h-full object-cover opacity-80 pointer-events-none"
                         />
-                        
-                        {/* SVG white overlay with text and banner cutout mask - wider viewBox for mobile */}
+
+                        <p
+                        style={{
+                            position: 'absolute',
+                            fontFamily: 'Impact, Helvetica, Arial, sans-serif',
+                            fontSize: `${smallFontSize}px`,
+                            top: '20%',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            color: 'white',
+                            zIndex: 10,
+                        }}
+                        className='bg-clip-text text-transparent z-50'>
+                            SHPEUCF
+                        </p>
+                        <rect
+                        className="absolute w-full bottom-0 h-full bg-white pointer-events-none z-10">
+                        </rect>                        
+                        {/*{/* SVG white overlay with text and banner cutout mask - wider viewBox for mobile *
                         <svg
                             className="absolute inset-0 w-full h-full"
                             viewBox="0 0 600 400"
@@ -247,7 +250,7 @@ export default function HeroMask({
                                 </linearGradient>
                                 
                                 <mask id="small-text-mask">
-                                    {/* White = visible, Black = transparent cutout */}
+                                    {/* White = visible, Black = transparent cutout *
                                     <rect width="100%" height="100%" fill="white" />
                                     <text
                                         x="300"
@@ -262,7 +265,7 @@ export default function HeroMask({
                                     >
                                         {text}          
                                     </text>
-                                    {/* Banner rectangle cutout */}
+                                    {/* Banner rectangle cutout *
                                     <rect
                                         x="0"
                                         y="220"
@@ -273,7 +276,7 @@ export default function HeroMask({
                                 </mask>
                             </defs>
                             
-                            {/* White overlay with text and banner cutout */}
+                            {/* White overlay with text and banner cutout *
                             <rect 
                                 width="100%" 
                                 height="100%" 
@@ -281,7 +284,7 @@ export default function HeroMask({
                                 mask="url(#small-text-mask)" 
                             />
                             
-                            {/* White gradient overlay - fades to white at bottom */}
+                            {/* White gradient overlay - fades to white at bottom *
                             <rect
                                 x="0"
                                 y="0"
@@ -290,7 +293,7 @@ export default function HeroMask({
                                 fill="url(#small-white-fade-overlay)"
                             />
                             
-                            {/* Tagline text inside banner */}
+                            {/* Tagline text inside banner *
                             <text
                                 x="300"
                                 y="280"
@@ -304,7 +307,7 @@ export default function HeroMask({
                             >
                                 {tagline}
                             </text>
-                            {/* Subtitle text inside banner */}
+                            {/* Subtitle text inside banner *
                             <text
                                 x="300"
                                 y="300"
@@ -323,7 +326,7 @@ export default function HeroMask({
                 </div>
             </motion.div>
         );
-    }
+    }*/}
 
     // Medium/Tablet version (768px - 1024px)
     if (isMedium) {
@@ -337,7 +340,7 @@ export default function HeroMask({
             >
                 <div className="relative w-full">
                     {/* Video and text mask section */}
-                    <div className="relative w-full h-[50vh] overflow-hidden">
+                    <div className="relative w-full h-[70vh] overflow-hidden">
                         {/* Video layer - bottom */}
                         <video
                             autoPlay
@@ -382,7 +385,8 @@ export default function HeroMask({
                                         fontFamily="Impact, Helvetica, Arial, sans-serif"
                                         fontSize={mediumFontSize}
                                         letterSpacing="-0.02em"
-                                        transform="translate(600, 220) scale(1.4, 1.6) translate(-603, -210)"
+                                        // transform="translate(600, 220) scale(1.4, 1.6) translate(-603, -198)"
+                                        className="aspect-auto"
                                     >
                                         {text}          
                                     </text>
@@ -742,14 +746,15 @@ export default function HeroMask({
                                 <rect width="100%" height="100%" fill="white" />
                                 <text
                                     x="600"
-                                    y="220"
+                                    y="280"
                                     textAnchor="middle"
                                     dominantBaseline="middle"
                                     fill="black"
                                     fontFamily="Impact, Helvetica, Arial, sans-serif"
                                     fontSize={desktopFontSize}
                                     letterSpacing="-0.02em"
-                                    transform="translate(600, 220) scale(1.1, 1.2) translate(-603, -200)"
+                                    // transform="translate(600, 220) scale(1.4, 1.5) translate(-603, -197)"
+                                    className="fixed"
                                 >
                                     {text}
                                 </text>
