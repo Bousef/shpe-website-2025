@@ -11,7 +11,7 @@ const navItems = [
   { href: "/board", label: "Board" },
   { href: "/dev-team", label: "Dev team" },
   { href: "/alumni", label: "Alumni" },
-  { href: "/sponsors", label: "Sponsors" },
+  { href: "/sponsors", label: "Partners" },
   { href: "/calendar", label: "Calendar" },
   { href: "/shop", label: "Shop", external: true },
 ];
