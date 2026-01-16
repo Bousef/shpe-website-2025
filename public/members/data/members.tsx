@@ -34,8 +34,8 @@ export const remainingMembers: Member[] = [
     hobbies: "Salsa, soccer, track",
     country: "",
     linkedin: "https://www.linkedin.com/in/jc150",
-    email: "projects@shpeucf.com",
-    picture: ""
+    email: "jo180717@ucf.edu",
+    picture: "jonathan.jpg"
   },
   {
     name: "John Zuluaga",
