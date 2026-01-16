@@ -35,7 +35,7 @@ export const remainingMembers: Member[] = [
     country: "",
     linkedin: "https://www.linkedin.com/in/jc150",
     email: "jo180717@ucf.edu",
-    picture: ""
+    picture: "jonathan.jpg"
   },
   {
     name: "John Zuluaga",
