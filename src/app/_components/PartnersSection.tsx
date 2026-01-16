@@ -12,7 +12,6 @@ const logos = [
   "intel",
   "micron",
   "microsoft",
-  "nasa",
   "northrop",
   "nvidia",
   "qorvo",
