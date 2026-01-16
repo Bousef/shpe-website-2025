@@ -23,7 +23,7 @@ export const eBoardMembers: Member[] = [
     hobbies:
       "Going to the beach, traveling/exploring new places, playing board games, doing crafty activities",
     country: "",
-    linkedin: "www.linkedin.com/in/alejandra-camejo1",
+    linkedin: "https://www.linkedin.com/in/alejandra-camejo1",
     email: "internalvp@shpeucf.com",
     picture: "ale.jpeg",
   },
@@ -35,8 +35,8 @@ export const eBoardMembers: Member[] = [
     bio: "Hello! My name is Denice Garcia, I am a third-year computer science major with a minor in intelligent robotics systems. I love taking on challenges and solving puzzles, which is what sparked my interest in computer science. I am a proud Mexican and a first-generation college student, and I hope to extend my passion for STEM to those around me. I am looking forward to collaborating with and learning from you all! Fun Fact: I love making niche pop culture references!",
     hobbies: "visiting museums, ballet, watching video essays, pilates!",
     country: "",
-    linkedin: "linkedin.com/in/denice-garcia",
-    email: "denice.garcia1230@gmail.com",
+    linkedin: "https://www.linkedin.com/in/denice-garcia",
+    email: "externalvp@shpeucf.com",
     picture: "denice.jpg",
   },
   {
@@ -48,8 +48,8 @@ export const eBoardMembers: Member[] = [
     hobbies:
       "Traveling, annoying my friends :), finding the best spots on campus to study and vibing with A LOT of music",
     country: "Venezuela",
-    linkedin: "http://www.linkedin.com/in/gabriel-corderoarrieche",
-    email: "cordero.gabriel0905@gmail.com",
+    linkedin: "https://www.linkedin.com/in/gabriel-corderoarrieche",
+    email: "corporateaffairs@shpeucf.com",
     picture: "gabriel.jpeg",
   },
   {
@@ -61,7 +61,7 @@ export const eBoardMembers: Member[] = [
     hobbies: "Lifting, off roading, soccer, f1, ufc",
     country: "",
     linkedin: "Jayson Benitez",
-    email: "",
+    email: "marketing@shpeucf.com",
     picture: "jayson.jpeg",
   },
   {
@@ -72,8 +72,8 @@ export const eBoardMembers: Member[] = [
     bio: "I am currently a third-year studying Industrial Engineering at the University of Central Florida (UCF) and am a member of the UCF Burnett Honors College. Over this past summer, I interned in Assets and Operations on the Advisory and Digital Services team at Arup in Dublin, Ireland working on a variety of Intelligent Transportation Systems (ITS) projects. I previously served as your Dial U Career Development Director and on the SHPEtinas committee. I am incredibly excited to serve you all as your secretary and can’t wait to see all that we accomplish!",
     hobbies: "Playing soccer, listening to music, and singing in choir",
     country: "",
-    linkedin: "http://linkedin.com/in/helenacanova",
-    email: "helenacanovaa@gmail.com",
+    linkedin: "https://www.linkedin.com/in/helenacanova",
+    email: "secretary@shpeucf.com",
     picture: "helena.jpeg",
   },
   {
@@ -84,8 +84,8 @@ export const eBoardMembers: Member[] = [
     bio: "Hey! I’m Miguel, a Mechanical Engineering student with a minor in Computer Science, and I'm your SHPEUCF Treasurer. I’m passionate about aerospace, problem-solving, and helping make engineering more accessible and exciting for everyone. I’ve interned at Lockheed Martin Space and Glass Aero, and I’m always looking for ways to grow as both an engineer and a leader in the space industry. Outside of engineering, I can yap your ear off about Formula 1 (McLaren on top), football, or music, just ask!",
     hobbies: "Reading, Lifting, Basketball, Cooking",
     country: "",
-    linkedin: "www.linkedin.com/in/gonzmiguel",
-    email: "miguelgonz.eng@gmail.com",
+    linkedin: "https://www.linkedin.com/in/gonzmiguel",
+    email: "treasurer@shpeucf.com",
     picture: "miguel.jpeg",
   },
 ];

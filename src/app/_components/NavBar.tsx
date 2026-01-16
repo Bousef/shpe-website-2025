@@ -10,6 +10,7 @@ const navItems = [
   { href: "/dev-team", label: "Dev team" },
   { href: "/sponsors", label: "Sponsors" },
   { href: "/calendar", label: "Calendar" },
+  { href: "/history", label: "History" },
 ];
 
 export default function Navbar() {
