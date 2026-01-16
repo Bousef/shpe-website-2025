@@ -1,3 +1,6 @@
+"use client"
+import { motion } from "motion/react";
+
 // components/AboutSection.tsx
 const aboutCards = [
   {
@@ -43,47 +46,50 @@ export default function AboutSection() {
     <section id="about" className="w-full bg-white py-12">
       {/* Section Header */}
       <div className="text-center mb-12 px-4 sm:px-6 lg:px-8">
-      <h2 className="text-3xl sm:text-4xl lg:text-5xl font-helvetica text-blue-800">
-        ABOUT US
+      <h2 className="text-3xl sm:text-4xl lg:text-6xl font-helvetica text-blue-800 font-bold">
+        ABOUT US  
         </h2>
-        <p className="mt-4 text-base sm:text-lg lg:text-xl text-[#001f5b] mx-auto font-helvetica ">
-          WE BRING YOU THE BEST PROFESSIONAL DEVELOPMENT, ENGINEERING, AND SOCIAL EXPERIENCES WITH A HISPANIC TWIST.
+        <p className="mt-8 text-base sm:text-lg lg:text-xl text-[#001f5b]/70 mx-auto font-helvetica">
+          We bring professionalism, culture, and a Hispanic touch! Learn more about SHPE UCF's core values and what drives our mission.
         </p>
       </div>
 
       {/* Responsive Grid of Cards */}
       <div className="mx-auto max-w-6xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-6 px-4 sm:px-">
       {aboutCards.map(({ img, title, text, bgColor }) => (
-          <div
+          <motion.div
             key={title}
             className={`
               ${bgColor}
               flex flex-col items-center
               p-6 sm:p-8 lg:p-10
-              text-white
+              text-white rounded-3xl
               min-h-[20rem] sm:min-h-[22rem] lg:min-h-[25rem]
               shadow-lg
               transition-transform hover:scale-105
             `}
+            viewport={{ once: true, amount: 0.2 }}
+            whileInView={{ opacity: 1 }}
+            initial={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
           >
             {/* Icon */}
-<div className="mb-6">
-  <img
-    src={`/assets/${img}`}
-    alt={title}
-    className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 object-contain"
-  />
-</div>
+            <div className="mb-6">
+              <img
+                src={`/assets/${img}`}
+                alt={title}
+                className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 object-contain"
+              />
+            </div>
 
-<h3 className="font-bold text-2xl sm:text-2xl md:text-3xl lg:text-4xl mb-6 px-2 text-center">
-  {title}
-</h3>
+            <h3 className="font-bold text-2xl sm:text-2xl md:text-3xl lg:text-4xl mb-6 px-2 text-center">
+              {title}
+            </h3>
 
-<p className="text-sm sm:text-base md:text-lg lg:text-xl leading-snug text-center">
-  {text}
-</p>
-
-          </div>
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl leading-snug text-center">
+              {text}
+            </p>
+          </motion.div> 
         ))}
       </div>
     </section>

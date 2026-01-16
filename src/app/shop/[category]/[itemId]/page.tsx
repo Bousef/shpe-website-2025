@@ -63,39 +63,37 @@ useEffect(() => {
     setGalleryImage(rawUrls[0] || "");
   }
 
-  loadProduct();
+  void loadProduct();
 }, [itemId]);
 
 
   const showSizes = (category === "Clothes");
 
-  if (showSizes) {
-    useEffect(() => {
-      if (!product) return;
-      async function loadSizeStock() {
-        const { data, error } = await supabase
-          .from("shpe-website-2025_clothes_sizes")
-          .select(sizes.join(", "))
-          .eq("id", Number(itemId))
-          .single();
+  useEffect(() => {
+    if (!showSizes || !product) return;
+    async function loadSizeStock() {
+      const { data, error } = await supabase
+        .from("shpe-website-2025_clothes_sizes")
+        .select(sizes.join(", "))
+        .eq("id", Number(itemId))
+        .single();
 
-        if (error) {
-          setErrorMsg(error.message);
-          return;
-        }
-        const stockMap: Record<string, number> = {};
-        sizes.forEach((sz) => {
-          stockMap[sz] = (data as any)[sz] ?? 0;
-        });
-        setSizeStock(stockMap);
-        if ((stockMap[selectedSize] ?? 0) < 1) {
-          const avail = sizes.find((sz) => (stockMap[sz] ?? 0) > 0);
-          if (avail) setSelectedSize(avail);
-        }
+      if (error) {
+        setErrorMsg(error.message);
+        return;
       }
-      loadSizeStock();
-    }, [product, itemId]);
-  }
+      const stockMap: Record<string, number> = {};
+      sizes.forEach((sz) => {
+        stockMap[sz] = (data as any)[sz] ?? 0;
+      });
+      setSizeStock(stockMap);
+      if ((stockMap[selectedSize] ?? 0) < 1) {
+        const avail = sizes.find((sz) => (stockMap[sz] ?? 0) > 0);
+        if (avail) setSelectedSize(avail);
+      }
+    }
+    void loadSizeStock();
+  }, [product, itemId, showSizes, selectedSize, sizes]);
 
   if (errorMsg)
     return <p className="text-red-600 text-center mt-10">{errorMsg}</p>;
