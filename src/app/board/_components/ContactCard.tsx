@@ -1,6 +1,6 @@
 import Flag from "react-world-flags";
 import iso from "iso-3166-1";
-import { BsLinkedin } from "react-icons/bs";
+import { BsEnvelope, BsLinkedin } from "react-icons/bs";
 import { type Member } from "../../_components/MemberCard";
 import Image from "next/image";
 
@@ -76,16 +76,25 @@ export default function ContactCard({ member, onClose }: ContactCardProps) {
               flex gap-3 sm:gap-4 mt-3 items-center
               ${'lg:absolute lg:bottom-4 lg:right-4'}
             `}
+            onClick={(e) => e.stopPropagation()}
           >
             <Flag
               className="h-10"
               code={iso.whereCountry(member.country ?? "")?.alpha3 ?? ""}
             />
             <a
+              href={`mailto:${member.email}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block text-blue-600 underline cursor-pointer hover:text-blue-800"
+            >
+              <BsEnvelope className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10" />
+            </a>
+            <a
               href={member.linkedin}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block text-blue-600 underline"
+              className="inline-block text-blue-600 underline cursor-pointer hover:text-blue-800"
             >
               <BsLinkedin className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10" />
             </a>
