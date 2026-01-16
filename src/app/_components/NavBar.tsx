@@ -8,7 +8,7 @@ import { HiMenuAlt3, HiX } from "react-icons/hi";
 const navItems = [
   { href: "/board", label: "Board" },
   { href: "/dev-team", label: "Dev team" },
-  { href: "/sponsors", label: "Sponsors" },
+  { href: "/sponsors", label: "Partners" },
   { href: "/calendar", label: "Calendar" },
   { href: "/history", label: "History" },
 ];
