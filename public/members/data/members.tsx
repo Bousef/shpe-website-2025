@@ -10,7 +10,7 @@ export const remainingMembers: Member[] = [
     hobbies: "Eating and Sleeping",
     country: "",
     linkedin: "https://www.linkedin.com/me?trk=p_mwlite_feed-secondary_nav",
-    email: "jovanyjosephh@gmail.com",
+    email: "professionaldevelopment@shpeucf.com",
     picture: "jovany.jpg"
   },
   {
@@ -22,7 +22,7 @@ export const remainingMembers: Member[] = [
     hobbies: "Sports/ water sports( Jetskiing/ boating/ fishing)",
     country: "",
     linkedin: "https://www.linkedin.com/in/onely-maza-91761a267?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app",
-    email: "onelym84@gmail.com",
+    email: "social@shpeucf.com",
     picture: "onely.jpg"
   },
   {
@@ -34,7 +34,7 @@ export const remainingMembers: Member[] = [
     hobbies: "Salsa, soccer, track",
     country: "",
     linkedin: "https://www.linkedin.com/in/jc150",
-    email: "jo180717@ucf.edu",
+    email: "projects@shpeucf.com",
     picture: ""
   },
   {
@@ -45,8 +45,8 @@ export const remainingMembers: Member[] = [
     bio: "Hey! My name is John Zuluaga, and I’m from Cali, Colombia. I’m an Electrical Engineering student at UCF, and I currently work as an Intel Undergraduate Scholar Co-op in the UCF Cleanroom, operating advanced fabrication and testing equipment to support semiconductor processes. In addition, I contribute to research focused on developing wireless biosensor impedance systems in the Nano Biosensors and Systems Lab at UCF. I’m passionate about applying technical skills to real-world challenges and fostering innovation in engineering.",
     hobbies: "Gym, Soccer",
     country: "Colombia",
-    linkedin: "www.linkedin.com/in/john-s-z",
-    email: "",
+    linkedin: "https://www.linkedin.com/in/john-s-z",
+    email: "projects@shpeucf.com",
     picture: "john.jpg"
   },
   {
@@ -57,8 +57,8 @@ export const remainingMembers: Member[] = [
     bio: "What's up everyone! My name is Justin and I'm a Computer Science major (hopefully FinTech minor soon) with an interest in becoming a Software/Cyber Engineer in the Biomedical, FinTech, or Defense industries. As a hobby, I enjoy collecting records of my favorite albums and I am always looking for more music to listen to. I am excited to work with all of you as your MentorSHPE Chair and make this year great!",
     hobbies: "Collecting records, Hanging out with friends, Gaming",
     country: "",
-    linkedin: "www.linkedin.com/in/justinhoyos",
-    email: "",
+    linkedin: "https://www.linkedin.com/in/justinhoyos",
+    email: "mentorshpe@shpeucf.com",
     picture: "justin.jpeg"
   },
   {
@@ -69,8 +69,8 @@ export const remainingMembers: Member[] = [
     bio: "Hey! My name is Gabriela, I was born in Maracay, Venezuela, my grandparents where Colombian (Medellin) and Lebanese (Zgharta) immigrants in Venezuela. I'm majoring in Industrial Engineering and minoring in Business Administration. Fun fact about me: I do rappel since I was 2 years old. I also want to be an architect and a fashion designer living in Italy, that's why I'm learning my forth language (Italian)",
     hobbies: "Sports, Modeling, F1, Sewing, Amusement parks, Music, Traveling, Concerts, Try new things and adventures",
     country: "",
-    linkedin: "www.linkedin.com/in/g-cardenas",
-    email: "socials@shpeucf.com",
+    linkedin: "https://www.linkedin.com/in/g-cardenas",
+    email: "social@shpeucf.com",
     picture: "gaby.jpeg"
   },
   {
@@ -82,7 +82,7 @@ export const remainingMembers: Member[] = [
     hobbies: "Watching Youtube gameplays, listening to music, drawing, singing, and playing video games",
     country: "Cuba",
     linkedin: "https://www.linkedin.com/in/salma-petrov",
-    email: "",
+    email: "shpetinas@shpeucf.com",
     picture: "salma.jpg"
   },
     {
@@ -94,7 +94,7 @@ export const remainingMembers: Member[] = [
     hobbies: "Listening to music, salsa, gym, playing video games and watching anime",
     country: "Puerto Rico",
     linkedin: "https://www.linkedin.com/in/reyjayc/",
-    email: "",
+    email: "tech@shpeucf.com",
     picture: "reyjay.jpeg"
   }
 ];
