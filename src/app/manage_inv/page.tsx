@@ -8,10 +8,10 @@ import Navbar from "../_components/NavBar";
 
 export default function InventoryManagement() {
     const { data: products, isLoading, refetch } = api.product.getAll.useQuery();
-    const deleteProduct = api.product.delete.useMutation({ onSuccess: () => refetch() });
+    const deleteProduct = api.product.delete.useMutation({ onSuccess: () => { void refetch(); } });
     const createProduct = api.product.create.useMutation({
         onSuccess: () => {
-            refetch();
+            void refetch();
             setShowAdd(false);
         },
     });
@@ -99,9 +99,9 @@ export default function InventoryManagement() {
                                         {selectedProduct && (
                                             <AddProductForm
                                                 product={selectedProduct}
-                                                onAdd={(updatedProduct) => {
+                                                onAdd={(_updatedProduct) => {
                                                     setSelectedProduct(null);
-                                                    refetch();
+                                                    void refetch();
                                                 }}
                                                 onClose={() => setSelectedProduct(null)}
                                             />

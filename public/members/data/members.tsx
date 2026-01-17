@@ -10,7 +10,7 @@ export const remainingMembers: Member[] = [
     hobbies: "Eating and Sleeping",
     country: "",
     linkedin: "https://www.linkedin.com/me?trk=p_mwlite_feed-secondary_nav",
-    email: "jovanyjosephh@gmail.com",
+    email: "professionaldevelopment@shpeucf.com",
     picture: "jovany.jpg"
   },
   {
@@ -22,7 +22,7 @@ export const remainingMembers: Member[] = [
     hobbies: "Sports/ water sports( Jetskiing/ boating/ fishing)",
     country: "",
     linkedin: "https://www.linkedin.com/in/onely-maza-91761a267?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app",
-    email: "onelym84@gmail.com",
+    email: "social@shpeucf.com",
     picture: "onely.jpg"
   },
   {
@@ -35,7 +35,7 @@ export const remainingMembers: Member[] = [
     country: "",
     linkedin: "https://www.linkedin.com/in/jc150",
     email: "jo180717@ucf.edu",
-    picture: ""
+    picture: "jonathan.jpg"
   },
   {
     name: "John Zuluaga",
@@ -45,8 +45,8 @@ export const remainingMembers: Member[] = [
     bio: "Hey! My name is John Zuluaga, and I’m from Cali, Colombia. I’m an Electrical Engineering student at UCF, and I currently work as an Intel Undergraduate Scholar Co-op in the UCF Cleanroom, operating advanced fabrication and testing equipment to support semiconductor processes. In addition, I contribute to research focused on developing wireless biosensor impedance systems in the Nano Biosensors and Systems Lab at UCF. I’m passionate about applying technical skills to real-world challenges and fostering innovation in engineering.",
     hobbies: "Gym, Soccer",
     country: "Colombia",
-    linkedin: "www.linkedin.com/in/john-s-z",
-    email: "",
+    linkedin: "https://www.linkedin.com/in/john-s-z",
+    email: "projects@shpeucf.com",
     picture: "john.jpg"
   },
   {
@@ -57,33 +57,9 @@ export const remainingMembers: Member[] = [
     bio: "What's up everyone! My name is Justin and I'm a Computer Science major (hopefully FinTech minor soon) with an interest in becoming a Software/Cyber Engineer in the Biomedical, FinTech, or Defense industries. As a hobby, I enjoy collecting records of my favorite albums and I am always looking for more music to listen to. I am excited to work with all of you as your MentorSHPE Chair and make this year great!",
     hobbies: "Collecting records, Hanging out with friends, Gaming",
     country: "",
-    linkedin: "www.linkedin.com/in/justinhoyos",
-    email: "",
+    linkedin: "https://www.linkedin.com/in/justinhoyos",
+    email: "mentorshpe@shpeucf.com",
     picture: "justin.jpeg"
-  },
-  {
-    name: "Denice Garcia",
-    role: "Outreach Chair",
-    major: "Computer Science",
-    future_ind: "Technology/Robotics",
-    bio: "Hello! My name is Denice Garcia, I am a third-year computer science major with a minor in intelligent robotics systems. I love taking on challenges and solving puzzles, which is what sparked my interest in computer science. I am a proud Mexican and a first-generation college student, and I hope to extend my passion for STEM to those around me. I am looking forward to collaborating with and learning from you all! Fun Fact: I love making niche pop culture references!",
-    hobbies: "visiting museums, ballet, watching video essays, pilates!",
-    country: "",
-    linkedin: "linkedin.com/in/denice-garcia",
-    email: "denice.garcia1230@gmail.com",
-    picture: "denice.jpg"
-  },
-  {
-    name: "Catalina Ocampo",
-    role: "Technology Co-Chair",
-    major: "Computer Science",
-    future_ind: "Software Engineering/Cloud Development",
-    bio: "Hola! My name is Catalina, a fourth-year Computer Science major. I was raised in South Florida, and I’m proudly Colombia. A fun fact about me: I’ve traveled to about nine countries in the past year! I’m excited to support aspiring developers in pursuing their dreams!",
-    hobbies: "Running, Soccer, Board Games, Cooking, Reading, Playing Nintendo Switch, Creating Random Websites for Events I Host",
-    country: "",
-    linkedin: "https://www.linkedin.com/in/catalinaocampo03/",
-    email: "",
-    picture: "cata.png"
   },
   {
     name: "Gabriela A. Cárdenas Sánchez",
@@ -93,32 +69,32 @@ export const remainingMembers: Member[] = [
     bio: "Hey! My name is Gabriela, I was born in Maracay, Venezuela, my grandparents where Colombian (Medellin) and Lebanese (Zgharta) immigrants in Venezuela. I'm majoring in Industrial Engineering and minoring in Business Administration. Fun fact about me: I do rappel since I was 2 years old. I also want to be an architect and a fashion designer living in Italy, that's why I'm learning my forth language (Italian)",
     hobbies: "Sports, Modeling, F1, Sewing, Amusement parks, Music, Traveling, Concerts, Try new things and adventures",
     country: "",
-    linkedin: "www.linkedin.com/in/g-cardenas",
-    email: "socials@shpeucf.com",
+    linkedin: "https://www.linkedin.com/in/g-cardenas",
+    email: "social@shpeucf.com",
     picture: "gaby.jpeg"
   },
   {
-    name: "Vilanys Rivera Caceres",
+    name: "Salma Petrov",
     role: "SHPEtinas Chair",
-    major: "Mechanical Engineering",
-    future_ind: "Manufacturing, Space, Energy",
-    bio: "Hellooo! My name is Vilanys and I’m from Puerto Rico 🇵🇷 I’m a junior majoring in Mechanical Engineering, and I’m currently working at GE Vernova as a Steam Turbine Engineering Intern. I’m so excited for an amazing year ahead as your SHPEtinas Chair :)",
-    hobbies: "Concerts, Video Games, Going out to eat",
-    country: "Puerto Rico",
-    linkedin: "https://www.linkedin.com/in/vilanys-rivera-caceres-8b4000291?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app",
-    email: "vilanysc@gmail.com",
-    picture: "vila.jpg"
+    major: "Computer Science",
+    future_ind: "Software Engineer or Game Development",
+    bio: "Hey!! I'm Salma, this year's SHPEtinas Chair! I'm very dedicated to making engineering feel like an open road for anyone interested in their respective fields. I love talking to new people so please don't hesitate to come up to me to chat! I love to play video games, draw, sing, and listening to all kinds of music. I'm so looking forward to uplifting our girlies in engineering and so excited to see what this year for SHPE will bring! Much love 🫶",
+    hobbies: "Watching Youtube gameplays, listening to music, drawing, singing, and playing video games",
+    country: "Cuba",
+    linkedin: "https://www.linkedin.com/in/salma-petrov",
+    email: "shpetinas@shpeucf.com",
+    picture: "salma.jpg"
   },
-  {
-    name: "Yousef Osman",
-    role: "Technology Co-Chair",
-    major: "Information Technology",
-    future_ind: "Full Stack Developer",
-    bio: "Hi! My name is Yousef and I am a junior Information Technology major! I'm Egyptian and Puerto Rican Currently in an internship at Lockheed Martin working as a software engineer, I look forward to working with all of you guys!",
-    hobbies: "Kickboxing, Gaming, Traveling, Finding Cool Food Places",
-    country: "",
-    linkedin: "https://www.linkedin.com/in/youosman/",
-    email: "",
-    picture: "yousef.png"
+    {
+    name: "Reyjay Collazo",
+    role: "Tech Chair",
+    major: "Computer Science",
+    future_ind: "Software Engineering, Robotics or Firmware",
+    bio: "I suck at making bios",
+    hobbies: "Listening to music, salsa, gym, playing video games and watching anime",
+    country: "Puerto Rico",
+    linkedin: "https://www.linkedin.com/in/reyjayc/",
+    email: "tech@shpeucf.com",
+    picture: "reyjay.jpeg"
   }
 ];

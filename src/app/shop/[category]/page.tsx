@@ -22,7 +22,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
 
   // Fetch products when `category` changes
   useEffect(() => {
-    (async () => {
+    void (async () => {
       const { data, error } = await supabase
         .from("shpe-website-2025_products")
         .select("id, name, description, image, price, stock, category, status")
@@ -38,7 +38,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
       setProducts(
         (data ?? []).map(p => ({
           ...p,
-          image: p.image.split(";")[0] || "",
+          image: p.image?.split(";")[0] ?? "",
         }))
       );
     })();

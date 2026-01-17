@@ -118,7 +118,7 @@ export default function AddProductForm({
     setErrorMsg("");
 
     const files = imageFiles.filter((f): f is File => !!f);
-    let storedUrls: string[] = [];
+    const storedUrls: string[] = [];
 
     try {
       setLoading(true);
