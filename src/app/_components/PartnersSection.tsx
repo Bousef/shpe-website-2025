@@ -30,7 +30,11 @@ export default function PartnersSection() {
           {logos.map((l) => (
             <div
               key={l.name}
-              className="flex items-center justify-center w-80 h-80 p-4">
+              className="flex items-center justify-center 
+             w-40 h-40 
+             sm:w-56 sm:h-56 
+             md:w-72 md:h-72 
+             p-4">
               <img
                 src={`assets/sponsors/${l.file}`}
                 alt={l.name}
