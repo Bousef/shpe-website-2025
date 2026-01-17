@@ -1,22 +1,21 @@
 import "tailwindcss";
 
 const logos = [
-  "bloomberg",
-  "blueorigin",
-  "adobe",
-  "nasa",
-  "accen",
-  "bny_mellon",
-  "boa",
-  "disney",
-  "intel",
-  "micron",
-  "microsoft",
-  "northrop",
-  "nvidia",
-  "qorvo",
-  "tesla",
-  "verizon"
+  { name: "bloomberg", file: "bloomberg.svg" },
+  { name: "blueorigin", file: "blueorigin.svg" },
+  { name: "boa", file: "boa.svg" },
+  { name: "boeing", file: "boeing.svg" },
+  { name: "burns-and-mcdonnell", file: "burns-and-mcdonnell.svg" },
+  { name: "CDM-Smith", file: "CDM-Smith.png" },
+  { name: "disney", file: "disney.svg" },
+  { name: "honeywell", file: "honeywell.svg" },
+  { name: "jnj", file: "jnj.svg" },
+  { name: "lockheed", file: "lockheed.svg" },
+  { name: "microsoft", file: "microsoft.svg" },
+   { name: "wells", file: "wells.svg" },
+  { name: "sg-logo", file: "sg-logo.png" },
+  { name: "career", file: "career.png" },
+  
 ];
 
 export default function PartnersSection() {
@@ -24,17 +23,17 @@ export default function PartnersSection() {
     <main className="bg-white py-12 px-4">
       <section className="max-w-6xl mx-auto text-center">
         <h2 className="text-5xl text-blue-800">
-          THANK YOU TO OUR SPONSORS!
+          THANK YOU TO OUR PARTNERS!
         </h2>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 place-items-center mt-8">
           {logos.map((l) => (
             <div
-              key={l}
+              key={l.name}
               className="flex items-center justify-center w-80 h-80 p-4">
               <img
-                src={`assets/sponsors/${l}.svg`}
-                alt={l}
+                src={`assets/sponsors/${l.file}`}
+                alt={l.name}
                 className="w-full h-full object-contain"
               />
             </div>
@@ -52,13 +51,13 @@ export default function PartnersSection() {
         {/* donation buttons */}
         <div className="mt-12 flex flex-col sm:flex-row justify-center gap-6">
           <a
-            href="/become-a-sponsor" // replace with actual URL
+            href="mailto:corporateaffairs@shpeucf.com"
             className="bg-[var(--shpe-blue)] text-white font-semibold py-3 px-6 rounded-lg hover:brightness-110 transition"
           >
-            Become a Sponsor
+            Become a Partner
           </a>
           <a
-            href="/donate" // replace with actual donation link
+            href="https://shpe.org/donor-info/" // replace with actual donation link
             className="bg-[var(--shpe-orange)] text-white font-semibold py-3 px-6 rounded-lg hover:brightness-110 transition"
           >
             Donate
