@@ -44,7 +44,7 @@ export const remainingMembers: Member[] = [
     future_ind: "Electronics, Semiconductors, Tech",
     bio: "Hey! My name is John Zuluaga, and I’m from Cali, Colombia. I’m an Electrical Engineering student at UCF, and I currently work as an Intel Undergraduate Scholar Co-op in the UCF Cleanroom, operating advanced fabrication and testing equipment to support semiconductor processes. In addition, I contribute to research focused on developing wireless biosensor impedance systems in the Nano Biosensors and Systems Lab at UCF. I’m passionate about applying technical skills to real-world challenges and fostering innovation in engineering.",
     hobbies: "Gym, Soccer",
-    country: "Colombia",
+    country: "",
     linkedin: "https://www.linkedin.com/in/john-s-z",
     email: "projects@shpeucf.com",
     picture: "john.jpg"
@@ -80,7 +80,7 @@ export const remainingMembers: Member[] = [
     future_ind: "Software Engineer or Game Development",
     bio: "Hey!! I'm Salma, this year's SHPEtinas Chair! I'm very dedicated to making engineering feel like an open road for anyone interested in their respective fields. I love talking to new people so please don't hesitate to come up to me to chat! I love to play video games, draw, sing, and listening to all kinds of music. I'm so looking forward to uplifting our girlies in engineering and so excited to see what this year for SHPE will bring! Much love 🫶",
     hobbies: "Watching Youtube gameplays, listening to music, drawing, singing, and playing video games",
-    country: "Cuba",
+    country: "",
     linkedin: "https://www.linkedin.com/in/salma-petrov",
     email: "shpetinas@shpeucf.com",
     picture: "salma.jpg"
@@ -92,7 +92,7 @@ export const remainingMembers: Member[] = [
     future_ind: "Software Engineering, Robotics or Firmware",
     bio: "I suck at making bios",
     hobbies: "Listening to music, salsa, gym, playing video games and watching anime",
-    country: "Puerto Rico",
+    country: "",
     linkedin: "https://www.linkedin.com/in/reyjayc/",
     email: "tech@shpeucf.com",
     picture: "reyjay.jpeg"

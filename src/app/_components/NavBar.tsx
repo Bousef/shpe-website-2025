@@ -17,7 +17,7 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-  <nav className="w-full bg-gradient-to-t from-white to-[#afc1e3] p-4 sm:p-5 max-w-screen overlay-x-hidden">
+  <nav className="w-full bg-gradient-to-t backdrop-blur-4xl from-white to-[#afc1e3] p-4 sm:p-5 max-w-screen overlay-x-hidden">
   <div className="flex items-center ">
     {/* Logo */}
     <Link href="/" className="flex-shrink-0.5">
