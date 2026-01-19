@@ -1,0 +1,29 @@
+name: Enforce allowed PR sources into prod
+
+on:
+  pull_request:
+    branches:
+      - prod
+
+jobs:
+  enforce-source-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enforce dev or hotfix/* as PR source
+        shell: bash
+        run: |
+          HEAD="${{ github.head_ref }}"
+          BASE="${{ github.base_ref }}"
+          echo "Base branch: $BASE"
+          echo "Head branch: $HEAD"
+
+          # Allow only:
+          # - dev
+          # - hotfix/<anything>
+          if [[ "$HEAD" == "dev" || "$HEAD" =~ ^hotfix/ ]]; then
+            echo "✅ Allowed source branch: $HEAD"
+            exit 0
+          fi
+
+          echo "❌ PRs into '$BASE' must come from 'dev' or 'hotfix/*'."
+          exit 1
