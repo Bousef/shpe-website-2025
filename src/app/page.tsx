@@ -51,6 +51,7 @@ export default function HomePage() {
         <Navbar />
         <HeroMask />
         <HeroSection /> 
+        <WeeklyEvents />
         <AboutSection />
         {/* <WeeklyEvents /> */}
       </div>

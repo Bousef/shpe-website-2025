@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "motion/react";
-import { supabaseMobile } from "../../supabase-client";
+import { supabase} from "../../supabase-client";
 import { useEffect, useState } from "react";
 
 
@@ -12,9 +12,9 @@ export default function WeeklyEvents() {
   
 useEffect(() => {
   async function loadEvents() {
-    const { data, error } = await supabaseMobile
-      .from("Events")
-      .select("name, description, image_url");
+    const { data, error } = await supabase
+      .from("shpe-website-2025_events")
+      .select("title, description, image");
 
     console.log("DATA:", data);
     console.log("ERROR:", error);
@@ -24,10 +24,10 @@ useEffect(() => {
       return;
     }
 
-    const events = (data ?? []).map((event: { name: string; description: string; image_url: string | null }) => ({
-      name: event.name,
+    const events = (data ?? []).map((event: { title: string; description: string; image: string | null }) => ({
+      name: event.title,
       description: event.description,
-      imgSrc: event.image_url?.split(";")[0] ?? "/placeholder.jpg",
+      imgSrc: event.image?.split(";")[0] ?? "/placeholder.jpg",
     }));
 
     setEvents(events);
@@ -55,32 +55,45 @@ useEffect(() => {
 
       {/* Horizontal Scrollable Slider */}
       <div className="flex overflow-x-auto overflow-y-hidden space-x-6 px-4 lg:px-8 scrollbar-thin scrollbar-thumb-blue-700 scrollbar-track-blue-100 snap-x snap-mandatory"> 
-        {events.map(({ name, imgSrc }) => (
-          <motion.a
+        {events.map(({ name, description, imgSrc }) => (
+          <motion.div
             key={name}
-            href={imgSrc}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-none w-72 lg:w-80 2xl:w-96 bg-[#EFB70E] rounded-3xl shadow-lg"
+            className="flex-none w-72 lg:w-80 2xl:w-96 h-[400px] lg:h-[450px] 2xl:h-[500px] group"
+            style={{ perspective: "1000px" }}
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
-            whileHover={{ scale: 0.95 }}
-
           >
-            <div className="aspect-square flex items-center justify-center rounded-md overflow-hidden">
-              <img
-                src={imgSrc}
-                alt={name}
-                className="w-10/11 h-10/11 object-cover object-center"
-              />
+            <div className="relative w-full h-full preserve-3d transition-transform duration-700 group-hover:rotate-y-180">
+              {/* Front of card */}
+              <div className="absolute w-full h-full backface-hidden bg-[#EFB70E] rounded-3xl shadow-lg">
+                <div className="aspect-square flex items-center justify-center rounded-md overflow-hidden">
+                  <img
+                    src={imgSrc}
+                    alt={name}
+                    className="w-10/11 h-10/11 object-cover object-center"
+                  />
+                </div>
+                <div className="px-4 py-3">
+                  <h3 className="text-center text-slate-800 font-bold text-xl 2xl:text-2xl">
+                    {name.toUpperCase()}
+                  </h3>
+                </div>
+              </div>
+
+              {/* Back of card */}
+              <div className="absolute w-full h-full backface-hidden rotate-y-180 bg-[#001f5b] rounded-3xl shadow-lg p-6 flex items-center justify-center">
+                <div className="text-white text-center">
+                  <h3 className="font-bold text-xl 2xl:text-2xl mb-4">
+                    {name.toUpperCase()}
+                  </h3>
+                  <p className="text-sm lg:text-base">
+                    {description}
+                  </p>
+                </div>
+              </div>
             </div>
-            <div className="px-4 py-3">
-              <h3 className="text-center text-slate-800 font-bold text-xl 2xl:text-2xl">
-                {name.toUpperCase()}
-              </h3>
-            </div>
-          </motion.a>
+          </motion.div>
         ))}
       </div>
     </section>
