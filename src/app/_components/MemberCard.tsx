@@ -40,7 +40,7 @@ export default function MemberCard({ member, onSelect }: MemberCardProps) {
       <button
         onClick={() => onSelect(member)}
         className="relative block w-full overflow-hidden rounded-2xl 
-                   bg-gradient-to-br from-blue-800 via-blue-700 to-blue-800
+                   bg-gradient-to-br from-[#001F5B] via-[#004080] to-[#002060]
                    p-[2px] transition-shadow duration-300 ease-out
                    shadow-lg shadow-blue-800/20
                    hover:shadow-xl hover:shadow-orange-500/30
@@ -62,7 +62,7 @@ export default function MemberCard({ member, onSelect }: MemberCardProps) {
 
             {/* Gradient Overlay on Hover */}
             <motion.div
-              className="absolute inset-0 bg-gradient-to-t from-blue-800/90 via-blue-800/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-250"
+              className="absolute inset-0 bg-gradient-to-t from-[#001F5B] via-[#004080]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-250"
             />
 
             {/* Hover Action Indicator */}
@@ -89,7 +89,7 @@ export default function MemberCard({ member, onSelect }: MemberCardProps) {
 
             {/* Name */}
             <h3
-              className="mb-1 truncate text-lg font-semibold tracking-tight text-blue-800 sm:text-xl"
+              className="mb-1 truncate text-lg font-semibold tracking-tight text-[#001F5B] sm:text-xl"
               title={member.name}
             >
               {member.name}
@@ -97,7 +97,7 @@ export default function MemberCard({ member, onSelect }: MemberCardProps) {
 
             {/* Role Badge */}
             <div className="inline-flex items-center justify-center">
-              <span className="relative inline-block rounded-full bg-gradient-to-r from-blue-800 to-blue-700 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white sm:px-4 sm:text-sm">
+              <span className="relative inline-block rounded-full bg-gradient-to-r from-[#001F5B] to-[#004080] px-3 py-1 text-xs font-bold uppercase tracking-wider text-white sm:px-4 sm:text-sm">
                 {member.role}
               </span>
             </div>

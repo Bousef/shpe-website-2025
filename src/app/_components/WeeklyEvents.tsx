@@ -41,7 +41,7 @@ useEffect(() => {
       {/* Header */}
       {/* Section Header */}
       <div className="text-center mb-12 px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl sm:text-4xl lg:text-6xl font-helvetica text-blue-800 font-bold">
+        <h2 className="text-3xl sm:text-4xl lg:text-6xl font-helvetica text-[#001F5B] font-bold">
           CATCH OUR WEEKLY EVENTS
         </h2>
         <p className="mt-8 text-base sm:text-lg lg:text-xl text-[#001f5b]/70 mx-auto font-helvetica ">

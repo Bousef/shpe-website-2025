@@ -119,7 +119,7 @@ export default function DevSection() {
       {/* Main Title */}
       <div className="flex items-center">
         <div className="mx-auto text-yellow-500">
-          <h1 className="font-helvetica m-6 pb-4 text-center text-[28px] text-blue-800 sm:m-10 sm:text-[36px] md:text-[50px]">
+          <h1 className="font-helvetica m-6 pb-4 text-center text-[28px] text-[#001F5B] sm:m-10 sm:text-[36px] md:text-[50px]">
             GET TO KNOW OUR TEAM
           </h1>
         </div>
