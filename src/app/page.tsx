@@ -39,6 +39,7 @@ export default function HomePage() {
           <Navbar />
           <HeroMask2 />  
           <AboutSection />
+          <WeeklyEvents />
         </div>
       </>
     );
@@ -53,7 +54,6 @@ export default function HomePage() {
         <HeroSection /> 
         <WeeklyEvents />
         <AboutSection />
-        {/* <WeeklyEvents /> */}
       </div>
     </>
   );
