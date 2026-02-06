@@ -1,138 +1,97 @@
 "use client";
-import { useState } from "react";
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
+import { useActionState } from "react";
 import Navbar from "../_components/NavBar";
+import { signup } from "./actions";
+import InputBox, { InputField, PasswordInputField } from "../_components/Inputbox";
 
 export default function SignUp() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [ucfId, setUcfId] = useState("");
-  const [status, setStatus] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<string[]>([]);
+  const [signupState, signupAction] = useActionState(signup, { errors: [] });
 
-  return (
+  const errors = signupState.errors;
+  const formData = signupState.formData;
+
+  return(
     <div>
       <Navbar />
 
       <h1 className="h2 text-center text-5xl text-[var(--shpe-orange)] font-medium py-3">
         SIGN UP
       </h1>
-
-      <div className="border-4 border-solid border-[#82a8bc] px-2 py-4 w-full max-w-md mx-auto mt-10">
-        {/* First name */}
-        <div>
-          <input
+      <form>
+        <InputBox>
+          <InputField
             id="firstname"
-            type="First Name"
+            type="text"
+            name="first_name"
             required
             placeholder="First Name"
-            className="placeholder-[#0b1e57] w-full mb-4 border-b border-[#82a8bc] focus:outline-none py-1"
+            defaultValue={formData?.first_name ?? ""}
           />
-        </div>
-
-        {/* Last name */}
-        <div>
-          <input
+          <InputField
             id="lastname"
-            type="Last Name"
+            type="text"
+            name="last_name"
             required
             placeholder="Last Name"
-            className="placeholder-[#0b1e57] w-full mb-4 border-b border-blue-300 focus:outline-none py-1"
+            defaultValue={formData?.last_name ?? ""}
           />
-        </div>
-
-        {/* UCF Email */}
-        <div>
-          <input
+          <InputField
             id="email"
-            type="text"
+            type="email"
+            name="email"
             required
             placeholder="UCF Email"
-            className="peer placeholder-[#0b1e57] w-full mb-4 border-b border-blue-300 focus:outline-none py-1"
-            onChange={(e) => setEmail(e.target.value)}
+            defaultValue={formData?.email ?? ""}
           />
           {errors.includes("Email must be a valid @ucf.edu address.") && (
             <div className="text-red-600 text-sm mb-1">Email must be a valid @ucf.edu address.</div>
           )}
-        </div>
-
-        {/* UCF ID */}
-        <div>
-          <input
+          <InputField
             id="ucfID"
-            type="UCF ID"
+            type="text"
+            name="ucf_id"
             required
             placeholder="UCF ID"
-            className="placeholder-[#0b1e57] w-full mb-4 border-b border-blue-300 focus:outline-none py-1"
-            onChange={(e) => setUcfId(e.target.value)}
+            defaultValue={formData?.ucf_id ?? ""}
           />
           {errors.includes("UCF ID must be exactly 7 digits.") && (
             <div className="text-red-600 text-sm mb-1">UCF ID must be exactly 7 digits.</div>
           )}
-        </div>
-
-        {/* Password */}
-        <div>
-          <div className="relative mb-1">
-            <input
-              id="password"
-              type={showPassword ? "text" : "password"}
-              required
-              placeholder="Password"
-              className="placeholder-[#0b1e57] w-full border-b border-blue-300 focus:outline-none py-1 pr-10"
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-0 top-0 mt-1 mr-1"
-            >
-              {showPassword ? (
-                <EyeSlashIcon className="h-5 w-5 text-blue-700" />
-              ) : (
-                <EyeIcon className="h-5 w-5 text-blue-700" />
-              )}
-            </button>
-          </div>
+          <PasswordInputField
+            id="password"
+            name="password"
+            required
+            placeholder="Password"
+          />
           {errors.includes("Password must be 8+ characters, 1 capital letter, 1 number.") && (
             <div className="text-red-600 text-sm mb-1">Password must be 8+ characters, 1 capital letter, 1 number.</div>
           )}
+        </InputBox>
+
+        {/* // skip email ucf id and password validation errors */}
+        {errors.length > 0 && (
+          <div className="text-red-600 text-sm mt-4 text-center">
+            {errors.map((error, index) => {
+              if (error === "Email must be a valid @ucf.edu address." ||
+                  error === "UCF ID must be exactly 7 digits." ||
+                  error === "Password must be 8+ characters, 1 capital letter, 1 number.") return null;
+
+              return <div key={index}>{error}</div>;
+            })}
+          </div>
+        )}
+     
+      <div className="flex justify-center"> 
+          <button
+            type="submit"
+            className="py-4 bg-[#82a8bc] hover:bg-[#6c92a8] text-[#0b1e57] w-md mt-10 mx-auto font-medium"
+            formAction={signupAction}
+          >
+            SIGN UP
+          </button>
         </div>
+      </form>
 
-        <div />
-      </div>
-
-      <div className="flex justify-center">
-        <button
-          className="py-4 bg-[#82a8bc] hover:bg-[#6c92a8] text-[#0b1e57] w-md mt-10 mx-auto font-medium"
-          onClick={() => {
-            const newErrors = [];
-            if (!/^[\w.-]+@ucf\.edu$/.test(email)) {
-              newErrors.push("Email must be a valid @ucf.edu address.");
-            }
-            if (!/^\d{7}$/.test(ucfId)) {
-              newErrors.push("UCF ID must be exactly 7 digits.");
-            }
-            if (!/^(?=.*[A-Z])(?=.*\d).{8,}$/.test(password)) {
-              newErrors.push("Password must be 8+ characters, 1 capital letter, 1 number.");
-            }
-
-            if (newErrors.length > 0) {
-              setErrors(newErrors);
-              setStatus("");
-            } else {
-              setErrors([]);
-              setStatus("Signing up...");
-              // Add signup logic here
-            }
-          }}
-        >
-          SIGN UP
-        </button>
-      </div>
-
-      <div className="text-center mt-4 text-red-600 font-medium">{status}</div>
 
       <div>
         <p className="text-md font-medium text-gray-600 text-center mt-3">
@@ -145,3 +104,4 @@ export default function SignUp() {
     </div>
   );
 }
+
