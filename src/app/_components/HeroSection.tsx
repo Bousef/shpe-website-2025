@@ -20,7 +20,7 @@ export default function HeroSection({
   return (
     
     <main className="w-full flex flex-col items-center justify-items-center py-16 sm:py-20 px-6 bg-white">
-      <h2 className="text-center text-3xl sm:text-4xl lg:text-6xl font-helvetica text-blue-800 font-bold">
+      <h2 className="text-center text-3xl sm:text-4xl lg:text-6xl font-helvetica text-[#001F5B] font-bold">
         {"WANT TO JOIN SHPE UCF?"}
       </h2>
     <div className="mt-16 relative w-full max-w-4xl">

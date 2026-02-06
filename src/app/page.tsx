@@ -8,6 +8,7 @@ import HeroMask       from "./_components/HeroMask";
 import HeroMask2      from "./_components/HeroMask2";
 import HistorySection from "./_components/HistorySection";
 import { useEffect, useState } from "react";
+import NavbarLogin from "./_components/NavBarLogin";
 
 {/*export const metadata = {
   title: "SHPE UCF",
@@ -37,7 +38,9 @@ export default function HomePage() {
         {/* full page */}
         <div className="bg-[#F7F8F9] text-black overflow-x-hidden flex flex-col">
           <Navbar />
-          <HeroMask2 />  
+          <HeroMask2 />
+          <HeroSection />
+          <WeeklyEvents /> 
           <AboutSection />
         </div>
       </>
@@ -48,11 +51,11 @@ export default function HomePage() {
     <>
       {/* full page */}
       <div className="bg-[#F7F8F9] text-black overflow-x-hidden flex flex-col">
-        <Navbar />
+        <NavbarLogin />
         <HeroMask />
         <HeroSection /> 
+        <WeeklyEvents />
         <AboutSection />
-        {/* <WeeklyEvents /> */}
       </div>
     </>
   );
