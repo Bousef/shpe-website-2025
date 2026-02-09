@@ -30,7 +30,7 @@ export default function HistorySection() {
 
     return (
     <section className="w-full bg-white mt-12 flex flex-col items-center">
-        <h1 className="text-3xl sm:text-4xl lg:text-6xl font-helvetica text-[#001F5B] font-bold">OUR HISTORY</h1>
+        <h1 className="text-4xl md:text-5xl font-semibold text-[#001f5b] tracking-tight">OUR HISTORY</h1>
         
         {/* Word-by-word reveal - each word fades in as it enters viewport */}
         <WordReveal text={textContent} />

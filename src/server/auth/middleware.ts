@@ -1,6 +1,24 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { env } from '~/env';
+import { db } from '~/server/db';
+import { members } from '~/server/db/schema';
+import { eq } from 'drizzle-orm';
+
+// Define admin roles - must match the ones in user.ts
+const ADMIN_ROLES = [
+  "President",
+  "Internal Vice President",
+  "Corporate Vice President",
+  "Secretary",
+  "Marketing Vice President",
+  "Treasurer",
+  "Technology Chair",
+  "DevTeam",
+] as const;
+
+// Routes that require admin access
+const ADMIN_ROUTES = ['/admin', '/manage_inv'];
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -44,6 +62,45 @@ export async function updateSession(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  // Check if this is an admin route
+  const isAdminRoute = ADMIN_ROUTES.some(route => 
+    request.nextUrl.pathname.startsWith(route)
+  );
+
+  if (isAdminRoute) {
+    // No user - redirect to login
+    if (!user) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/login';
+      url.searchParams.set('redirect', request.nextUrl.pathname);
+      return NextResponse.redirect(url);
+    }
+
+    // User exists - verify admin role from database
+    try {
+      const member = await db
+        .select({ position: members.position })
+        .from(members)
+        .where(eq(members.uuid, user.id));
+
+      const position = member[0]?.position;
+      const isAdmin = position && ADMIN_ROLES.includes(position as typeof ADMIN_ROLES[number]);
+
+      if (!isAdmin) {
+        // User is logged in but not an admin - redirect to home
+        const url = request.nextUrl.clone();
+        url.pathname = '/';
+        return NextResponse.redirect(url);
+      }
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+      // On error, deny access to be safe
+      const url = request.nextUrl.clone();
+      url.pathname = '/';
+      return NextResponse.redirect(url);
+    }
+  }
 
   // Put unauthorized user types and paths here
   if (

@@ -14,7 +14,7 @@ export default function SignUp() {
     <div>
       <Navbar />
 
-      <h1 className="h2 text-center text-5xl text-[var(--shpe-orange)] font-medium py-3">
+      <h1 className="text-4xl md:text-5xl font-semibold text-[#001f5b] tracking-tight text-center py-3">
         SIGN UP
       </h1>
       <form>

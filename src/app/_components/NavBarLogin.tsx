@@ -32,6 +32,14 @@ export default function NavbarLogin() {
   const { data: member, isLoading } = api.user.getCurrentMember.useQuery();
   const isLoggedIn = Boolean(member);
   
+  // Secure server-side role check - only fetches when logged in
+  const { data: roleData } = api.user.getRole.useQuery(undefined, {
+    enabled: isLoggedIn, // Only fetch role if user is logged in
+  });
+  
+  // Admin status comes from server, not client-side string comparison
+  const isAdmin = roleData?.isAdmin ?? false;
+  
   // sign out and reload
   const logout = api.user.logout.useMutation({
     onSuccess: () => {
@@ -39,8 +47,6 @@ export default function NavbarLogin() {
       router.push("/");
     },
   });
-
-  const isAdmin = member?.position === "DevTeam"; // Simple check for admin role
 
   return (
   <nav className="w-full bg-gradient-to-t from-white to-[#afc1e3] p-4 sm:p-5 max-w-screen overlay-x-hidden">

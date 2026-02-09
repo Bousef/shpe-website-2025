@@ -94,7 +94,7 @@ export default function Shop() {
 
       <main className="px-4 py-10 lg:px-48">
         <div className="flex items-center mb-8">
-          <h1 className="flex-1 text-center text-5xl text-yellow-500 lg:text-6xl">
+          <h1 className="flex-1 text-center text-4xl md:text-5xl font-semibold text-[#001f5b] tracking-tight">
             CATEGORIES
           </h1>
 

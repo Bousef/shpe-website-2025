@@ -54,7 +54,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
         <Link href="/shop" className="text-blue-600 hover:underline">
           ← Back to categories
         </Link>
-        <h1 className="text-5xl font-bold uppercase text-yellow-500">
+        <h1 className="text-4xl md:text-5xl font-semibold text-[#001f5b] tracking-tight uppercase">
           {category}
         </h1>
         <Link
