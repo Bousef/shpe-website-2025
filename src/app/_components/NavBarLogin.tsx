@@ -13,15 +13,25 @@ const navItems = [
   { href: "/dev-team", label: "Dev team" },
   { href: "/sponsors", label: "Sponsors" },
   { href: "/calendar", label: "Calendar" },
+  { href: "/history", label: "History" },
 ];
+const adminNavItems = [
+  { href: "/admin", label: "Admin" },
+  { href: "/board", label: "Board" },
+  { href: "/dev-team", label: "Dev team" },
+  { href: "/sponsors", label: "Sponsors" },
+  { href: "/calendar", label: "Calendar" },
+  { href: "/history", label: "History" },
+]
 
 export default function NavbarLogin() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const router = useRouter();
 
-  // Fetch current member; null if not signed in
+  // Fetch current member (includes isAdmin flag); null if not signed in
   const { data: member, isLoading } = api.user.getCurrentMember.useQuery();
   const isLoggedIn = Boolean(member);
+  const isAdmin = member?.isAdmin ?? false;
   
   // sign out and reload
   const logout = api.user.logout.useMutation({
@@ -54,7 +64,64 @@ export default function NavbarLogin() {
 
     {/* Desktop Nav */}
 
-    <div className="hidden md:flex justify-between items-center w-full text-sm lg:text-xl mt-4 md:mt-0 px-6 font-extralight">
+    {isAdmin ? (
+      // if admin, show admin nav items
+      <div className="hidden md:flex justify-between items-center w-full text-sm lg:text-xl mt-4 md:mt-0 px-6 font-extralight">
+      {adminNavItems.map(({ href, label }) => (
+          <motion.div
+            key={href}
+            className="px-3 py-1 relative inline-block"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1 }}
+            whileHover="hover"
+          >
+            <Link
+              href={href}
+              className="text-[#001f5b] hover:text-[#001133]"
+            >
+              {label.toUpperCase()}
+            </Link>
+            <motion.div 
+              className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#001f5b]" 
+              initial={{ scaleX: 0 }}
+              variants={{
+                hover: { scaleX: 1 }
+              }}
+              transition={{ duration: 0.3 }}
+            />
+          </motion.div>
+        )
+      )}
+          {/* account / login / logout */}
+          {( isLoggedIn ? (
+              <div className="flex items-center space-x-4">
+                <Link href="/profile" title="Your Profile">
+                  <VscAccount className="text-3xl text-[#001f5b] cursor-pointer" />
+                </Link>
+                <button
+                   onClick={() => logout.mutate()}
+                  className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                >
+                  Log out
+                </button>
+              </div>
+            ) : (
+              <motion.a
+                href="/login"
+                className="px-3 py-1 text-[#001f5b] hover:text-[#001133] font-medium"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1 }}
+              >
+                Log in
+              </motion.a>
+            )
+          )}
+      </div>
+    ) : (
+      // if not admin, show regular nav items
+      <div className="hidden md:flex justify-between items-center w-full text-sm lg:text-xl mt-4 md:mt-0 px-6 font-extralight">
       {navItems.map(({ href, label }) => (
           <motion.div
             key={href}
@@ -81,7 +148,7 @@ export default function NavbarLogin() {
           </motion.div>
         )
       )}
- {/* account / login / logout */}
+          {/* account / login / logout */}
           {( isLoggedIn ? (
               <div className="flex items-center space-x-4">
                 <Link href="/profile" title="Your Profile">
@@ -107,10 +174,54 @@ export default function NavbarLogin() {
             )
           )}
     </div>
+    )}
   </div>
 
+
   {/* Mobile Nav */}
-  {mobileOpen && (
+
+  {isAdmin ? (
+    // if admin, show admin nav items
+    mobileOpen && (
+    <div className="md:hidden mt-4 space-y-3 flex flex-col items-start text-lg sm:text-xl">
+      {adminNavItems.map(({ href, label }) => (
+          <Link
+            key={href}
+            href={href}
+            className="block w-full px-4 py-2 text-[#001f5b] hover:text-[#001133] hover:scale-105 transition-transform duration-150 bg-white/90 rounded-xl"
+            onClick={() => setMobileOpen(false)}
+          >
+            {label}
+          </Link>
+        )
+      )}
+           {( isLoggedIn ? (
+              <div className="px-4 py-2 flex items-center space-x-4 bg-white/90 rounded-xl">
+                <Link href="/profile">
+                  <VscAccount className="text-2xl text-[#001f5b]" />
+                </Link>
+                <button
+                   onClick={() => logout.mutate()}
+                  className="text-red-600 font-medium"
+                >
+                  Log out
+                </button>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setMobileOpen(false)}
+                className="px-4 py-2 bg-white/90 rounded-xl"
+              >
+                Log in
+              </Link>
+            )
+          )}
+    </div>
+  )
+  ) : (
+    // if not admin, show regular nav items
+    mobileOpen && (
     <div className="md:hidden mt-4 space-y-3 flex flex-col items-start text-lg sm:text-xl">
       {navItems.map(({ href, label }) => (
           <Link
@@ -146,8 +257,8 @@ export default function NavbarLogin() {
             )
           )}
     </div>
+    )
   )}
-</nav>
-
+  </nav>
   );
 }

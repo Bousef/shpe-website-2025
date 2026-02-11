@@ -2,6 +2,9 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { env } from '~/env';
 
+// Routes that require authentication
+const ADMIN_ROUTES = ['/admin', '/manage_inv'];
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -44,6 +47,19 @@ export async function updateSession(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  // Check if this is an admin route
+  const isAdminRoute = ADMIN_ROUTES.some(route => 
+    request.nextUrl.pathname.startsWith(route)
+  );
+
+  if (isAdminRoute && !user) {
+    // No user - redirect to login
+    const url = request.nextUrl.clone();
+    url.pathname = '/login';
+    url.searchParams.set('redirect', request.nextUrl.pathname);
+    return NextResponse.redirect(url);
+  }
 
   // Put unauthorized user types and paths here
   if (

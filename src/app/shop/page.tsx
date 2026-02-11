@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import Navbar from "../_components/NavBar";
+import NavbarLogin from "../_components/NavBarLogin";
 import { supabase } from "../../supabase-client";
 import Image from "next/image";
 import { api } from '~/trpc/react'
@@ -73,7 +73,7 @@ export default function Shop() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-100">
-      <Navbar />
+      <NavbarLogin />
       <div className="flex justify-end px-4 lg:px-48 mt-4">
         {showEdit && (
           <Link
@@ -94,7 +94,7 @@ export default function Shop() {
 
       <main className="px-4 py-10 lg:px-48">
         <div className="flex items-center mb-8">
-          <h1 className="flex-1 text-center text-5xl text-yellow-500 lg:text-6xl">
+          <h1 className="flex-1 text-center text-4xl md:text-5xl font-semibold text-[#001f5b] tracking-tight">
             CATEGORIES
           </h1>
 

@@ -1,5 +1,5 @@
 "use client";
-import Navbar from "../_components/NavBar";
+import NavbarLogin from "../_components/NavBarLogin";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
@@ -15,7 +15,7 @@ export default function ForgotPassword() {
 
   return (
     <div>
-      <Navbar />
+      <NavbarLogin />
       <section className="relative flex min-w-[280px] flex-col items-center justify-center px-4 py-[2rem] pb-[6rem]">
         <form
           onSubmit={handleSubmit}

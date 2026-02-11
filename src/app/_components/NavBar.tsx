@@ -11,10 +11,13 @@ const navItems = [
   { href: "/sponsors", label: "Partners" },
   { href: "/calendar", label: "Calendar" },
   { href: "/history", label: "History" },
+  { href: "/admin", label: "admin"},
 ];
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+
+
 
   return (
   <nav className="w-full bg-gradient-to-t backdrop-blur-4xl from-white to-[#afc1e3] p-4 sm:p-5 max-w-screen overlay-x-hidden">
