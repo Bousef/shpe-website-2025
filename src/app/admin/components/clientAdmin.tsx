@@ -1,9 +1,63 @@
 "use client";
 
 import { motion } from "motion/react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import NavbarLogin from "~/app/_components/NavBarLogin";
+import { api } from "~/trpc/react";
 
 export default function AdminUI() {
+    const router = useRouter();
+    const { data: member, isLoading } = api.user.getCurrentMember.useQuery();
+    const [minLoading, setMinLoading] = useState(true);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setMinLoading(false);
+        }, 2000); // 2 seconds minimum loading time, for animation to show
+        return () => clearTimeout(timer);
+    }, []);
+
+    const showLoading = isLoading || minLoading;
+
+    // Redirect non-admin users
+    useEffect(() => {
+        if (!isLoading && (!member || !member.isAdmin)) {
+            router.replace("/");
+        }
+    }, [member, isLoading, router]);
+
+    // Show nothing while checking auth
+    if (showLoading || !member?.isAdmin) {
+            return (
+                <main className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-white to-slate-100">
+                    <NavbarLogin />
+                    <motion.div 
+                        className="flex flex-col items-center justify-center gap-2 py-32 text-[#001f5b] text-lg"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 1 }}>
+                        {"Loading Admin Panel"}
+                        <div className="flex flex-row gap-2">
+                        <motion.p 
+                            className="bg-[#001f5b] h-[10px] w-[10px]"
+                            initial={{ opacity: 0 , rotate: 0 }}
+                            animate={{ opacity: 1, rotate: 360, transition: { repeat: Infinity, duration: 2 } }}></motion.p>
+                        <motion.p 
+                            className="bg-[#001f5b] h-[10px] w-[10px]"
+                            initial={{ opacity: 0 , rotate: 0 }}
+                            animate={{ opacity: 1, rotate: 360, transition: { repeat: Infinity, duration: 2 } }}></motion.p>
+                        <motion.p 
+                            className="bg-[#001f5b] h-[10px] w-[10px]"
+                            initial={{ opacity: 0 , rotate: 0 }}
+                            animate={{ opacity: 1, rotate: 360, transition: { repeat: Infinity, duration: 2 } }}></motion.p>
+                        </div>
+                        
+                    </motion.div>
+                </main>
+            );
+        }
+
     const AdminCapabilities = [
         { 
             name: "Manage Users", 
@@ -35,7 +89,7 @@ export default function AdminUI() {
     ];
 
     return (
-        <main className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-white to-slate-100">
+        <main className="min-h-screen w-full">
             <NavbarLogin />
             
             <div className="max-w-4xl mx-auto px-6 py-16">
@@ -47,10 +101,10 @@ export default function AdminUI() {
                     transition={{ duration: 0.6 }}
                 >
                     <h1 className="text-4xl md:text-5xl font-semibold text-[#001f5b] tracking-tight">
-                        Admin Panel
+                        {`Welcome back ${member?.first_name}!`}
                     </h1>
                     <p className="mt-3 text-slate-500 text-lg max-w-md mx-auto">
-                        Manage your organization settings and content
+                        {`Manage your organization settings and content`}
                     </p>
                 </motion.div>
 

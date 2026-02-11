@@ -14,5 +14,4 @@ const globalForDb = globalThis as unknown as {
 const conn = globalForDb.conn ?? postgres(env.DATABASE_URL);
 if (env.NODE_ENV !== "production") globalForDb.conn = conn;
 
-const client = postgres(process.env.DATABASE_URL!);
-export const db = drizzle({ client });
+export const db = drizzle({ client: conn });

@@ -1,11 +1,11 @@
 "use client";
 import HistorySection from "../_components/HistorySection";
-import Navbar from "../_components/NavBar";
+import NavbarLogin from "../_components/NavBarLogin";
 
 export default function HistoryPage() {
     return (
         <>
-            <Navbar />
+            <NavbarLogin />
             <HistorySection />
         </>
     );

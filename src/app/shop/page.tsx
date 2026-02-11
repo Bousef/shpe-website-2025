@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import Navbar from "../_components/NavBar";
+import NavbarLogin from "../_components/NavBarLogin";
 import { supabase } from "../../supabase-client";
 import Image from "next/image";
 import { api } from '~/trpc/react'
@@ -73,7 +73,7 @@ export default function Shop() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-100">
-      <Navbar />
+      <NavbarLogin />
       <div className="flex justify-end px-4 lg:px-48 mt-4">
         {showEdit && (
           <Link

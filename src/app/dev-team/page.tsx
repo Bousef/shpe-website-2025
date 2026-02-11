@@ -1,6 +1,6 @@
 "use client";
 
-import Navbar from "../_components/NavBar";
+import NavbarLogin from "../_components/NavBarLogin";
 import MemberCard from "../_components/MemberCard";
 import type { Member } from "../_components/MemberCard";
 import { useState } from "react";
@@ -115,7 +115,7 @@ export default function DevSection() {
 
   return (
     <main>
-      <Navbar />
+      <NavbarLogin />
       {/* Main Title */}
       <div className="flex items-center">
         <div className="mx-auto text-yellow-500">

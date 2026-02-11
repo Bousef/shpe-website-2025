@@ -1,6 +1,6 @@
 "use client";
 
-import Navbar from "../_components/NavBar";
+import NavbarLogin from "../_components/NavBarLogin";
 import { useState } from "react";
 import ContactCard from "./_components/ContactCard";
 import { eBoardMembers } from "../../../public/members/data/eboard";
@@ -14,7 +14,7 @@ export default function Board() {
 
   return (
     <main>
-      <Navbar />
+      <NavbarLogin />
       {/* Main Title */}
       <div className="flex items-center">
         <div className="mx-auto text-yellow-500">

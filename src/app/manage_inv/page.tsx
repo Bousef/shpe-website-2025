@@ -4,7 +4,7 @@ import { api } from "~/trpc/react";
 import { PencilIcon, TrashIcon, PlusCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import AddProductForm, { type Product } from "../_components/AddProductForm";
-import Navbar from "../_components/NavBar";
+import NavbarLogin from "../_components/NavBarLogin";
 
 export default function InventoryManagement() {
     const { data: products, isLoading, refetch } = api.product.getAll.useQuery();
@@ -27,7 +27,7 @@ export default function InventoryManagement() {
 
     return (
         <>
-            <Navbar />
+            <NavbarLogin />
             <div className="p-6 max-w-6xl mx-auto">
                 <div className="flex items-center justify-between mb-6">
                     <h1 className="text-4xl md:text-5xl font-semibold text-[#001f5b] tracking-tight">Inventory Management</h1>

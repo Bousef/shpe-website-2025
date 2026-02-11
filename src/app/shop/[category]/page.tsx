@@ -3,7 +3,7 @@
 import React, { useState, useEffect, type Usable, use } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import Navbar from "../../_components/NavBar";
+import NavbarLogin from "../../_components/NavBarLogin";
 import { supabase } from "../../../supabase-client";
 import { type Product } from "../../_components/AddProductForm";
 
@@ -47,7 +47,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
   return (
     <div className="min-h-screen bg-white">
       {/* Top nav */}
-      <Navbar />
+      <NavbarLogin />
 
       {/* Header row: Back link, title, cart */}
       <div className="flex items-center justify-between px-4 lg:px-48 mt-4">

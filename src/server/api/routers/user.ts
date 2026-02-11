@@ -33,7 +33,11 @@ export const userRouter = createTRPCRouter({
       .from(members)
       .where(eq(members.uuid, user.id));
 
-    return member[0] ?? null;
+    const m = member[0] ?? null;
+    if (!m) return null;
+
+    const isAdmin = ADMIN_ROLES.includes(m.position as typeof ADMIN_ROLES[number]);
+    return { ...m, isAdmin };
   }),
 
   // Secure server-side role check - position is fetched from DB, not client

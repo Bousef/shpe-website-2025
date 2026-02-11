@@ -28,17 +28,10 @@ export default function NavbarLogin() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const router = useRouter();
 
-  // Fetch current member; null if not signed in
+  // Fetch current member (includes isAdmin flag); null if not signed in
   const { data: member, isLoading } = api.user.getCurrentMember.useQuery();
   const isLoggedIn = Boolean(member);
-  
-  // Secure server-side role check - only fetches when logged in
-  const { data: roleData } = api.user.getRole.useQuery(undefined, {
-    enabled: isLoggedIn, // Only fetch role if user is logged in
-  });
-  
-  // Admin status comes from server, not client-side string comparison
-  const isAdmin = roleData?.isAdmin ?? false;
+  const isAdmin = member?.isAdmin ?? false;
   
   // sign out and reload
   const logout = api.user.logout.useMutation({
