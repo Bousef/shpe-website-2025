@@ -2,6 +2,8 @@ import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 import { cartRouter } from "./cart";
 import { members } from "~/server/db/schema";
 import { eq } from "drizzle-orm";
+import { z } from "zod";
+import { TRPCError } from "node_modules/@trpc/server/dist/unstable-core-do-not-import/error/TRPCError";
 
 // Define admin roles centrally - these are the positions that grant admin access
 const ADMIN_ROLES = [
@@ -40,6 +42,49 @@ export const userRouter = createTRPCRouter({
     return { ...m, isAdmin };
   }),
 
+  // Mutation to update member's profile information
+  updateCurrentMember: protectedProcedure
+  .input(
+    z.object({
+      field: z.enum(["first_name", "last_name", "position", "email", "ucf_id"]),
+      value: z.string().min(1, "Value cannot be empty"),
+    })
+  )
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.user.id;
+
+      // Update the specified field for the current user
+      const allowedFields: Record<string, string> = {
+        first_name: "first_name",
+        last_name: "last_name",
+        position: "position",
+        email: "email",
+        ucf_id: "ucf_id",
+      }
+
+      const column = allowedFields[input.field];
+      
+      if (!column) {
+        throw new TRPCError({ 
+          code: "BAD_REQUEST", 
+          message: "Invalid field" 
+        });
+      }
+
+      try {
+        await ctx.db
+          .update(members)
+          .set({ [column]: input.value })
+          .where(eq(members.uuid, userId));
+      } catch (e) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to update profile",
+        });
+      }
+
+      return { success: true };
+    }),
   // Secure server-side role check - position is fetched from DB, not client
   getRole: protectedProcedure.query(async ({ ctx }) => {
     const member = await ctx.db
