@@ -4,10 +4,35 @@ import { motion } from "motion/react";
 import { useState, useEffect } from "react";
 import NavbarLogin from "~/app/_components/NavBarLogin";
 import { api } from "~/trpc/react";
+import EditableField from "./EditableField";
+import { useRouter } from "next/navigation";
 
 export default function ClientProfile() {
+    const utils = api.useUtils();
     const { data: member, isLoading } = api.user.getCurrentMember.useQuery();
-    const [minloading, setMinLoading] = useState(true);
+    const [minLoading, setMinLoading] = useState(true);
+    const router = useRouter();
+
+    // Connect to the backend mutation you already created
+    const updateMember = api.user.updateCurrentMember.useMutation({
+        onSuccess: () => {
+            // Refetch the profile so the UI shows the updated data
+            void utils.user.getCurrentMember.invalidate();
+        },
+    });
+
+    useEffect(() => {
+            if (!isLoading && (!member || !member.isAdmin)) {
+                router.replace("/login?error=Unauthorized");
+            }
+        }, [member, isLoading, router]);
+
+    const handleSave = async (
+        field: "first_name" | "last_name" | "position" | "email" | "ucf_id",
+        value: string,
+    ) => {
+        await updateMember.mutateAsync({ field, value });
+    };
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -16,7 +41,7 @@ export default function ClientProfile() {
         return () => clearTimeout(timer);
     }, []);
 
-    const showLoading = isLoading || minloading;
+    const showLoading = isLoading || minLoading;
 
     if (showLoading) {
         return (
@@ -53,6 +78,7 @@ export default function ClientProfile() {
     const infoFields = [
         {
             label: "Email",
+            fieldKey: "email" as const,
             value: member?.email,
             icon: (
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -62,6 +88,7 @@ export default function ClientProfile() {
         },
         {
             label: "Position",
+            fieldKey: "position" as const,
             value: member?.position,
             icon: (
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -71,7 +98,8 @@ export default function ClientProfile() {
         },
         {
             label: "UCF ID",
-            value: member?.ucf_id,
+            fieldKey: "ucf_id" as const,
+            value: member?.ucf_id != null ? String(member.ucf_id) : null,
             icon: (
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15A2.25 2.25 0 002.25 6.75v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z" />
@@ -154,26 +182,28 @@ export default function ClientProfile() {
                         {infoFields.map((field, i) => (
                             <motion.div
                                 key={field.label}
-                                className="flex items-center gap-4 px-6 py-4 transition-colors hover:bg-slate-50/70"
                                 initial={{ opacity: 0, x: -10 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ duration: 0.3, delay: 0.4 + i * 0.05 }}
                             >
-                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#001f5b]/5 text-[#001f5b]">
-                                    {field.icon}
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                    <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                                        {field.label}
-                                    </p>
-                                    <p className="mt-0.5 truncate text-base font-medium text-slate-800">
-                                        {field.value ?? "—"}
-                                    </p>
-                                </div>
-                                <button className="h-[30px] w-auto rounded-xl bg-[#001f5b] text-white cursor-pointer text-center leading-[30px] px-3">Modify</button>
+                                <EditableField
+                                    label={field.label}
+                                    fieldKey={field.fieldKey}
+                                    value={field.value}
+                                    icon={field.icon}
+                                    onSave={handleSave}
+                                    isSaving={updateMember.isPending}
+                                />
                             </motion.div>
                         ))}
                     </div>
+
+                    {/* Error feedback */}
+                    {updateMember.isError && (
+                        <div className="border-t border-red-100 bg-red-50 px-6 py-3 text-sm text-red-600">
+                            Failed to save: {updateMember.error.message}
+                        </div>
+                    )}
                 </motion.div>
             </div>
         </main>

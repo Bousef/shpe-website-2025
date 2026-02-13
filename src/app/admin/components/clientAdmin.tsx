@@ -5,11 +5,14 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import NavbarLogin from "~/app/_components/NavBarLogin";
 import { api } from "~/trpc/react";
+import CreateAnEvent from "~/app/_components/CreateAnEvent";
+import ManageUsers from "~/app/_components/ManageUsers";
 
 export default function AdminUI() {
     const router = useRouter();
     const { data: member, isLoading } = api.user.getCurrentMember.useQuery();
     const [minLoading, setMinLoading] = useState(true);
+    const [activeComponent, setActiveComponent] = useState<string | null>(null);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -23,7 +26,7 @@ export default function AdminUI() {
     // Redirect non-admin users
     useEffect(() => {
         if (!isLoading && (!member || !member.isAdmin)) {
-            router.replace("/");
+            router.replace("/login?error=Unauthorized");
         }
     }, [member, isLoading, router]);
 
@@ -66,16 +69,8 @@ export default function AdminUI() {
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
-            )
-        },
-        { 
-            name: "Edit Content", 
-            description: "Update website content, images, and text",
-            icon: (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-            )
+            ),
+            component: "ManageUsers" // Placeholder for component later
         },
         { 
             name: "Create Event", 
@@ -84,9 +79,50 @@ export default function AdminUI() {
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-            )
+            ),
+            component: "CreateAnEvent"
         },
     ];
+
+    // If a component is active, render it instead of the admin panel
+    if (activeComponent === "CreateAnEvent") {
+        return (
+            <main className="min-h-screen w-full">
+                <NavbarLogin />
+                <div className="max-w-4xl mx-auto px-6 py-8">
+                    <button
+                        onClick={() => setActiveComponent(null)}
+                        className="mb-6 inline-flex items-center gap-2 text-sm text-slate-500 hover:text-[#001f5b] transition-colors"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                        Back to Admin Panel
+                    </button>
+                    <CreateAnEvent />
+                </div>
+            </main>
+        );
+    }
+    else if (activeComponent === "ManageUsers") {
+        return (
+            <main className="min-h-screen w-full">
+                <NavbarLogin />
+                <div className="max-w-4xl mx-auto px-6 py-8">
+                    <button
+                        onClick={() => setActiveComponent(null)}
+                        className="mb-6 inline-flex items-center gap-2 text-sm text-slate-500 hover:text-[#001f5b] transition-colors"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                        Back to Admin Panel
+                    </button>
+                    <ManageUsers />
+                </div>
+            </main>
+        );
+    }
 
     return (
         <main className="min-h-screen w-full">
@@ -123,6 +159,11 @@ export default function AdminUI() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 * index + 0.4, duration: 0.4 }}
                             whileHover={{ y: -2 }}
+                            onClick={() => {
+                                if (item.component) {
+                                    setActiveComponent(item.component);
+                                }
+                            }}
                         >
                             {/* Hover gradient overlay */}
                             <div className="absolute inset-0 bg-gradient-to-r from-[#001f5b]/5 to-[#ff4d00]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
