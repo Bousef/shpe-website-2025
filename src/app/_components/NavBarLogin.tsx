@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 const navItems = [
   { href: "/board", label: "Board" },
   { href: "/dev-team", label: "Dev team" },
-  { href: "/sponsors", label: "Sponsors" },
+  { href: "/sponsors", label: "Partners" },
   { href: "/calendar", label: "Calendar" },
   { href: "/history", label: "History" },
 ];
@@ -19,7 +19,7 @@ const adminNavItems = [
   { href: "/admin", label: "Admin" },
   { href: "/board", label: "Board" },
   { href: "/dev-team", label: "Dev team" },
-  { href: "/sponsors", label: "Sponsors" },
+  { href: "/sponsors", label: "Partners" },
   { href: "/calendar", label: "Calendar" },
   { href: "/history", label: "History" },
 ]

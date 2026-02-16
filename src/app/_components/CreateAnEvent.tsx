@@ -2,17 +2,33 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-
-// TODO: Add tRPC imports when connecting to backend
+import { api } from "~/trpc/react";
 
 export default function CreateAnEvent() {
     const [eventName, setEventName] = useState("");
-    const [date, setDate] = useState("");
-    const [time, setTime] = useState("");
+    const [startTime, setStartTime] = useState("")
+    const [endTime, setEndTime] = useState("")
     const [location, setLocation] = useState("");
     const [isVirtual, setIsVirtual] = useState(false);
     const [description, setDescription] = useState("");
     const [flyerPreview, setFlyerPreview] = useState<string | null>(null);
+    const [submitStatus, setSubmitStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+
+    const createEvent = api.events.createEvent.useMutation({
+        onSuccess: () => {
+            setSubmitStatus("success");
+            setEventName("");
+            setStartTime("");
+            setEndTime("");
+            setLocation("");
+            setIsVirtual(false);
+            setDescription("");
+            setFlyerPreview(null);
+        },
+        onError: () => {
+            setSubmitStatus("error");
+        },
+    });
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -24,8 +40,16 @@ export default function CreateAnEvent() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // TODO: Wire up tRPC mutation here
-        console.log({ eventName, date, time, location, isVirtual, description });
+        setSubmitStatus("loading");
+
+        createEvent.mutate({
+            title: eventName,
+            description,
+            location,
+            start_time: startTime ? new Date(startTime) : undefined,
+            end_time: endTime ? new Date(endTime) : undefined,
+            image: flyerPreview ?? undefined,
+        });
     };
 
     return (
@@ -86,7 +110,7 @@ export default function CreateAnEvent() {
                         </div>
                     </motion.div>
 
-                    {/* Date & Time */}
+                    {/* Start Time & End Time */}
                     <motion.div
                         className="flex items-center gap-4 px-6 py-4"
                         initial={{ opacity: 0, x: -10 }}
@@ -95,26 +119,32 @@ export default function CreateAnEvent() {
                     >
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#001f5b]/5 text-[#001f5b]">
                             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
                         <div className="min-w-0 flex-1">
                             <label className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                                Date & Time
+                                Start Time & End Time
                             </label>
                             <div className="mt-0.5 flex gap-3">
-                                <input
-                                    type="date"
-                                    value={date}
-                                    onChange={(e) => setDate(e.target.value)}
-                                    className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-base font-medium text-slate-800 outline-none transition-colors focus:border-[#001f5b] focus:ring-1 focus:ring-[#001f5b]"
-                                />
-                                <input
-                                    type="time"
-                                    value={time}
-                                    onChange={(e) => setTime(e.target.value)}
-                                    className="w-36 rounded-lg border border-slate-300 px-3 py-2 text-base font-medium text-slate-800 outline-none transition-colors focus:border-[#001f5b] focus:ring-1 focus:ring-[#001f5b]"
-                                />
+                                <div className="flex-1">
+                                    <label className="text-xs text-slate-400">Start</label>
+                                    <input
+                                        type="datetime-local"
+                                        value={startTime}
+                                        onChange={(e) => setStartTime(e.target.value)}
+                                        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base font-medium text-slate-800 outline-none transition-colors focus:border-[#001f5b] focus:ring-1 focus:ring-[#001f5b]"
+                                    />
+                                </div>
+                                <div className="flex-1">
+                                    <label className="text-xs text-slate-400">End</label>
+                                    <input
+                                        type="datetime-local"
+                                        value={endTime}
+                                        onChange={(e) => setEndTime(e.target.value)}
+                                        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base font-medium text-slate-800 outline-none transition-colors focus:border-[#001f5b] focus:ring-1 focus:ring-[#001f5b]"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </motion.div>
@@ -249,11 +279,18 @@ export default function CreateAnEvent() {
                         </button>
                         <button
                             type="submit"
-                            className="rounded-xl bg-[#001f5b] px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-[#001f5b]/90 hover:shadow-md active:scale-[0.98]"
+                            disabled={createEvent.isPending}
+                            className="rounded-xl bg-[#001f5b] px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-[#001f5b]/90 hover:shadow-md active:scale-[0.98] disabled:opacity-50"
                         >
-                            Create Event
+                            {createEvent.isPending ? "Creating..." : "Create Event"}
                         </button>
                     </div>
+                    {submitStatus === "success" && (
+                        <p className="mt-2 text-sm text-green-600">Event created successfully!</p>
+                    )}
+                    {submitStatus === "error" && (
+                        <p className="mt-2 text-sm text-red-600">Failed to create event. Please try again.</p>
+                    )}
                 </motion.div>
             </motion.form>
         </motion.div>

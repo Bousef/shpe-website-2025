@@ -3,23 +3,18 @@ import { cartRouter } from "./cart";
 import { members } from "~/server/db/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { TRPCError } from "node_modules/@trpc/server/dist/unstable-core-do-not-import/error/TRPCError";
+import { TRPCError } from "@trpc/server";
 
-// Define admin roles centrally - these are the positions that grant admin access
+// Only DevTeam gets admin-tab access
 const ADMIN_ROLES = [
-  "President",
-  "Internal Vice President",
-  "Corporate Vice President",
-  "Secretary",
-  "Marketing Vice President",
-  "Treasurer",
-  "Technology Chair",
   "DevTeam",
 ] as const;
 
+// Fields that Members are allowed to edit (everyone else can edit all fields)
+const MEMBER_EDITABLE_FIELDS = ["email", "ucf_id"] as const;
+
 /// Represents the currently signed-in user.
 export const userRouter = createTRPCRouter({
-  cart: cartRouter,
 
   getCurrentMember: publicProcedure.query(async ({ ctx }) => {
     if (!ctx.supabase) return null;
@@ -53,6 +48,25 @@ export const userRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.user.id;
 
+      // Fetch caller's current position to enforce permissions
+      const caller = await ctx.db
+        .select({ position: members.position })
+        .from(members)
+        .where(eq(members.uuid, userId));
+
+      const callerPosition = caller[0]?.position ?? "Member";
+
+      // Members can only edit email and ucf_id
+      if (
+        callerPosition === "Member" &&
+        !(MEMBER_EDITABLE_FIELDS as readonly string[]).includes(input.field)
+      ) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Members can only modify their email and UCF ID",
+        });
+      }
+
       // Update the specified field for the current user
       const allowedFields: Record<string, string> = {
         first_name: "first_name",
@@ -63,7 +77,7 @@ export const userRouter = createTRPCRouter({
       }
 
       const column = allowedFields[input.field];
-      
+
       if (!column) {
         throw new TRPCError({ 
           code: "BAD_REQUEST", 
