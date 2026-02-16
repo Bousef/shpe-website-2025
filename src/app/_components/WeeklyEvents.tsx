@@ -5,6 +5,8 @@ import { supabase } from "../../supabase-client";
 import { useEffect, useState } from "react";
 import { FaGear } from "react-icons/fa6";
 
+const placeholder = "/assets/placeholder.png";
+
 
 export default function WeeklyEvents() {
 
@@ -21,11 +23,15 @@ useEffect(() => {
     console.log("DATA:", data);
     console.log("ERROR:", error);
 
-    const events = (data ?? []).map((event: { title: string; description: string; image: string | null }) => ({
-      name: event.title,
-      description: event.description,
-      imgSrc: event.image?.split(";")[0] ?? "/placeholder.jpg",
-    }));
+    const events = (data ?? []).map((event: { title: string; description: string; image: string | null }) => {
+      const img = event.image?.split(";")[0];
+      const isValidUrl = img && (img.startsWith("http://") || img.startsWith("https://") || img.startsWith("/"));
+      return {
+        name: event.title,
+        description: event.description,
+        imgSrc: isValidUrl ? img : placeholder,
+      };
+    });
 
     setEvents(events);
   }

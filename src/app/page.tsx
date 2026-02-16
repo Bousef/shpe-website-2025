@@ -36,7 +36,7 @@ export default function HomePage() {
     return (
       <>
         {/* full page */}
-        <div className="bg-[#F7F8F9] text-black overflow-x-hidden flex flex-col">
+        <div className="bg-white text-black overflow-x-hidden flex flex-col">
           <NavbarLogin />
           <HeroMask2 />
           <HeroSection />
@@ -50,7 +50,7 @@ export default function HomePage() {
   return (
     <>
       {/* full page */}
-      <div className="bg-[#F7F8F9] text-black overflow-x-hidden flex flex-col">
+      <div className="bg-white text-black overflow-x-hidden flex flex-col">
         <NavbarLogin />
         <HeroMask />
         <HeroSection /> 

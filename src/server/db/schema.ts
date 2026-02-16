@@ -1,4 +1,4 @@
-import { pgEnum, pgTableCreator, varchar, boolean, unique } from "drizzle-orm/pg-core";
+import { pgEnum, pgTable, pgTableCreator, varchar, boolean, unique } from "drizzle-orm/pg-core";
 import type { InferSelectModel } from "drizzle-orm";
 
 
@@ -41,7 +41,7 @@ export type Member = InferSelectModel<typeof members>;
 //--------------------  Tables --------------------
 
 //members table
-export const members = createTable(
+export const members = pgTable(
   "members",
   (d) => ({
     // id has to mirror the id from Supabase's auth.users table
@@ -56,6 +56,22 @@ export const members = createTable(
     resume: varchar({ length: 2048 }), //url
     is_member: boolean().default(false),
     position: positionEnum("position").default("Member"),
+  })
+);
+
+export const events = pgTable(
+  "events",
+  (d) => ({
+    id: d.bigint({ mode: "number" }).primaryKey().generatedByDefaultAsIdentity(),
+    created_at: d.timestamp({ withTimezone: true }).defaultNow(),
+    updated_at: d.timestamp({ withTimezone: true }),
+    title: d.varchar({ length: 255 }),
+    description: d.varchar({ length: 255 }),
+    location: d.varchar({ length: 255 }),
+    start_time: d.timestamp({ withTimezone: true }),
+    end_time: d.timestamp({ withTimezone: true }),
+    image: d.varchar({ length: 2048 }),
+    points: d.integer().default(0),
   })
 );
 
