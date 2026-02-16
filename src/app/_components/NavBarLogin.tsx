@@ -24,6 +24,28 @@ const adminNavItems = [
   { href: "/history", label: "History" },
 ]
 
+function NavLink({ href, label }: { href: string; label: string }) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <Link
+      href={href}
+      className="relative rounded-full px-4 py-2 text-sm font-semibold text-[#001F5B] transition-colors hover:text-[#FD652F]"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <motion.span
+        className="absolute inset-0 z-0 rounded-full bg-[#FD652F]/20"
+        initial={false}
+        animate={{ scaleX: hovered ? 1 : 0 }}
+        style={{ originX: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+      />
+      <span className="relative z-10">{label}</span>
+    </Link>
+  );
+}
+
 export default function NavbarLogin() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const router = useRouter();
@@ -42,223 +64,125 @@ export default function NavbarLogin() {
   });
 
   return (
-  <nav className="w-full bg-gradient-to-t from-white to-[#afc1e3] p-4 sm:p-5 max-w-screen overlay-x-hidden">
-  <div className="flex items-center ">
-    {/* Logo */}
-    <Link href="/" className="flex-shrink-0.5">
-      <img
-        src="/assets/NavLogo.png"
-        alt="SHPE UCF logo"
-        className="w-80 object-contain"
-      />
-    </Link>
-
-    {/* Toggle Button — FIXED CLASS */}
-    <button
-      className="md:hidden text-3xl text-[#001f5b]"
-      onClick={() => setMobileOpen((prev) => !prev)}
-      aria-label="Toggle menu"
-    >
-      {mobileOpen ? <HiX /> : <HiMenuAlt3 />}
-    </button>
-
-    {/* Desktop Nav */}
-
-    {isAdmin ? (
-      // if admin, show admin nav items
-      <div className="hidden md:flex justify-between items-center w-full text-sm lg:text-xl mt-4 md:mt-0 px-6 font-extralight">
-      {adminNavItems.map(({ href, label }) => (
-          <motion.div
-            key={href}
-            className="px-3 py-1 relative inline-block"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1 }}
-            whileHover="hover"
-          >
-            <Link
-              href={href}
-              className="text-[#001f5b] hover:text-[#001133]"
-            >
-              {label.toUpperCase()}
-            </Link>
-            <motion.div 
-              className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#001f5b]" 
-              initial={{ scaleX: 0 }}
-              variants={{
-                hover: { scaleX: 1 }
-              }}
-              transition={{ duration: 0.3 }}
+    <div className="sticky top-4 z-50 px-2 sm:px-6 lg:px-8 pb-4">
+      <motion.nav
+        className="mx-auto max-w-7xl rounded-2xl bg-white/80 backdrop-blur-xl shadow-sm"
+        initial={{ y: 0 }}
+        whileHover={{ 
+          y: -2,
+          scale: 1.02,
+          boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)" 
+        }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
+      >
+        <div className="relative flex h-16 items-center justify-between px-4 sm:px-6">
+          {/* Logo */}
+          <Link href="/" className="flex-shrink-0">
+            <img
+              src="/assets/NavLogo.png"
+              alt="SHPE UCF logo"
+              className="h-9 w-auto object-contain"
             />
-          </motion.div>
-        )
-      )}
-          {/* account / login / logout */}
-          {( isLoggedIn ? (
-              <div className="flex items-center space-x-4">
-                <Link href="/profile" title="Your Profile">
-                  <VscAccount className="text-3xl text-[#001f5b] cursor-pointer" />
-                </Link>
-                <button
-                   onClick={() => logout.mutate()}
-                  className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
-                >
-                  Log out
-                </button>
-              </div>
-            ) : (
-              <motion.a
-                href="/login"
-                className="px-3 py-1 text-[#001f5b] hover:text-[#001133] font-medium"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 1 }}
-              >
-                Log in
-              </motion.a>
-            )
-          )}
-      </div>
-    ) : (
-      // if not admin, show regular nav items
-      <div className="hidden md:flex justify-between items-center w-full text-sm lg:text-xl mt-4 md:mt-0 px-6 font-extralight">
-      {navItems.map(({ href, label }) => (
-          <motion.div
-            key={href}
-            className="px-3 py-1 relative inline-block"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1 }}
-            whileHover="hover"
-          >
-            <Link
-              href={href}
-              className="text-[#001f5b] hover:text-[#001133]"
-            >
-              {label.toUpperCase()}
-            </Link>
-            <motion.div 
-              className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#001f5b]" 
-              initial={{ scaleX: 0 }}
-              variants={{
-                hover: { scaleX: 1 }
-              }}
-              transition={{ duration: 0.3 }}
-            />
-          </motion.div>
-        )
-      )}
-          {/* account / login / logout */}
-          {( isLoggedIn ? (
-              <div className="flex items-center space-x-4">
-                <Link href="/profile" title="Your Profile">
-                  <VscAccount className="text-3xl text-[#001f5b] cursor-pointer" />
-                </Link>
-                <button
-                   onClick={() => logout.mutate()}
-                  className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
-                >
-                  Log out
-                </button>
-              </div>
-            ) : (
-              <motion.a
-                href="/login"
-                className="px-3 py-1 text-[#001f5b] hover:text-[#001133] font-medium"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 1 }}
-              >
-                Log in
-              </motion.a>
-            )
-          )}
-    </div>
-    )}
-  </div>
-
-
-  {/* Mobile Nav */}
-
-  {isAdmin ? (
-    // if admin, show admin nav items
-    mobileOpen && (
-    <div className="md:hidden mt-4 space-y-3 flex flex-col items-start text-lg sm:text-xl">
-      {adminNavItems.map(({ href, label }) => (
-          <Link
-            key={href}
-            href={href}
-            className="block w-full px-4 py-2 text-[#001f5b] hover:text-[#001133] hover:scale-105 transition-transform duration-150 bg-white/90 rounded-xl"
-            onClick={() => setMobileOpen(false)}
-          >
-            {label}
           </Link>
-        )
-      )}
-           {( isLoggedIn ? (
-              <div className="px-4 py-2 flex items-center space-x-4 bg-white/90 rounded-xl">
-                <Link href="/profile">
-                  <VscAccount className="text-2xl text-[#001f5b]" />
+
+          {/* Desktop Nav */}
+          <div className="hidden md:flex items-center gap-1">
+            {(isAdmin ? adminNavItems : navItems).map(({ href, label }) => (
+              <NavLink key={href} href={href} label={label} />
+            ))}
+          </div>
+
+          {/* Desktop Right Side */}
+          <div className="hidden md:flex items-center gap-4">
+            {isLoggedIn ? (
+              <>
+                <Link
+                  href="/profile"
+                  title="Your Profile"
+                  className="flex h-9 w-9 items-center justify-center rounded-full text-[#001F5B] transition-colors hover:bg-slate-100 hover:text-[#FD652F]"
+                >
+                  <VscAccount className="text-xl" />
                 </Link>
                 <button
-                   onClick={() => logout.mutate()}
-                  className="text-red-600 font-medium"
+                  onClick={() => logout.mutate()}
+                  className="text-sm font-semibold text-[#001F5B] transition-colors hover:text-[#FD652F]"
                 >
                   Log out
                 </button>
-              </div>
+              </>
             ) : (
               <Link
                 href="/login"
-                onClick={() => setMobileOpen(false)}
-                className="px-4 py-2 bg-white/90 rounded-xl"
+                className="rounded-full bg-gradient-to-r from-[#72A9BE] to-[#FD652F] px-5 py-2 text-sm font-bold text-white shadow-md transition-transform hover:scale-105"
               >
                 Log in
               </Link>
-            )
-          )}
-    </div>
-  )
-  ) : (
-    // if not admin, show regular nav items
-    mobileOpen && (
-    <div className="md:hidden mt-4 space-y-3 flex flex-col items-start text-lg sm:text-xl">
-      {navItems.map(({ href, label }) => (
-          <Link
-            key={href}
-            href={href}
-            className="block w-full px-4 py-2 text-[#001f5b] hover:text-[#001133] hover:scale-105 transition-transform duration-150 bg-white/90 rounded-xl"
-            onClick={() => setMobileOpen(false)}
+            )}
+          </div>
+
+          {/* Mobile Toggle */}
+          <button
+            className="md:hidden flex h-9 w-9 items-center justify-center rounded-lg text-[#001F5B] transition-colors hover:bg-slate-100"
+            onClick={() => setMobileOpen((prev) => !prev)}
+            aria-label="Toggle menu"
           >
-            {label}
-          </Link>
-        )
-      )}
-           {( isLoggedIn ? (
-              <div className="px-4 py-2 flex items-center space-x-4 bg-white/90 rounded-xl">
-                <Link href="/profile">
-                  <VscAccount className="text-2xl text-[#001f5b]" />
-                </Link>
-                <button
-                   onClick={() => logout.mutate()}
-                  className="text-red-600 font-medium"
+            {mobileOpen ? <HiX className="text-xl" /> : <HiMenuAlt3 className="text-xl" />}
+          </button>
+        </div>
+
+        {/* Mobile Nav Dropdown */}
+        {mobileOpen && (
+          <motion.div
+            className="md:hidden border-t border-slate-200 px-4 pb-4 pt-2"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="space-y-1">
+              {(isAdmin ? adminNavItems : navItems).map(({ href, label }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className="block rounded-lg px-3 py-2.5 text-sm font-medium text-[#001F5B] transition-colors hover:bg-slate-100 hover:text-[#FD652F]"
+                  onClick={() => setMobileOpen(false)}
                 >
-                  Log out
-                </button>
-              </div>
-            ) : (
-              <Link
-                href="/login"
-                onClick={() => setMobileOpen(false)}
-                className="px-4 py-2 bg-white/90 rounded-xl"
-              >
-                Log in
-              </Link>
-            )
-          )}
+                  {label}
+                </Link>
+              ))}
+            </div>
+
+            <div className="mt-3 border-t border-slate-200 pt-3">
+              {isLoggedIn ? (
+                <div className="flex items-center gap-3">
+                  <Link
+                    href="/profile"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-[#001F5B] hover:bg-slate-100"
+                  >
+                    <VscAccount className="text-lg" />
+                    Profile
+                  </Link>
+                  <button
+                    onClick={() => logout.mutate()}
+                    className="ml-auto rounded-lg px-3 py-2 text-sm font-medium text-red-500 hover:bg-slate-50"
+                  >
+                    Log out
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  href="/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="block w-full rounded-full bg-gradient-to-r from-[#72A9BE] to-[#FD652F] px-4 py-2.5 text-center text-sm font-bold text-white shadow-sm"
+                >
+                  Log in
+                </Link>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </motion.nav>
     </div>
-    )
-  )}
-  </nav>
   );
 }
