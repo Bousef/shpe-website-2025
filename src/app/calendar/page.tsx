@@ -1,10 +1,10 @@
-import Navbar from "../_components/NavBar";
+import NavbarLogin from "../_components/NavBarLogin";
 
 export default function Calendar() {
 
     return (
         <div>
-            <Navbar />
+            <NavbarLogin />
             <div className = "flex flex-col items-center">
                 <iframe
                     id="calendar"

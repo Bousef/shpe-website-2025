@@ -111,7 +111,7 @@ export default function Checkout() {
   
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 space-y-10">
-      <h1 className="text-3xl font-bold">Checkout</h1>
+      <h1 className="text-4xl md:text-5xl font-semibold text-[#001f5b] tracking-tight">Checkout</h1>
 
       {/* ---------- Cart ---------- */}
       {items.length === 0 ? (

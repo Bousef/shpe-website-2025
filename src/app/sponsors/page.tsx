@@ -1,10 +1,10 @@
-import Navbar from "../_components/NavBar";
+import NavbarLogin from "../_components/NavBarLogin";
 import PartnersSection from "../_components/PartnersSection";
 export default function Board () {
 
     return (
         <div>
-            <Navbar/>
+            <NavbarLogin/>
             <PartnersSection/>
         </div>
     );

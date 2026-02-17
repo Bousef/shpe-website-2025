@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 
-import Navbar from "../../../_components/NavBar";
+import NavbarLogin from "../../../_components/NavBarLogin";
 import { supabase } from "../../../../supabase-client";
 import type { Product } from "../../../_components/AddProductForm";
 import { boolean } from "drizzle-orm/gel-core";
@@ -105,7 +105,7 @@ useEffect(() => {
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar />
+      <NavbarLogin />
       <div className="flex justify-end px-4 lg:px-48 mt-4">
   <Link
     href="/cart"

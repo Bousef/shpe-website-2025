@@ -88,12 +88,6 @@ export const createTRPCRouter = t.router;
 const timingMiddleware = t.middleware(async ({ next, path }) => {
   const start = Date.now();
 
-  if (t._config.isDev) {
-    // artificial delay in dev
-    const waitMs = Math.floor(Math.random() * 400) + 100;
-    await new Promise((resolve) => setTimeout(resolve, waitMs));
-  }
-
   const result = await next();
 
   const end = Date.now();
@@ -129,18 +123,15 @@ export const protectedProcedure = t.procedure
       });
     }
 
-    const { data: { session } } = await ctx.supabase.auth.getSession();
-    const { data: { user } } = await ctx.supabase.auth.getUser();
+    const { data: { user }, error } = await ctx.supabase.auth.getUser();
 
-    if (!session || !user) {
+    if (error || !user) {
       throw new TRPCError({ code: "UNAUTHORIZED" });
     }
 
-    // We reconstruct to make sure the session is non-nullable 
     return next({
       ctx: {
         ...ctx,
-        session: session, // Now typed as non-nullable Session
         user: user,
       },
     });

@@ -1,6 +1,6 @@
 "use client";
 
-import Navbar from "../_components/NavBar";
+import NavbarLogin from "../_components/NavBarLogin";
 import { useState } from "react";
 import ContactCard from "./_components/ContactCard";
 import { eBoardMembers } from "../../../public/members/data/eboard";
@@ -14,7 +14,7 @@ export default function Board() {
 
   return (
     <main>
-      <Navbar />
+      <NavbarLogin />
       {/* Main Title */}
       <div className="flex items-center">
         <div className="mx-auto text-yellow-500">
@@ -22,7 +22,7 @@ export default function Board() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="font-helvetica m-6 pb-4 text-center text-[28px] text-blue-800 sm:m-10 sm:text-[36px] md:text-[50px]"
+            className="text-4xl md:text-5xl font-semibold text-[#001f5b] tracking-tight text-center m-6 pb-4 sm:m-10"
           >KNOW THE FACES OF SHPE UCF
           </motion.h1>
         </div>
