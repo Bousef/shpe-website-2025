@@ -32,12 +32,12 @@ function ResetPasswordContent() {
         <section className="flex flex-col items-center justify-center pb-[6rem] py-[2rem] px-4 min-w-[280px]">
             {/* header */}
             <div className="container px-4 text-center mb-5">
-                <h2 className="text-4xl text-[var(--shpe-orange)] font-bold">Set a New Password</h2>
+                <h2 className="text-4xl text-[#001f5b] font-bold">Set a New Password</h2>
             </div>
             
             {/* ENTER NEW PASSWORD */}
             <form onSubmit={handleSubmit} className="w-full max-w-md bg-white item-center p-6 rounded-lg shadow text-[var(--shpe-navy-blue)]">
-                <h2 className="text-lg font-semibold">Enter New Password</h2>
+                <h2 className="text-lg font-semibold text-[#001f5b]">Enter New Password</h2>
                 <input 
                     type="password"
                     minLength={8}

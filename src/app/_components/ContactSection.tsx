@@ -23,7 +23,7 @@ export default function ContactSection() {
     "/>
       <section className="relative flex flex-col items-center w-screen">
         <header className="h-[5%]">
-          <h2 className="font-bold text-slate-800 text-4xl 2xl:text-7xl text-center mb-6 2xl:mb-10 pt-10">
+          <h2 className="font-bold text-[#001f5b] text-4xl 2xl:text-7xl text-center mb-6 2xl:mb-10 pt-10">
             Let's stay connected
           </h2>
           <p className="font-medium text-slate-500 text-xl 2xl:text-4xl text-center">
@@ -52,7 +52,7 @@ export default function ContactSection() {
               <div className="flex items-center justify-center w-16 h-16 2xl:w-24 2xl:h-24 rounded-full bg-orange-500">
                 <Icon className="text-white text-3xl 2xl:text-5xl" />
               </div>
-              <h3 className="font-bold text-slate-800 text-2xl 2xl:text-4xl">
+              <h3 className="font-bold text-[#001f5b] text-2xl 2xl:text-4xl">
                 {name}
               </h3>
             </a>

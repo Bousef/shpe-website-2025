@@ -11,7 +11,7 @@ const ADMIN_ROLES = [
 ] as const;
 
 // Fields that Members are allowed to edit (everyone else can edit all fields)
-const MEMBER_EDITABLE_FIELDS = ["email", "ucf_id"] as const;
+const MEMBER_EDITABLE_FIELDS = ["first_name", "last_name"] as const;
 
 /// Represents the currently signed-in user.
 export const userRouter = createTRPCRouter({
@@ -56,7 +56,7 @@ export const userRouter = createTRPCRouter({
 
       const callerPosition = caller[0]?.position ?? "Member";
 
-      // Members can only edit email and ucf_id
+      // Members can only edit first_name and last_name
       if (
         callerPosition === "Member" &&
         !(MEMBER_EDITABLE_FIELDS as readonly string[]).includes(input.field)

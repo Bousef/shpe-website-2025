@@ -164,7 +164,7 @@ export default function SignUp() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <h1 className="text-3xl font-semibold tracking-tight text-[var(--shpe-navy-blue)]">
+          <h1 className="text-3xl font-semibold tracking-tight text-[#001f5b]">
             Create your account
           </h1>
           <p className="mt-2 text-sm text-slate-500">
