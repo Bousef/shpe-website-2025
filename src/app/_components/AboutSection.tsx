@@ -82,7 +82,7 @@ export default function AboutSection() {
               />
             </div>
 
-            <h3 className="font-bold text-2xl sm:text-2xl md:text-3xl lg:text-4xl mb-6 px-2 text-center text-[#001f5b]">
+            <h3 className="font-bold text-2xl sm:text-2xl md:text-3xl lg:text-4xl mb-6 px-2 text-center text-white">
               {title}
             </h3>
 
