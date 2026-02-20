@@ -78,7 +78,7 @@ export default function CreateAnEvent() {
             >
                 {/* Section: Event Details */}
                 <div className="border-b border-slate-100 px-6 py-4">
-                    <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-400">
+                    <h2 className="text-sm font-semibold uppercase tracking-wider text-[#001f5b]">
                         Event Details
                     </h2>
                 </div>

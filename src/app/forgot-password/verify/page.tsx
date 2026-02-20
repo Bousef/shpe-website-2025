@@ -29,12 +29,12 @@ function CodeVerificationContent() {
         <section className="flex flex-col items-center justify-center pb-[6rem] py-[2rem] px-4 min-w-[280px]">
             {/* header */}
             <div className="container px-4 text-center mb-5">
-                <h2 className="text-4xl text-[var(--shpe-orange)] font-bold">Verification</h2>
+                <h2 className="text-4xl text-[#001f5b] font-bold">Verification</h2>
             </div>
             
             {/* ENTER CODE */}
             <form onSubmit={handleSubmit} className="w-full max-w-md bg-white item-center p-6 rounded-lg shadow text-[var(--shpe-navy-blue)]">
-                <h2 className="text-xl font-bold mb-4">Enter Verification Code</h2>
+                <h2 className="text-xl font-bold mb-4 text-[#001f5b]">Enter Verification Code</h2>
                 <input 
                     type="text"
                     maxLength={6}

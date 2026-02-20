@@ -144,7 +144,7 @@ useEffect(() => {
             ← Back to {category}
           </Link>
 
-          <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
+          <h1 className="text-3xl font-bold mb-4 text-[#001f5b]">{product.name}</h1>
           <p className="text-2xl font-semibold mb-1">${product.price.toFixed(2)}</p>
           <p className="text-sm text-gray-600 mb-6">
             Pay in 4 interest-free payments of ${(

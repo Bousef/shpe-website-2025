@@ -152,7 +152,7 @@ export default function ClientProfile() {
                     </motion.div>
 
                     <motion.h1
-                        className="text-3xl font-bold tracking-tight text-[#001f5b]/60 sm:text-4xl"
+                        className="text-3xl font-bold tracking-tight text-[#001f5b] sm:text-4xl"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.1 }}
@@ -191,7 +191,7 @@ export default function ClientProfile() {
                 >
                     {/* Section header */}
                     <div className="border-b border-slate-100 px-6 py-4">
-                        <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-400">
+                        <h2 className="text-sm font-semibold uppercase tracking-wider text-[#001f5b]">
                             Personal Information
                         </h2>
                     </div>
@@ -212,6 +212,7 @@ export default function ClientProfile() {
                                     icon={field.icon}
                                     onSave={handleSave}
                                     isSaving={updateMember.isPending}
+                                    isMember={member?.position === "Member"}
                                 />
                             </motion.div>
                         ))}
