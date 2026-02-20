@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
 
 type modificationProps = {
@@ -10,8 +9,7 @@ type modificationProps = {
 }
 
 const Boxes = [
-    { name: "Add User", placeholder: "Add a new user to the system", href: "/admin/add" },
-    { name: "Edit User", placeholder: "Edit existing user details", href: "/admin/edit" },
+    { name: "Change User Role", placeholder: "Change a user's role in the system", href: "/admin/add" },
     { name: "Delete User", placeholder: "Remove a user from the system", href: "/admin/delete" },
 ]
 const UserCard = ({ placeholder, name, href }: modificationProps) => {

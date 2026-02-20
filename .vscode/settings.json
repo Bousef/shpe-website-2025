@@ -1,0 +1,8 @@
+{
+    "workbench.colorTheme": "Monokai Dimmed",
+    "editor.autoClosingBrackets": "beforeWhitespace",
+    "editor.autoClosingComments": "beforeWhitespace",
+    "typescript.suggest.enabled": false,
+    "typescript.suggest.completeJSDocs": false,
+    "tailwindCSS.suggestions": false
+}
