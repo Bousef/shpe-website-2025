@@ -56,6 +56,7 @@ export const members = pgTable(
     resume: varchar({ length: 2048 }), //url
     is_member: boolean().default(false),
     position: positionEnum("position").default("Member"),
+    points: d.integer().default(0),
   })
 );
 
