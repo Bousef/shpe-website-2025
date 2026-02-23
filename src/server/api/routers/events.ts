@@ -3,6 +3,7 @@ import { events } from "~/server/db/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+import AddressConvert from "~/lib/AddressToCoord";
 
 export const eventsRouter = createTRPCRouter({
 
@@ -18,6 +19,7 @@ export const eventsRouter = createTRPCRouter({
         })
     ).mutation(async ({ ctx, input }) => {
     try {
+        const { latitude, longitude } = await AddressConvert(input.location);
         const eventId = await ctx.db.insert(events)
         .values({
             title: input.title,
@@ -27,6 +29,8 @@ export const eventsRouter = createTRPCRouter({
             end_time: input.end_time,
             image: input.image,
             points: input.points,
+            latitude,
+            longitude,
         });
 
         return eventId;
