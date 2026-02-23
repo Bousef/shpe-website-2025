@@ -13,7 +13,7 @@ export const checkinRouter = createTRPCRouter({
             ucf_id: z.number().int().positive("UCF ID is required"),
             title: z.string().min(1, "Event name is required"),
             latitude: z.number(),
-            longtitude: z.number(),
+            longitude: z.number(),
         })
     ).mutation(async ({ ctx, input }) => {
 
@@ -53,7 +53,7 @@ export const checkinRouter = createTRPCRouter({
         }
         
         const eventLat = event[0]?.latitude;
-        const eventLon = event[0]?.longtitude;
+        const eventLon = event[0]?.longitude;
         const radius = event[0]?.radius_meters;
 
         if (typeof eventLat !== "number" || typeof eventLon !== "number") {
@@ -61,7 +61,7 @@ export const checkinRouter = createTRPCRouter({
         }
 
         const distance = HarversineDistance(
-            input.latitude, input.longtitude,
+            input.latitude, input.longitude,
             eventLat, eventLon,
         )
 
@@ -88,7 +88,7 @@ export const checkinRouter = createTRPCRouter({
             await tx
                 .update(members)
                 .set({
-                    points:        sql`${members.points} + ${event[0]!.points}`,
+                    points:        sql`${members.points} + ${event[0]!.points ?? 0}`,
                     event_counter: sql`${members.event_counter} + 1`,
             })
                 .where(eq(members.ucf_id, input.ucf_id));

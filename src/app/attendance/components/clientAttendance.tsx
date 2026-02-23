@@ -63,7 +63,7 @@ export default function AttendanceUI() {
             ucf_id:     currentMember.ucf_id,
             title:      selectedTitle,
             latitude,
-            longtitude: longitude,
+            longitude,
           });
         }
       },
