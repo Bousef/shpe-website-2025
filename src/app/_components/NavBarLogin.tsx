@@ -14,6 +14,7 @@ const navItems = [
   { href: "/sponsors", label: "Partners" },
   { href: "/calendar", label: "Calendar" },
   { href: "/history", label: "History" },
+  { href: "/point-rankings", label: "Points" },
 ];
 const adminNavItems = [
   { href: "/admin", label: "Admin" },
@@ -22,6 +23,7 @@ const adminNavItems = [
   { href: "/sponsors", label: "Partners" },
   { href: "/calendar", label: "Calendar" },
   { href: "/history", label: "History" },
+  { href: "/point-rankings", label: "Point Rankings" },
 ]
 
 function NavLink({ href, label }: { href: string; label: string }) {

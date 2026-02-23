@@ -22,7 +22,7 @@ export default function PartnersSection() {
   return (
     <main className="bg-white py-12 px-4">
       <section className="max-w-6xl mx-auto text-center">
-        <h2 className="text-5xl text-[#001F5B]">
+        <h2 className="text-5xl font-bold text-[#001F5B]">
           THANK YOU TO OUR PARTNERS!
         </h2>
 

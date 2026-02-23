@@ -62,8 +62,6 @@ export default function AddPage() {
         }
     };
 
-    
-
     return (
         <main className="flex flex-col w-full min-h-screen items-center bg-gradient-to-br from-[#e3e9f7] to-[#f8fafc]">
             <NavBarLogin />

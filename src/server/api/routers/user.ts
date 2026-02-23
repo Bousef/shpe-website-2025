@@ -109,6 +109,13 @@ export const userRouter = createTRPCRouter({
     return { ...m, isAdmin };
   }),
 
+  getAllMembers: publicProcedure.query(async ({ ctx }) => {
+    if (!ctx.supabase) return [];
+
+    return ctx.db.select({ name: members.first_name, point: members.points }).from(members);
+
+  }),
+
   // Mutation to update member's profile information
   updateCurrentMember: protectedProcedure
   .input(
