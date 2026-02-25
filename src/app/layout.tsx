@@ -1,6 +1,7 @@
 import "~/styles/globals.css";
 import { type Metadata } from "next";
 import { Geist } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import FooterSection from "./_components/FooterSection";
 import { TRPCReactProvider } from "~/trpc/react";
 import { env } from "~/env";
@@ -62,6 +63,7 @@ export default function RootLayout({
           {/* always rendered at the bottom */}
           <FooterSection />
         </TRPCReactProvider>
+        <Analytics />
       </body>
     </html>
   );
