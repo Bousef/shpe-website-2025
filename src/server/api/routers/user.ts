@@ -1,5 +1,4 @@
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
-import { cartRouter } from "./cart";
 import { members } from "~/server/db/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -11,10 +10,82 @@ const ADMIN_ROLES = [
 ] as const;
 
 // Fields that Members are allowed to edit (everyone else can edit all fields)
-const MEMBER_EDITABLE_FIELDS = ["email", "ucf_id"] as const;
+const MEMBER_EDITABLE_FIELDS = ["first_name", "last_name"] as const;
 
 /// Represents the currently signed-in user.
 export const userRouter = createTRPCRouter({
+
+  updateUserRole: protectedProcedure
+  .input(
+    z.object({
+      ucf_id: z.string().min(7, "UCF ID is required"),
+      new_role: z.enum([
+        "President",
+        "Internal Vice President",
+        "Corporate Vice President",
+        "Secretary",
+        "Marketing Vice President",
+        "Treasurer",
+        "Technology Chair",
+        "Professional Development Chair",
+        "Projects Chair",
+        "Mentorship Chair",
+        "Outreach Chair",
+        "Shpetinas Chair",
+        "Social Chair",
+        "Director",
+        "DevTeam",
+        "Committee",
+        "Member"
+      ]),
+    })
+  )
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.user.id;
+
+      // Check if caller is admin
+      const caller = await ctx.db
+        .select({ position: members.position })
+        .from(members)
+        .where(eq(members.uuid, userId));
+      const callerPosition = caller[0]?.position ?? "Member";
+      if (!ADMIN_ROLES.includes(callerPosition as typeof ADMIN_ROLES[0])) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only admins can update member roles",
+        });
+      }
+
+      // Update the role for the specified UCF ID
+      await ctx.db
+        .update(members)
+        .set({ position: input.new_role })
+        .where(eq(members.ucf_id, Number(input.ucf_id)));
+  }),
+
+  deleteUser: protectedProcedure
+  .input(
+    z.object({
+      ucf_id: z.string().min(7, "UCF ID is required"),
+    })
+  )
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.user.id;
+      // Check if caller is admin
+      const caller = await ctx.db
+        .select({ position: members.position })
+        .from(members)
+        .where(eq(members.uuid, userId));
+      const callerPosition = caller[0]?.position ?? "Member";
+      if (!ADMIN_ROLES.includes(callerPosition as typeof ADMIN_ROLES[0])) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only admins can delete members",
+        });
+      }
+      // Delete the member with the specified UCF ID
+      await ctx.db.delete(members).where(eq(members.ucf_id, Number(input.ucf_id)));
+  }),
 
   getCurrentMember: publicProcedure.query(async ({ ctx }) => {
     if (!ctx.supabase) return null;
@@ -37,6 +108,13 @@ export const userRouter = createTRPCRouter({
     return { ...m, isAdmin };
   }),
 
+  getAllMembers: publicProcedure.query(async ({ ctx }) => {
+    if (!ctx.supabase) return [];
+
+    return ctx.db.select({ name: members.first_name, point: members.points }).from(members);
+
+  }),
+
   // Mutation to update member's profile information
   updateCurrentMember: protectedProcedure
   .input(
@@ -56,7 +134,7 @@ export const userRouter = createTRPCRouter({
 
       const callerPosition = caller[0]?.position ?? "Member";
 
-      // Members can only edit email and ucf_id
+      // Members can only edit first_name and last_name
       if (
         callerPosition === "Member" &&
         !(MEMBER_EDITABLE_FIELDS as readonly string[]).includes(input.field)

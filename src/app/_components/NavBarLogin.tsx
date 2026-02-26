@@ -14,6 +14,7 @@ const navItems = [
   { href: "/sponsors", label: "Partners" },
   { href: "/calendar", label: "Calendar" },
   { href: "/history", label: "History" },
+  { href: "/point-rankings", label: "Point Rankings" },
 ];
 const adminNavItems = [
   { href: "/admin", label: "Admin" },
@@ -22,6 +23,7 @@ const adminNavItems = [
   { href: "/sponsors", label: "Partners" },
   { href: "/calendar", label: "Calendar" },
   { href: "/history", label: "History" },
+  { href: "/point-rankings", label: "Point Rankings" },
 ]
 
 function NavLink({ href, label }: { href: string; label: string }) {
@@ -66,7 +68,7 @@ export default function NavbarLogin() {
   return (
     <div className="sticky top-4 z-50 px-2 sm:px-6 lg:px-8 pb-4">
       <motion.nav
-        className="mx-auto max-w-7xl rounded-2xl bg-white/80 backdrop-blur-xl shadow-sm"
+        className="mx-auto max-w-7xl rounded-2xl bg-white/50 backdrop-blur-xl hover:bg-gradient-to-b hover:from-[#FD652F]/10 hover:to-transparent"
         initial={{ y: 0 }}
         whileHover={{ 
           y: -2,

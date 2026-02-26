@@ -56,6 +56,8 @@ export const members = pgTable(
     resume: varchar({ length: 2048 }), //url
     is_member: boolean().default(false),
     position: positionEnum("position").default("Member"),
+    points: d.integer().default(0).notNull(),
+    event_counter: d.integer().default(0).notNull(),
   })
 );
 
@@ -71,7 +73,10 @@ export const events = pgTable(
     start_time: d.timestamp({ withTimezone: true }),
     end_time: d.timestamp({ withTimezone: true }),
     image: d.varchar({ length: 2048 }),
-    points: d.integer().default(0),
+    points: d.integer().notNull().default(0),
+    latitude: d.doublePrecision().notNull().default(0),
+    longitude: d.doublePrecision().notNull().default(0),
+    radius_meters: d.integer().default(20).notNull(),
   })
 );
 
@@ -133,6 +138,18 @@ export const cart = createTable(
     unique().on(table.member_uuid, table.product_id),
     unique("cart_member_product_unique").on(table.member_uuid, table.created_at),
   ]
+);
+
+export const history = pgTable(
+  "history",
+  (d) => ({
+    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+    event_id: d.bigint({ mode: "number" }).notNull().references(() => events.id),
+    member_id: d.integer().notNull().references(() => members.ucf_id),
+    points_earned: d.integer().notNull().default(0),
+    attended_at: d.timestamp({ withTimezone: true }).defaultNow(),
+    event_title: d.varchar({ length: 255}).notNull().references(() => events.title),
+  })
 );
 
 /*

@@ -40,7 +40,7 @@ export default function HomePage() {
           <NavbarLogin />
           <HeroMask2 />
           <HeroSection />
-          <WeeklyEvents /> 
+          {/*<WeeklyEvents /> */}
           <AboutSection />
         </div>
       </>
@@ -54,7 +54,7 @@ export default function HomePage() {
         <NavbarLogin />
         <HeroMask />
         <HeroSection /> 
-        <WeeklyEvents />
+        {/*<WeeklyEvents /> */}
         <AboutSection />
       </div>
     </>
