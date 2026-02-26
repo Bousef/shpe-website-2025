@@ -1,6 +1,5 @@
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 import { events } from "~/server/db/schema";
-import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import AddressConvert from "~/lib/AddressToCoord";

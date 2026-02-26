@@ -12,6 +12,7 @@ export default function ClientProfile() {
     const { data: member, isLoading } = api.user.getCurrentMember.useQuery();
     const [minLoading, setMinLoading] = useState(true);
     const router = useRouter();
+    const [hovered, setHovered] = useState(false);
 
     // Connect to the backend mutation you already created
     const updateMember = api.user.updateCurrentMember.useMutation({
@@ -123,6 +124,7 @@ export default function ClientProfile() {
         ),
     };
 
+
     // Members: email + UCF ID only. Everyone else: all fields.
     const infoFields = isMember
         ? [emailField, ucfIdField]
@@ -177,6 +179,40 @@ export default function ClientProfile() {
                                 Admin
                             </span>
                         )}
+                        <motion.span 
+                            className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-sm font-medium text-[#001f5b]/60 backdrop-blur-sm ring-1 ring-white/20 hover:bg-white/40 hover:shadow-lg"
+                            onHoverStart={() => setHovered(true)}
+                            onHoverEnd={() => setHovered(false)}
+                            initial={{ opacity: 1, width: 'auto' }}
+                            animate={{ width: hovered ? '95px' : '40px' }}
+                            transition={{ width: { duration: 1, ease: "easeInOut" } }}>
+
+                            {hovered ? (
+                                <motion.a
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 1, ease: "easeInOut" }}
+                                    href="/attendance">
+                                    Attendance
+                                </motion.a>
+                            ) : (
+                                <motion.svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth="1.5"
+                                    stroke="currentColor"
+                                    className="size-4"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.5, ease: "easeInOut" }}>
+                                    
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0M3.124 7.5A8.969 8.969 0 0 1 5.292 3m13.416 0a8.969 8.969 0 0 1 2.168 4.5" />
+                                </motion.svg>
+                            )}
+                        </motion.span>
                     </motion.div>
                 </div>
             </div>
