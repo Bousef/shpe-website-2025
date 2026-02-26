@@ -76,7 +76,7 @@ export const events = pgTable(
     points: d.integer().notNull().default(0),
     latitude: d.doublePrecision().notNull().default(0),
     longitude: d.doublePrecision().notNull().default(0),
-    radius_meters: d.integer().default(50).notNull(),
+    radius_meters: d.integer().default(20).notNull(),
   })
 );
 
