@@ -7,6 +7,19 @@ import { TRPCError } from "@trpc/server";
 // Only DevTeam gets admin-tab access
 const ADMIN_ROLES = [
   "DevTeam",
+  "President",
+  "Internal Vice President",
+  "Corporate Vice President",
+  "Secretary",
+  "Marketing Vice President",
+  "Treasurer",
+  "Technology Chair",
+  "Professional Development Chair",
+  "Projects Chair",
+  "Mentorship Chair",
+  "Social Chair",
+  "Director",
+  "Committee",
 ] as const;
 
 // Fields that Members are allowed to edit (everyone else can edit all fields)

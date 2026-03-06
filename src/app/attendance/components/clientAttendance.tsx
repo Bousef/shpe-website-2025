@@ -5,12 +5,14 @@ import { useState, useEffect, useRef } from "react";
 import { api } from "~/trpc/react";
 import NavBarLogin from "../../_components/NavBarLogin";
 import { MapPin, CheckCircle, XCircle, Loader2, ChevronDown, Zap } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-type CheckinStatus = "idle" | "locating" | "checking" | "success" | "error" | "out_of_range";
+type CheckinStatus = "idle" | "locating" | "checking" | "success" | "error" | "out_of_range" | "you_are_already_checked_in";
 
 export default function AttendanceUI() {
   const { data: allEvents, isLoading } = api.events.getEvents.useQuery();
   const { data: currentMember } = api.user.getCurrentMember.useQuery();
+  const router = useRouter();
 
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
   const [selectedTitle, setSelectedTitle] = useState<string>("");
@@ -18,26 +20,27 @@ export default function AttendanceUI() {
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [pointsEarned, setPointsEarned] = useState<number | null>(null);
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [attendance, setAttendance] = useState<null | number>(null);
   const watchRef = useRef<number | null>(null);
 
   const checkinMutation = api.checkin.checkin.useMutation({
     onSuccess: (data) => {
       setPointsEarned(data.pointsEarned);
       setStatus("success");
+      setAttendance(data.attended);
       stopWatching();
     },
     onError: (err) => {
       if (err.message.includes("not within range")) {
         setStatus("out_of_range");
       } else if (err.message.includes("already checked in")) {
-        setStatus("success"); // treat as success so box turns green
+        setStatus("you_are_already_checked_in"); // treat as success so box turns green
       } else {
         setErrorMsg(err.message);
         setStatus("error");
       }
     },
   });
-
   const stopWatching = () => {
     if (watchRef.current !== null) {
       navigator.geolocation.clearWatch(watchRef.current);
@@ -140,6 +143,15 @@ export default function AttendanceUI() {
       icon: <CheckCircle className="w-10 h-10 text-emerald-400" />,
       label: "Attendance confirmed!",
       sub: pointsEarned ? `+${pointsEarned} points earned` : "You're checked in",
+      pulse: false,
+    },
+    you_are_already_checked_in: {
+      bg: "bg-[#BA8E23]/80 backdrop-blur-xl",
+      border: "border-#E9D502",
+      glow: "shadow-[0_0_60px_rgba(52,211,153,0.25)]",
+      icon: <CheckCircle className="w-10 h-10 text-yellow-400" />,
+      label: "Attendance checked!",
+      sub: pointsEarned ? `+${pointsEarned} points earned` : "Already checked In!",
       pulse: false,
     },
   };
@@ -273,6 +285,9 @@ export default function AttendanceUI() {
                     <Zap className="w-3.5 h-3.5 text-emerald-400" />
                     <span className="text-emerald-300 text-sm font-bold font-mono">
                       +{pointsEarned} pts
+                    </span>
+                    <span className="text-emerald-300 text-sm font-bold font-mono">
+                      Attendance: {(attendance ?? 0) + 1} people
                     </span>
                   </motion.div>
                 )}

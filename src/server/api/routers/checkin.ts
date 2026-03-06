@@ -73,7 +73,7 @@ export const checkinRouter = createTRPCRouter({
             throw new TRPCError ({ code: 'FORBIDDEN', message: 'You are not at the event yet, get there to take attendance!'});
         }
 
-        // STEP 5 — Transaction: insert history + update member
+        // STEP 5 — Transaction: insert history + update member + augment the event attendance
         await ctx.db.transaction(async (tx) => {
             await tx
                 .insert(history)
@@ -88,10 +88,12 @@ export const checkinRouter = createTRPCRouter({
             await tx
                 .update(members)
                 .set({
-                    points:        sql`${members.points} + ${event[0]!.points ?? 0}`,
-                    event_counter: sql`${members.event_counter} + 1`,
-            })
-                .where(eq(members.ucf_id, input.ucf_id));
+                    attendance_key: sql`${members.attendance_key}`,
+            }).where(eq(members.ucf_id, input.ucf_id));
+            
+            await tx.update(events).set({
+                attendance_count: sql`${events.attendance_count} + 1`
+            }).where(eq(events.title, input.title))
         });
 
         // STEP 6 — Return success
@@ -99,6 +101,7 @@ export const checkinRouter = createTRPCRouter({
             success:      true,
             pointsEarned: event[0]!.points,
             message:      'You have successfully checked in!',
+            attended: event[0]!.attendance_count,
         };
     }),
 });
