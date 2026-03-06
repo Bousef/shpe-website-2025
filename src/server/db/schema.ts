@@ -58,6 +58,7 @@ export const members = pgTable(
     position: positionEnum("position").default("Member"),
     points: d.integer().default(0).notNull(),
     event_counter: d.integer().default(0).notNull(),
+    attendance_key: d.text("attendance_key").array().notNull().default([]),
   })
 );
 
@@ -76,7 +77,9 @@ export const events = pgTable(
     points: d.integer().notNull().default(0),
     latitude: d.doublePrecision().notNull().default(0),
     longitude: d.doublePrecision().notNull().default(0),
-    radius_meters: d.integer().default(20).notNull(),
+    radius_meters: d.integer().default(50).notNull(),
+    attendance_count: d.integer().default(0).notNull(),
+    attendance_key: d.text().default("NO_STRING"),
   })
 );
 
@@ -151,6 +154,7 @@ export const history = pgTable(
     event_title: d.varchar({ length: 255}).notNull().references(() => events.title),
   })
 );
+
 
 /*
 export type IdentityType =

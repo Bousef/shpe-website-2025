@@ -9,7 +9,7 @@ import HeroMask2      from "./_components/HeroMask2";
 import HistorySection from "./_components/HistorySection";
 import { useEffect, useState } from "react";
 import NavbarLogin from "./_components/NavBarLogin";
-
+import ElectionComponents from "./_components/ElectionComponents";
 {/*export const metadata = {
   title: "SHPE UCF",
   description: "Society of Hispanic Professional Engineers - UCF Chapter",
@@ -56,6 +56,7 @@ export default function HomePage() {
         <HeroSection /> 
         {/*<WeeklyEvents /> */}
         <AboutSection />
+
       </div>
     </>
   );
