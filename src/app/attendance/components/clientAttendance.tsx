@@ -18,16 +18,12 @@ export default function AttendanceUI() {
   const [selectedTitle, setSelectedTitle] = useState<string>("");
   const [status, setStatus] = useState<CheckinStatus>("idle");
   const [errorMsg, setErrorMsg] = useState<string>("");
-  const [pointsEarned, setPointsEarned] = useState<number | null>(null);
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
-  const [attendance, setAttendance] = useState<null | number>(null);
   const watchRef = useRef<number | null>(null);
 
   const checkinMutation = api.checkin.checkin.useMutation({
     onSuccess: (data) => {
-      setPointsEarned(data.pointsEarned);
       setStatus("success");
-      setAttendance(data.attended);
       stopWatching();
     },
     onError: (err) => {
@@ -87,7 +83,6 @@ export default function AttendanceUI() {
     setSelectedTitle(title);
     setStatus("idle");
     setErrorMsg("");
-    setPointsEarned(null);
   };
 
   const statusConfig = {
@@ -141,8 +136,8 @@ export default function AttendanceUI() {
       border: "border-emerald-400/60",
       glow: "shadow-[0_0_60px_rgba(52,211,153,0.25)]",
       icon: <CheckCircle className="w-10 h-10 text-emerald-400" />,
-      label: "Attendance confirmed!",
-      sub: pointsEarned ? `+${pointsEarned} points earned` : "You're checked in",
+      label: "You're checked in!",
+      sub: "Attendance will be granted when the host pushes it.",
       pulse: false,
     },
     you_are_already_checked_in: {
@@ -150,8 +145,8 @@ export default function AttendanceUI() {
       border: "border-#E9D502",
       glow: "shadow-[0_0_60px_rgba(52,211,153,0.25)]",
       icon: <CheckCircle className="w-10 h-10 text-yellow-400" />,
-      label: "Attendance checked!",
-      sub: pointsEarned ? `+${pointsEarned} points earned` : "Already checked In!",
+      label: "Already checked in!",
+      sub: "You already have this event's key. Wait for the host to push attendance.",
       pulse: false,
     },
   };
@@ -273,24 +268,6 @@ export default function AttendanceUI() {
                   <p className="font-bold text-lg tracking-tight">{current.label}</p>
                   <p className="text-sm text-zinc-300 mt-1">{current.sub}</p>
                 </div>
-
-                {/* Points badge */}
-                {status === "success" && pointsEarned && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.3 }}
-                    className="flex items-center gap-1.5 bg-emerald-500/20 border border-emerald-500/30 rounded-full px-4 py-1.5 mt-1"
-                  >
-                    <Zap className="w-3.5 h-3.5 text-emerald-400" />
-                    <span className="text-emerald-300 text-sm font-bold font-mono">
-                      +{pointsEarned} pts
-                    </span>
-                    <span className="text-emerald-300 text-sm font-bold font-mono">
-                      Attendance: {(attendance ?? 0) + 1} people
-                    </span>
-                  </motion.div>
-                )}
 
                 {/* Coords debug (optional, remove in prod) */}
                 {coords && status !== "success" && (

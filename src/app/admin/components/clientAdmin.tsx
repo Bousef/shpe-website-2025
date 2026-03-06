@@ -7,6 +7,7 @@ import NavbarLogin from "~/app/_components/NavBarLogin";
 import { api } from "~/trpc/react";
 import CreateAnEvent from "~/app/_components/CreateAnEvent";
 import ManageUsers from "~/app/_components/ManageUsers";
+import PushAttendance from "~/app/_components/PushAttendance";
 
 export default function AdminUI() {
     const router = useRouter();
@@ -82,6 +83,16 @@ export default function AdminUI() {
             ),
             component: "CreateAnEvent"
         },
+        {
+            name: "Push Attendance",
+            description: "Grant attendance to members who were within event range",
+            icon: (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            ),
+            component: "PushAttendance"
+        },
     ];
 
     // If a component is active, render it instead of the admin panel
@@ -100,6 +111,25 @@ export default function AdminUI() {
                         Back to Admin Panel
                     </button>
                     <CreateAnEvent />
+                </div>
+            </main>
+        );
+    }
+    else if (activeComponent === "PushAttendance") {
+        return (
+            <main className="min-h-screen w-full">
+                <NavbarLogin />
+                <div className="max-w-4xl mx-auto px-6 py-8">
+                    <button
+                        onClick={() => setActiveComponent(null)}
+                        className="mb-6 inline-flex items-center gap-2 text-sm text-slate-500 hover:text-[#001f5b] transition-colors"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                        Back to Admin Panel
+                    </button>
+                    <PushAttendance />
                 </div>
             </main>
         );
