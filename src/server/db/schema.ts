@@ -39,7 +39,18 @@ export type Alumni = InferSelectModel<typeof alumni>;
 export type Member = InferSelectModel<typeof members>;
 
 //--------------------  Tables --------------------
-
+// photos table
+export const photos = pgTable(
+  "photos",
+  (d) => ({
+    id: d.uuid().defaultRandom().primaryKey(),
+    eventId: d.integer("event_id").notNull().references(() => events.id, { onDelete: "cascade"}),
+    userId: d.integer("user_id").notNull().references(() => members.ucf_id),
+    storagePath: d.text("storage_path").notNull(),
+    createdAt: d.timestamp({ withTimezone: true }).defaultNow(),
+    expiresAt: d.timestamp({ withTimezone: true }), 
+  })
+)
 //members table
 export const members = pgTable(
   "members",
