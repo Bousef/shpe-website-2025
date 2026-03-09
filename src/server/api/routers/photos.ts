@@ -7,7 +7,7 @@ import { photos, members, history } from "src/server/db/schema";
 import { z } from "zod";
 import { eq, and } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
-import { supabase } from "~/supabase-client";
+import { supabaseAdmin } from "~/supabase-admin";
 
 // --- ROUTER ---
 
@@ -107,11 +107,10 @@ export const photosRouter = createTRPCRouter({
         
         const photos_with_urls = await Promise.all(
             photo_list.map(async (photo) => {
-                const { data } = await supabase.storage
+                const { data, error } = await supabaseAdmin.storage
                     .from("events_images")
-                    .createSignedUrl(photo.storagePath, 3600,{
-                        download: true
-                    });
+                    .createSignedUrl(photo.storagePath, 3600,);
+
                 return { ...photo, signedUrl: data?.signedUrl }
             })
         )
