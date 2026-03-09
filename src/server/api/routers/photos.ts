@@ -38,7 +38,7 @@ export const photosRouter = createTRPCRouter({
             .where(eq(members.uuid, ctx.user.id))
             .limit(1)
         
-        if(!member[0]) throw new TRPCError({code: "UNAUTHORIZED"})
+        if(!member[0]) throw new TRPCError({code: "UNAUTHORIZED", message: "You are not logged in!"})
 
         const is_attended = await ctx.db
             .select()

@@ -47,7 +47,7 @@ export const photos = pgTable(
     eventId: d.integer("event_id").notNull().references(() => events.id, { onDelete: "cascade"}),
     userId: d.integer("user_id").notNull().references(() => members.ucf_id),
     storagePath: d.text("storage_path").notNull(),
-    createdAt: d.timestamp({ withTimezone: true }).defaultNow(),
+    createdAt: d.timestamp("created_at").defaultNow(),
   })
 )
 //members table
