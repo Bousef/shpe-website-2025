@@ -23,7 +23,7 @@ export const photosRouter = createTRPCRouter({
   // Step 3: Insert into photos table with eventId, userId, storagePath
   // Step 4: Return the new record
 
-// ---------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------
   
     uploadPhoto: protectedProcedure.input(
         z.object({
@@ -48,7 +48,7 @@ export const photosRouter = createTRPCRouter({
                 eq(history.event_id, input.eventId)
             ))
         
-        if(!is_attended[0]) throw new TRPCError({code: "NOT_FOUND"})
+        if(!is_attended[0]) throw new TRPCError({code: "NOT_FOUND", message: "Not attended yet"})
         
         const insert_new_photo = await ctx.db
             .insert(photos)
@@ -74,7 +74,7 @@ export const photosRouter = createTRPCRouter({
         // Supabase hint: supabase.storage.from("event-photos").createSignedUrl(storagePath, expiresInSeconds)
     // Step 4: Return photos with their signed URLs attache
 
-// ----------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------
 
     getEventPhotos: protectedProcedure.input(
         z.object({
@@ -109,7 +109,9 @@ export const photosRouter = createTRPCRouter({
             photo_list.map(async (photo) => {
                 const { data } = await supabase.storage
                     .from("events_images")
-                    .createSignedUrl(photo.storagePath, 3600);
+                    .createSignedUrl(photo.storagePath, 3600,{
+                        download: true
+                    });
                 return { ...photo, signedUrl: data?.signedUrl }
             })
         )

@@ -15,6 +15,7 @@ const navItems = [
   { href: "/calendar", label: "Calendar" },
   { href: "/history", label: "History" },
   { href: "/point-rankings", label: "Point Rankings" },
+  { href: "/testroute", label: "Test"}
 ];
 const adminNavItems = [
   { href: "/admin", label: "Admin" },
@@ -24,6 +25,7 @@ const adminNavItems = [
   { href: "/calendar", label: "Calendar" },
   { href: "/history", label: "History" },
   { href: "/point-rankings", label: "Point Rankings" },
+  { href: "/testroute", label: "Test"}
 ]
 
 function NavLink({ href, label }: { href: string; label: string }) {

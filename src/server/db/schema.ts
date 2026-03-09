@@ -48,7 +48,6 @@ export const photos = pgTable(
     userId: d.integer("user_id").notNull().references(() => members.ucf_id),
     storagePath: d.text("storage_path").notNull(),
     createdAt: d.timestamp({ withTimezone: true }).defaultNow(),
-    expiresAt: d.timestamp({ withTimezone: true }), 
   })
 )
 //members table
