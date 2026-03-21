@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { api } from "~/trpc/react";
+import LocationAutocomplete from "./LocationAutocomplete";
 
 export default function CreateAnEvent() {
     const [eventName, setEventName] = useState("");
@@ -53,6 +54,8 @@ export default function CreateAnEvent() {
             points: eventPoints,
         });
     };
+
+    
 
     return (
         <motion.div
@@ -168,12 +171,10 @@ export default function CreateAnEvent() {
                             <label className="text-xs font-medium uppercase tracking-wider text-slate-400">
                                 Location
                             </label>
-                            <input
-                                type="text"
+                            <LocationAutocomplete
                                 value={location}
-                                onChange={(e) => setLocation(e.target.value)}
-                                placeholder={isVirtual ? "e.g. https://zoom.us/j/123456" : "e.g. Engineering Building I, Room 120"}
-                                className="mt-0.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-base font-medium text-slate-800 outline-none transition-colors focus:border-[#001f5b] focus:ring-1 focus:ring-[#001f5b]"
+                                onChange={setLocation}
+                                isVirtual={isVirtual}
                             />
                             {/* Virtual toggle */}
                             <label className="mt-2 inline-flex cursor-pointer items-center gap-2">

@@ -1,7 +1,7 @@
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 import { events, history, members } from "~/server/db/schema";
 import { z } from "zod";
-import { eq, ne, sql, and } from "drizzle-orm";
+import { eq, ne, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import AddressConvert from "~/lib/AddressToCoord";
 import RandomString from "~/lib/randomString";
@@ -55,6 +55,40 @@ export const eventsRouter = createTRPCRouter({
     getEvents: publicProcedure.query(async ({ ctx }) => {
         const allEvents = await ctx.db.select().from(events);
         return allEvents;
+    }),
+
+    // Add this query to your eventsRouter, alongside createEvent etc.
+    // It proxies Nominatim through your server so the browser never touches it directly.
+
+    searchLocations: publicProcedure
+        .input(z.object({ query: z.string().min(1) }))
+        .query(async ({ input }) => {
+            const encoded = encodeURIComponent(input.query);
+            const res = await fetch(
+                `https://nominatim.openstreetmap.org/search?q=${encoded}&format=json&limit=5`,
+                {
+                    headers: {
+                        // Same User-Agent as AddressConvert — keeps your Nominatim identity consistent
+                        "User-Agent": "shpe-website-2025/1.0",
+                    },
+                }
+            );
+
+            if (!res.ok) {
+                throw new TRPCError({
+                    code: "INTERNAL_SERVER_ERROR",
+                    message: "Failed to reach geocoding service",
+                });
+            }
+
+            const data = await res.json() as Array<{
+                place_id: number;
+                display_name: string;
+                lat: string;
+                lon: string;
+            }>;
+
+            return data;
     }),
 
     // updateEvent: protectedProcedure (Prototype)

@@ -15,6 +15,7 @@ const navItems = [
   { href: "/calendar", label: "Calendar" },
   { href: "/history", label: "History" },
   { href: "/point-rankings", label: "Point Rankings" },
+  { href: "/testroute", label: "Test"}
 ];
 const adminNavItems = [
   { href: "/admin", label: "Admin" },
@@ -24,6 +25,7 @@ const adminNavItems = [
   { href: "/calendar", label: "Calendar" },
   { href: "/history", label: "History" },
   { href: "/point-rankings", label: "Point Rankings" },
+  { href: "/testroute", label: "Test"}
 ]
 
 function NavLink({ href, label }: { href: string; label: string }) {
@@ -101,9 +103,16 @@ export default function NavbarLogin() {
                 <Link
                   href="/profile"
                   title="Your Profile"
-                  className="flex h-9 w-9 items-center justify-center rounded-full text-[#001F5B] transition-colors hover:bg-slate-100 hover:text-[#FD652F]"
+                  className="flex flex-col h-12 w-12 items-center justify-center rounded-lg text-[#001F5B] transition-colors hover:bg-slate-100 hover:text-[#FD652F]"
                 >
                   <VscAccount className="text-xl" />
+                  <motion.p 
+                    className="text-xs font-bold text-[#001F5B]"
+                    initial={{ opacity: 0}}
+                    animate={{ opacity: 1}}
+                    transition={{ duration: 1 }}>
+                      Profile
+                  </motion.p>
                 </Link>
                 <button
                   onClick={() => logout.mutate()}

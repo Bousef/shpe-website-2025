@@ -1,9 +1,10 @@
 "use client";
-import HistorySection from "../_components/HistorySection";
+
+import MemoryBucketTest from "../_components/MemoryBucketTest"
 
 export default function TestRoutePage() {
     return (
-        <HistorySection />
+        <MemoryBucketTest />
     );
 }
 
