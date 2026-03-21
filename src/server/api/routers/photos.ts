@@ -5,7 +5,7 @@ import { publicProcedure, protectedProcedure, createTRPCRouter } from "src/serve
 import { db } from "src/server/db";
 import { photos, members, history } from "src/server/db/schema";
 import { z } from "zod";
-import { eq, and } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { supabaseAdmin } from "~/supabase-admin";
 
@@ -27,6 +27,7 @@ export const photosRouter = createTRPCRouter({
   
     uploadPhoto: protectedProcedure.input(
         z.object({
+            eventTitle: z.string(),
             eventId: z.number(),
             storagePath: z.string()
         })
@@ -54,7 +55,9 @@ export const photosRouter = createTRPCRouter({
             .insert(photos)
             .values({
                 eventId: input.eventId,
+                event_name: input.eventTitle,
                 userId: member[0].ucf_id,
+                user_name: member[0].first_name,
                 storagePath: input.storagePath
             }).returning();
                 
@@ -78,7 +81,9 @@ export const photosRouter = createTRPCRouter({
 
     getEventPhotos: protectedProcedure.input(
         z.object({
-            eventId: z.number()
+            eventId: z.number(),
+            cursor: z.number().optional(), // offset into the result set
+            limit: z.number().min(1).max(20).default(4),
         })
     ).query(async ({ctx, input}) => {
 
@@ -100,22 +105,29 @@ export const photosRouter = createTRPCRouter({
         
         if(!is_attended[0]) throw new TRPCError({code: "NOT_FOUND"})
 
+        const offset = input.cursor ?? 0;
+
         const photo_list = await ctx.db
             .select()
             .from(photos)
             .where(eq(photos.eventId, input.eventId))
+            .orderBy(desc(photos.createdAt))
+            .limit(input.limit)
+            .offset(offset)
         
         const photos_with_urls = await Promise.all(
             photo_list.map(async (photo) => {
-                const { data, error } = await supabaseAdmin.storage
+                const { data } = await supabaseAdmin.storage
                     .from("events_images")
-                    .createSignedUrl(photo.storagePath, 3600,);
-
-                return { ...photo, signedUrl: data?.signedUrl }
+                    .createSignedUrl(photo.storagePath, 3600);
+                return { ...photo, signedUrl: data?.signedUrl ?? null }
             })
         )
 
-        return photos_with_urls;
+        return {
+            items: photos_with_urls,
+            nextCursor: photo_list.length === input.limit ? offset + input.limit : undefined,
+        };
         
     }),
 
