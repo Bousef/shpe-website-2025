@@ -13,37 +13,90 @@ export const eventsRouter = createTRPCRouter({
             title: z.string().min(1, "Event name cannot be empty"),
             description: z.string().min(1, "Description cannot be empty"),
             location: z.string().min(1, "Location cannot be empty"),
-            start_time: z.date().optional(),
-            end_time: z.date().optional(),
+            startTime: z.date().optional(),
+            endTime: z.date().optional(),
             image: z.string().url("Image must be a valid URL").optional(),
             points: z.number().int().default(0),
+            latitude: z.number().optional(),   // new
+            longitude: z.number().optional(),  // new
+            hostName: z.string() // new 
         })
     ).mutation(async ({ ctx, input }) => {
     try {
-        const { latitude, longitude } = await AddressConvert(input.location);
+
+        // Confirm the provided host exists AND is an admin.
+        // first_name is not unique.... if multiple admins share a first name,
+        // we reject so the UI can be updated to use a unique identifier.
+        const hostCandidates = await ctx.db
+            .select({
+                uuid: members.uuid,
+                ucf_id: members.ucf_id,
+                first_name: members.first_name,
+                last_name: members.last_name,
+                position: members.position,
+            })
+            .from(members)
+            .where(eq(members.first_name, input.hostName));
+
+        const adminHosts = hostCandidates.filter((h) => h.position !== "Member");
+
+        if (adminHosts.length === 0) {
+            throw new TRPCError({
+                code: "BAD_REQUEST",
+                message: "Selected host must be an admin user",
+            });
+        }
+
+        if (adminHosts.length > 1) {
+            throw new TRPCError({
+                code: "CONFLICT",
+                message:
+                    "Multiple admin users share that first name. Please select a unique host (e.g., by UCF ID or UUID).",
+            });
+        }
+
+        const host = adminHosts[0]!;
+
+        // Use explicit coords if provided (dragged pin), otherwise geocode the string
+        const { latitude, longitude } =
+            input.latitude !== undefined && input.longitude !== undefined
+            ? { latitude: input.latitude, longitude: input.longitude }
+            : await AddressConvert(input.location);
         const { new_attendance_key } = await RandomString(input.title, input.points);
-        const eventId = await ctx.db.insert(events)
-        .values({
-            title: input.title,
-            description: input.description,
-            location: input.location,
-            start_time: input.start_time,
-            end_time: input.end_time,
-            image: input.image,
-            points: input.points,
-            latitude,
-            longitude,
-            attendance_key: new_attendance_key,
+
+        const result = await ctx.db.transaction(async (tx) => {
+            const inserted = await tx
+                .insert(events)
+                .values({
+                    title: input.title,
+                    description: input.description,
+                    location: input.location,
+                    start_time: input.startTime,
+                    end_time: input.endTime,
+                    image: input.image,
+                    points: input.points,
+                    latitude,
+                    longitude,
+                    attendance_key: new_attendance_key,
+                    host_ucf_id: host.ucf_id,
+                    host_name: `${host.first_name}`,
+                })
+                .returning({ id: events.id });
+
+            // Give the attendance_key to only the host.
+            await tx
+                .update(members)
+                .set({
+                    attendance_key: sql`array_append(${members.attendance_key}, ${new_attendance_key})`,
+                })
+                .where(eq(members.uuid, host.uuid));
+
+            return inserted[0] ?? null;
         });
 
-        // Update attendance_key for all non-Member users
-        await ctx.db
-            .update(members)
-            .set({ attendance_key: sql`array_append(${members.attendance_key}, ${new_attendance_key})`})
-            .where(ne(members.position, "Member"));
-
-        return eventId;
+        return result;
     } catch (error) {
+        if (error instanceof TRPCError) throw error;
         console.error("Failed to create event:", error);
         throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
@@ -55,6 +108,19 @@ export const eventsRouter = createTRPCRouter({
     getEvents: publicProcedure.query(async ({ ctx }) => {
         const allEvents = await ctx.db.select().from(events);
         return allEvents;
+    }),
+
+    getEventsWithHost: publicProcedure.query(async ({ ctx }) => {
+        const rows = await ctx.db
+        .select({
+            id: events.id,
+            title: events.title,
+            start_time: events.start_time,
+            host_name: members.first_name,
+            host_ucf_id: members.ucf_id,
+        }).from(events).innerJoin(members, eq(events.host_ucf_id, members.ucf_id))
+
+        return rows
     }),
 
     // Add this query to your eventsRouter, alongside createEvent etc.
@@ -89,6 +155,22 @@ export const eventsRouter = createTRPCRouter({
             }>;
 
             return data;
+    }),
+
+    // Input lat and long, and return display name that way people can drag and drop where they want an event
+
+    reverseGeocode: protectedProcedure
+    .input(z.object({ lat: z.number(), lon: z.number() }))
+    .query(async ({ input }) => {
+        const result = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${input.lat}&lon=${input.lon}&format=json`,
+            { headers: { 'User-Agent': 'shpe-website-2025/1.0' } }
+        );
+        if (!result.ok)
+            throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Reversed geocoding failed'})
+
+        const data = await result.json() as { display_name: string };
+        return { display_name: data.display_name };
     }),
 
     // updateEvent: protectedProcedure (Prototype)

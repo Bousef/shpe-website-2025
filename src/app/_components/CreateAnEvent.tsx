@@ -4,17 +4,20 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { api } from "~/trpc/react";
 import LocationAutocomplete from "./LocationAutocomplete";
+import { LocationMapPicker } from './LocationMapPicker';
 
 export default function CreateAnEvent() {
     const [eventName, setEventName] = useState("");
     const [startTime, setStartTime] = useState("")
     const [endTime, setEndTime] = useState("")
     const [location, setLocation] = useState("");
+    const [host, setHost] = useState("");
     const [isVirtual, setIsVirtual] = useState(false);
     const [description, setDescription] = useState("");
     const [flyerPreview, setFlyerPreview] = useState<string | null>(null);
     const [submitStatus, setSubmitStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
     const [eventPoints, setEventPoints] = useState<number>(0);
+    const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null);
 
     const createEvent = api.events.createEvent.useMutation({
         onSuccess: () => {
@@ -23,6 +26,7 @@ export default function CreateAnEvent() {
             setStartTime("");
             setEndTime("");
             setLocation("");
+            setHost("");
             setIsVirtual(false);
             setDescription("");
             setFlyerPreview(null);
@@ -31,6 +35,9 @@ export default function CreateAnEvent() {
             setSubmitStatus("error");
         },
     });
+
+    const allHost = api.member.getAllMembers.useQuery();
+    const hostOptions = (allHost.data ?? []).filter((m) => m.position !== "Member");
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -48,10 +55,11 @@ export default function CreateAnEvent() {
             title: eventName,
             description,
             location,
-            start_time: startTime ? new Date(startTime) : undefined,
-            end_time: endTime ? new Date(endTime) : undefined,
+            startTime: startTime ? new Date(startTime) : undefined,
+            endTime: endTime ? new Date(endTime) : undefined,
             image: flyerPreview ?? undefined,
             points: eventPoints,
+            hostName: host,
         });
     };
 
@@ -171,11 +179,7 @@ export default function CreateAnEvent() {
                             <label className="text-xs font-medium uppercase tracking-wider text-slate-400">
                                 Location
                             </label>
-                            <LocationAutocomplete
-                                value={location}
-                                onChange={setLocation}
-                                isVirtual={isVirtual}
-                            />
+                            <LocationMapPicker onLocationSelect={(display, lat, lon) => { setLocation(display); setCoords({ lat, lon }); }} />
                             {/* Virtual toggle */}
                             <label className="mt-2 inline-flex cursor-pointer items-center gap-2">
                                 <input
@@ -187,6 +191,46 @@ export default function CreateAnEvent() {
                                 <span className="text-sm text-slate-500">This is a virtual event</span>
                             </label>
                         </div>
+                        
+                    </motion.div>
+                    <motion.div
+                        className="flex items-center gap-4 px-6 py-4"
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: 0.3 }}
+                    >
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#001f5b]/5 text-[#001f5b]">
+                            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                {/* Head */}
+                                <path d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
+                                {/* Body/Shoulders */}
+                                <path d="M4 21v-2a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v2" />
+                            </svg>
+                        </div>
+                        <div className="min-w-0 flex-1">
+                            <label className="text-xs font-medium uppercase tracking-wider text-slate-400">
+                                Host
+                            </label>
+                            <select
+                            value={host}
+                            onChange={(e) => setHost(e.target.value)}
+                            className="mt-0.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-base font-medium text-slate-800 outline-none transition-colors focus:border-[#001f5b] focus:ring-1 focus:ring-[#001f5b]"
+                        >
+                            <option value="" disabled>
+                                {allHost.isLoading
+                                    ? "Loading hosts..."
+                                    : hostOptions.length === 0
+                                        ? "No admin hosts available"
+                                        : "Select a host..."}
+                            </option>
+                            {hostOptions.map((m) => (
+                                <option key={m.uuid} value={m.first_name}>
+                                    {m.first_name} {m.last_name} ({m.position})
+                                </option>
+                            ))}
+                        </select>
+                        </div>
+                        
                     </motion.div>
                     {/* Points */}
                     <motion.div
