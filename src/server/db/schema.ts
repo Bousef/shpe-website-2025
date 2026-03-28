@@ -92,6 +92,8 @@ export const events = pgTable(
     radius_meters: d.integer().default(50).notNull(),
     attendance_count: d.integer().default(0).notNull(),
     attendance_key: d.text().notNull(),
+    host_ucf_id: d.integer().references(() => members.ucf_id),
+    host_name: d.text().notNull(),
   })
 );
 

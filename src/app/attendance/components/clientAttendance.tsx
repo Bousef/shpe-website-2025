@@ -6,6 +6,7 @@ import { api } from "~/trpc/react";
 import NavBarLogin from "../../_components/NavBarLogin";
 import { MapPin, CheckCircle, XCircle, Loader2, ChevronDown, Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
+import dynamic from 'next/dynamic';
 
 type CheckinStatus = "idle" | "locating" | "checking" | "success" | "error" | "out_of_range" | "you_are_already_checked_in";
 
@@ -20,6 +21,13 @@ export default function AttendanceUI() {
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const watchRef = useRef<number | null>(null);
+
+  const CheckInMap = dynamic(
+() => import('../../_components/CheckInMap'),
+  { ssr: false, loading: () => <div className="h-[220px] rounded-2xl bg-[#001F5B]/40 animate-pulse" /> }
+  );
+
+  const selectedEvent = allEvents?.find((e) => e.id === selectedEventId) ?? null;
 
   const checkinMutation = api.checkin.checkin.useMutation({
     onSuccess: (data) => {
@@ -205,6 +213,25 @@ export default function AttendanceUI() {
             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-300 pointer-events-none" />
           </div>
         </motion.div>
+
+        {/* Live Check-in Map */}
+        {selectedEvent && selectedEvent.latitude !== 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.15 }}
+            className="w-full max-w-md mb-6"
+          >
+            <CheckInMap
+              eventLat={selectedEvent.latitude}
+              eventLon={selectedEvent.longitude}
+              userLat={coords?.lat ?? null}
+              userLon={coords?.lng ?? null}
+              radiusMeters={selectedEvent.radius_meters ?? 50}
+              status={status}
+            />
+          </motion.div>
+        )}
 
         {/* Status Box */}
         <motion.div
