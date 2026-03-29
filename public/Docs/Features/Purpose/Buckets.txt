@@ -1,0 +1,8 @@
+Adan
+06/03/2026
+Purpose Documentation for feature: Buckets.
+
+
+Core usage: 
+    - Allows members post their own pictures from events and let's them download from peers too. 
+    - Saves time to our marketing team has to take less pictures. 

@@ -39,7 +39,19 @@ export type Alumni = InferSelectModel<typeof alumni>;
 export type Member = InferSelectModel<typeof members>;
 
 //--------------------  Tables --------------------
-
+// photos table
+export const photos = pgTable(
+  "photos",
+  (d) => ({
+    id: d.uuid().defaultRandom().primaryKey(),
+    eventId: d.integer("event_id").notNull().references(() => events.id, { onDelete: "cascade"}),
+    userId: d.integer("user_id").notNull().references(() => members.ucf_id),
+    storagePath: d.text("storage_path").notNull(),
+    createdAt: d.timestamp("created_at").defaultNow(),
+    user_name: d.varchar("user_name").notNull(),
+    event_name: d.text("event_name").notNull()
+  })
+)
 //members table
 export const members = pgTable(
   "members",
@@ -49,8 +61,8 @@ export const members = pgTable(
     // so we have to assert it in the code that creates the members
     uuid: d.uuid().primaryKey().notNull(),
     ucf_id: d.integer().unique().notNull(),
-    first_name: d.varchar({ length: 100 }),
-    last_name: d.varchar({ length: 100 }),
+    first_name: d.varchar({ length: 100 }).notNull(),
+    last_name: d.varchar({ length: 100 }).notNull(),
     email: d.varchar({ length: 100 }).unique().notNull(),
     image: varchar({ length: 2048 }), //url
     resume: varchar({ length: 2048 }), //url
@@ -58,6 +70,7 @@ export const members = pgTable(
     position: positionEnum("position").default("Member"),
     points: d.integer().default(0).notNull(),
     event_counter: d.integer().default(0).notNull(),
+    attendance_key: d.text().array().notNull().default([]),
   })
 );
 
@@ -76,7 +89,11 @@ export const events = pgTable(
     points: d.integer().notNull().default(0),
     latitude: d.doublePrecision().notNull().default(0),
     longitude: d.doublePrecision().notNull().default(0),
-    radius_meters: d.integer().default(20).notNull(),
+    radius_meters: d.integer().default(50).notNull(),
+    attendance_count: d.integer().default(0).notNull(),
+    attendance_key: d.text().notNull(),
+    host_ucf_id: d.integer().references(() => members.ucf_id),
+    host_name: d.text().notNull(),
   })
 );
 
@@ -151,6 +168,7 @@ export const history = pgTable(
     event_title: d.varchar({ length: 255}).notNull().references(() => events.title),
   })
 );
+
 
 /*
 export type IdentityType =

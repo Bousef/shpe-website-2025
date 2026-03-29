@@ -7,8 +7,10 @@ import HeroSection    from "./_components/HeroSection";
 import HeroMask       from "./_components/HeroMask";
 import HeroMask2      from "./_components/HeroMask2";
 import HistorySection from "./_components/HistorySection";
+import TestRoutePage from "./testroute/page";
 import { useEffect, useState } from "react";
 import NavbarLogin from "./_components/NavBarLogin";
+import ElectionComponents from "./_components/ElectionComponents";
 
 {/*export const metadata = {
   title: "SHPE UCF",
@@ -40,7 +42,7 @@ export default function HomePage() {
           <NavbarLogin />
           <HeroMask2 />
           <HeroSection />
-          {/*<WeeklyEvents /> */}
+          <WeeklyEvents />
           <AboutSection />
         </div>
       </>
@@ -54,7 +56,7 @@ export default function HomePage() {
         <NavbarLogin />
         <HeroMask />
         <HeroSection /> 
-        {/*<WeeklyEvents /> */}
+        <WeeklyEvents /> 
         <AboutSection />
       </div>
     </>

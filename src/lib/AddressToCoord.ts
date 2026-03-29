@@ -15,7 +15,8 @@ export default async function AddressConvert(
     }
 
     const encoded = encodeURIComponent(address);
-    const url = `https://nominatim.openstreetmap.org/search?q=${encoded}&format=json&limit=1`;
+    const url = `https://nominatim.openstreetmap.org/search?q=${encoded}&format=json&limit=5`;
+    
 
     const response = await fetch(url, {
         headers: {

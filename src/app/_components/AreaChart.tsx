@@ -2,7 +2,6 @@
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer} from 'recharts';
 import { api } from "~/trpc/react";
-import { useState } from "react";
 
 export default function CustomBarChart() {
     

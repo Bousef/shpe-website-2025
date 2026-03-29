@@ -17,7 +17,7 @@ export default function ClientPointRankings() {
                     {"Point Rankings"}
             </motion.h1>
             <motion.p 
-                className="text-center text-md font-thin m-4 text-slate-400"
+                className="text-center text-md m-4 text-slate-400"
                 initial={{opacity: 0}}
                 animate={{opacity: 1}}
                 >
